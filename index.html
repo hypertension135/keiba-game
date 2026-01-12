@@ -46,7 +46,7 @@
 </head>
 <body>
 
-<h2>🏇 競馬ゲーム（全部入り）</h2>
+<h2> 競馬ゲーム（全部入り）</h2>
 
 <div class="box" id="players"></div>
 
@@ -63,13 +63,13 @@
 <div class="box" id="oddsTable"></div>
 
 <div class="box">
-  <h3 style="margin:0 0 8px">🎟️ 賭け（3人対戦）</h3>
+  <h3 style="margin:0 0 8px"> 賭け（3人対戦）</h3>
   <div id="betUI"></div>
   <div class="muted">最低100円。0円になったらその人は実質負け（賭けられない）。</div>
 </div>
 
 <div class="box">
-  <h3 style="margin:0 0 8px">🏁 レース</h3>
+  <h3 style="margin:0 0 8px"> レース</h3>
   <div id="race" class="trackRow"></div>
 </div>
 
@@ -134,7 +134,7 @@ load();
    画面描画
 ========================= */
 function drawPlayers(){
-  let html = `<h3 style="margin:0 0 8px">💰 所持金</h3>`;
+  let html = `<h3 style="margin:0 0 8px"> 所持金</h3>`;
   players.forEach(p=>{
     const danger = p.money<=0 ? " <span class='badge'>0円</span>" : "";
     html += `<div>${p.name}：<b>${p.money}</b>円${danger}</div>`;
@@ -203,14 +203,14 @@ function makeRaceCard(){
 
 function renderRaceInfo(){
   document.getElementById("raceInfo").innerHTML =
-    `<h3 style="margin:0 0 8px">📌 レース条件</h3>
+    `<h3 style="margin:0 0 8px"> レース条件</h3>
      距離：<b>${distance}m</b> ／ ペース：<b>${pace}</b>
-     ${chaos ? "<span class='badge'>⚠️ 大荒れ（ごく稀）</span>" : ""}`;
+     ${chaos ? "<span class='badge'> 大荒れ（ごく稀）</span>" : ""}`;
 }
 
 function renderOddsTable(){
   const sorted = [...horses].sort((a,b)=>a.odd-b.odd);
-  let html = `<h3 style="margin:0 0 8px">📊 オッズ表（人気順）</h3>
+  let html = `<h3 style="margin:0 0 8px"> オッズ表（人気順）</h3>
   <table class="table">
     <thead>
       <tr>
@@ -244,7 +244,7 @@ function renderRaceLanes(){
       <div class="track">
         <div class="lane"></div>
         <div class="finishLine"></div>
-        <span id="horse${h.id}" class="horseIcon">🐎</span>
+        <span id="horse${h.id}" class="horseIcon"></span>
       </div>
     </div>`;
   });
@@ -329,7 +329,3 @@ function step(){
     let s = Math.random()*6 + (h.power*0.65);
     // 連勝で少し強くなる
     s *= (1
-}
-</script>
-</body>
-</html>
