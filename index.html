@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>競馬ゲーム</title>
+
+<style>
+body{
+  font-family:sans-serif;
+  background:#f5f5f5;
+  color:#111;
+}
+h2{
+  background:#0b8f3c;
+  color:white;
+  padding:8px;
+}
+.box{
+  background:white;
+  border:1px solid #ccc;
+  border-radius:6px;
+  padding:6px;
+  margin:6px;
+}
+.bar{
+  height:14px;
+  background:linear-gradient(to right,#4caf50,#8bc34a);
+  border-radius:4px;
+}
+.pop{
+  display:flex;
+  gap:6px;
+  padding:4px;
+  border-bottom:1px dotted #ccc;
+  font-size:14px;
+}
+.rank{width:70px}
+.num{
+  width:24px;
+  text-align:center;
+  color:white;
+  border-radius:3px;
+  font-weight:bold;
+}
+.name{width:120px}
+.style{width:40px}
+.jockey{width:80px}
+.odd{margin-left:auto;font-weight:bold}
+
+/* 枠色 */
+.num.w1{background:white;color:black;border:1px solid #000}
+.num.w2{background:black}
+.num.w3{background:red}
+.num.w4{background:blue}
+.num.w5{background:yellow;color:black}
+.num.w6{background:green}
+.num.w7{background:orange}
+.num.w8{background:pink;color:black}
+
+select,input{margin:2px}
+</style>
+</head>
+
+<body>
+<h2>🏇 競馬ゲーム</h2>
+
+<div id="players" class="box"></div>
+
+<div class="box">
+  <h3>🎟️ 賭け</h3>
+  <div id="betUI"></div>
+  <button onclick="startRace()">レース開始</button>
+</div>
+
+<div id="info"></div>
+<div id="race"></div>
+<pre id="result"></pre>
+
+<script>
+// ===== ユーティリティ =====
+const rand=n=>Math.floor(Math.random()*n);
+const styles=["逃げ","先行","差し","追込"];
+const syll=["サン","ライ","ブレ","ファ","ド","ル","カ","グ","ヴ","ナ","ト","キ","ラ","ス"];
+const randName=()=>syll[rand(syll.length)]+syll[rand(syll.length)]+syll[rand(syll.length)];
+
+// ===== ローカル保存 =====
+const save=()=>localStorage.setItem("keiba",JSON.stringify({players,horsePool,history}));
+const load=()=>{
+  let d=JSON.parse(localStorage.getItem("keiba"));
+  if(d){
+    players=d.players;
+    horsePool=d.horsePool;
+    history=d.history;
+  }
+};
+
+// ===== プレイヤー =====
+let players=[
+  {name:"P1",money:1500},
+  {name:"P2",money:1500},
+  {name:"P3",money:1500}
+];
+
+// ===== 騎手 =====
+let jockeys=[];
+for(let i=0;i<60;i++){
+  jockeys.push({
+    name:`J${i+1}騎手`,
+    skill:Math.random()*0.4+0.8,
+    judge:Math.random()*0.4+0.8,
+    finish:Math.random()*0.4+0.8,
+    chaos:Math.random()*0.6+0.7
+  });
+}
+
+// ===== 馬300頭 =====
+let horsePool=[];
+for(let i=0;i<300;i++){
+  horsePool.push({
+    name:randName(),
+    style:styles[rand(4)],
+    power:Math.random()*3+2,
+    wins:0,
+    streak:0
+  });
+}
+
+let history=[];
+load();
+
+// ===== 表示 =====
+function drawPlayers(){
+  let t="";
+  players.forEach(p=>t+=`${p.name} 所持金:${p.money}円<br>`);
+  document.getElementById("players").innerHTML=t;
+}
+drawPlayers();
+
+// ===== かけUI =====
+function buildBetUI(){
+  let ui="";
+  players.forEach((p,i)=>{
+    ui+=`
+    <b>${p.name}</b>
+    券種:
+    <select id="type${i}">
+      <option>単勝</option>
+      <option>三連複</option>
+      <option>三連単</option>
+    </select>
+    馬:
+    <input id="sel${i}" placeholder="例:1 / 1-2-3 / 1→2→3">
+    金額:
+    <input type="number" id="amt${i}" value="100" min="100" step="100"><br><br>`;
+  });
+  document.getElementById("betUI").innerHTML=ui;
+}
+buildBetUI();
+
+// ===== 賭け入力のパース =====
+function parseNums(str){
+  if(!str) return [];
+  return str
+    .trim()
+    .replace(/[→>]/g, "-")
+    .split(/[\s\-_,/]+/)
+    .map(s => Number(s))
+    .filter(n => Number.isInteger(n) && n >= 1 && n <= 10);
+}
+
+// ===== 的中判定と払戻計算（payは100円あたり） =====
+function settleBet(type, selStr, amt, order, pay){
+  // amtは100円単位想定
+  if(!amt || amt < 100) return {ok:false, msg:"金額が不正", payout:0};
+  const scale = amt / 100;
+
+  const a = order[0].id + 1;
+  const b = order[1].id + 1;
+  const c = order[2].id + 1;
+
+  if(type === "単勝"){
+    const nums = parseNums(selStr);
+    if(nums.length !== 1) return {ok:false, msg:"単勝は「1」みたいに1つだけ", payout:0};
+    const hit = (nums[0] === a);
+    return {ok:true, msg: hit ? "的中(単勝)" : "ハズレ(単勝)", payout: hit ? Math.round(pay.win * scale) : 0};
+  }
+
+  if(type === "三連複"){
+    const nums = parseNums(selStr);
+    if(nums.length !== 3) return {ok:false, msg:"三連複は「1-2-3」みたいに3つ", payout:0};
+    const set1 = nums.slice().sort((x,y)=>x-y).join(",");
+    const set2 = [a,b,c].slice().sort((x,y)=>x-y).join(",");
+    const hit = (set1 === set2);
+    return {ok:true, msg: hit ? "的中(三連複)" : "ハズレ(三連複)", payout: hit ? Math.round(pay.trio * scale) : 0};
+  }
+
+  if(type === "三連単"){
+    const nums = parseNums(selStr);
+    if(nums.length !== 3) return {ok:false, msg:"三連単は「1-2-3」または「1→2→3」", payout:0};
+    const hit = (nums[0] === a && nums[1] === b && nums[2] === c);
+    return {ok:true, msg: hit ? "的中(三連単)" : "ハズレ(三連単)", payout: hit ? Math.round(pay.trifecta * scale) : 0};
+  }
+
+  return {ok:false, msg:"券種が不明", payout:0};
+}
+
+// ===== レース =====
+let horses=[],order=[],pace,chaos=false;
+
+function startRace(){
+  document.getElementById("race").innerHTML="";
+  document.getElementById("info").innerHTML="";
+  order=[];
+  chaos=Math.random()<0.03;
+  pace=["スロー","ミドル","ハイ"][rand(3)];
+
+  horses=horsePool.sort(()=>Math.random()-0.5).slice(0,10);
+  horses.forEach((h,i)=>{
+    h.id=i;h.pos=0;h.fin=false;
+    h.jockey=jockeys[rand(jockeys.length)];
+    h.condition=Math.random()*0.6+0.7;
+    h.odd=((15/h.power)*(1+h.streak*0.2)*(2-h.jockey.skill)).toFixed(1);
+
+    let frame=(i%8)+1;
+    let d=document.createElement("div");
+    d.innerHTML=`
+      <span class="num w${frame}">${i+1}</span>
+      ${h.name}（${h.style}）騎手:${h.jockey.name} ${h.odd}倍
+      <div id="h${i}" class="bar"></div>`;
+    document.getElementById("race").appendChild(d);
+  });
+
+  document.getElementById("info").innerHTML=
+    `<div class="box">距離:${rand(1200)+1000}m / ペース:${pace}${chaos?" ⚠️大荒れ":""}</div>`;
+
+  drawPopularity();
+
+  let timer=setInterval(()=>{
+    step();
+    if(order.length>=3){
+      clearInterval(timer);
+      finish();
+    }
+  },100);
+}
+
+function step(){
+  horses.forEach(h=>{
+    if(h.fin)return;
+    let s=Math.random()*6+(h.power*0.6);
+    s*=h.condition*h.jockey.skill;
+
+    if(pace==="ハイ"&&h.style==="逃げ")s-=1.5;
+    if(pace==="ハイ"&&h.style==="追込")s+=2;
+    if(pace==="スロー"&&h.style==="逃げ")s+=1.5;
+    if(pace==="スロー"&&h.style==="追込")s-=1;
+
+    if(h.pos>80)s*=h.jockey.finish;
+    if(chaos)s*=h.jockey.chaos;
+    if(Math.random()<0.05)s-=2;
+    if(Math.random()<0.05)s+=2;
+
+    h.pos+=s;
+    document.getElementById("h"+h.id).style.width=h.pos+"%";
+
+    if(h.pos>=100){
+      h.fin=true;
+      order.push(h);
+    }
+  });
+}
+
+// ===== 人気順 =====
+function drawPopularity(){
+  let sorted=[...horses].sort((a,b)=>a.odd-b.odd);
+  let html="<div class='box'><h3>📊 人気順</h3>";
+  sorted.forEach((h,i)=>{
+    let frame=(h.id%8)+1;
+    html+=`
+      <div class="pop">
+        <span class="rank">${i+1}番人気</span>
+        <span class="num w${frame}">${h.id+1}</span>
+        <span class="name">${h.name}</span>
+        <span class="style">${h.style}</span>
+        <span class="jockey">${h.jockey.name}</span>
+        <span class="odd">${h.odd}倍</span>
+      </div>`;
+  });
+  html+="</div>";
+  document.getElementById("info").innerHTML+=html;
+}
+
+// ===== 払戻表（100円あたり） =====
+function payout(order){
+  let f=order[0],s=order[1],t=order[2];
+  return {
+    win:Math.round(f.odd*100),
+    trio:Math.round((Number(f.odd)+Number(s.odd)+Number(t.odd))/3*300),
+    trifecta:Math.round(Number(f.odd)*800+Number(s.odd)*200+Number(t.odd)*100)
+  };
+}
+
+// ===== 結果 =====
+function finish(){
+  let res="🏁 結果\n";
+  order.forEach((h,i)=>res+=`${i+1}着 ${h.name}\n`);
+
+  let pay=payout(order);
+  res+=`
+【払戻金（100円あたり）】
+単勝　${order[0].id+1}　${pay.win}円
+三連複　${order[0].id+1}-${order[1].id+1}-${order[2].id+1}　${pay.trio}円
+三連単　${order[0].id+1}→${order[1].id+1}→${order[2].id+1}　${pay.trifecta}円
+`;
+
+  // ===== 所持金処理（購入→的中なら払戻） =====
+  res += "\n【購入結果】\n";
+  players.forEach((p,i)=>{
+    const type = document.getElementById("type"+i).value;
+    const sel  = document.getElementById("sel"+i).value;
+    const amt  = Number(document.getElementById("amt"+i).value);
+
+    // 未入力なら賭けなし
+    if(!sel || !amt){
+      res += `${p.name}: 見送り\n`;
+      return;
+    }
+
+    // 予算不足なら賭け不成立
+    if(amt > p.money){
+      res += `${p.name}: 資金不足で不成立\n`;
+      return;
+    }
+
+    // いったん購入
+    p.money -= amt;
+
+    const r = settleBet(type, sel, amt, order, pay);
+    if(!r.ok){
+      // 入力不正 → 購入自体をなかったことにする（返金）
+      p.money += amt;
+      res += `${p.name}: 入力不正（${r.msg}）→不成立\n`;
+      return;
+    }
+
+    // 払戻
+    if(r.payout > 0){
+      p.money += r.payout;
+      res += `${p.name}: ${r.msg} +${r.payout}円\n`;
+    }else{
+      res += `${p.name}: ${r.msg}\n`;
+    }
+  });
+
+  // ===== 成績更新 =====
+  order[0].wins++;
+  order[0].streak++;
+  order.slice(1).forEach(h=>h.streak=0);
+
+  history.unshift(order.map(h=>h.name));
+  if(history.length>10)history.pop();
+
+  save();
+  drawPlayers();
+  document.getElementById("result").textContent=res;
+}
+</script>
+</body>
+</html>
