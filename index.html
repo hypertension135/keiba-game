@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>競馬ゲーム（馬1〜馬10 / 騎手なし / 単勝・複勝 / GIF走行）</title>
+<title>競馬ゲーム（毎回違う馬名 / 単勝オッズばらけ強化 / GIF走行）</title>
 <style>
   body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;color:#111;margin:0;padding:12px}
   h2{background:#0b8f3c;color:#fff;padding:10px;border-radius:10px;margin:0 0 10px}
@@ -40,34 +40,15 @@
   .finishLine{position:absolute;right:10px;top:0;width:3px;height:100%;background:#fff;opacity:.75}
   .lane{position:absolute;left:0;top:50%;width:100%;height:1px;background:#2b2b2b}
 
-  /* GIF馬（horse.gif）が横に動く */
-  .horseIcon{
-    position:absolute;
-    left:0%;
-    top:3px;
-    height:20px;
-    width:auto;
-    transition:left .10s linear;
-    user-select:none;
-    image-rendering:auto;
-  }
-
-  /* horse.gif が無い時の絵文字フォールバック */
-  .horseFallback{
-    position:absolute;
-    left:0%;
-    top:2px;
-    font-size:18px;
-    transition:left .10s linear;
-    user-select:none
-  }
+  .horseIcon{position:absolute;left:0%;top:3px;height:20px;width:auto;transition:left .10s linear;user-select:none}
+  .horseFallback{position:absolute;left:0%;top:2px;font-size:18px;transition:left .10s linear;user-select:none}
 
   pre{white-space:pre-wrap;background:#111;color:#eaeaea;border-radius:12px;padding:10px;overflow:auto}
 </style>
 </head>
 <body>
 
-<h2>🏇 競馬ゲーム（馬1〜馬10 / 単勝・複勝 / GIF走行）</h2>
+<h2>🏇 競馬ゲーム（毎回違う馬名 / 単勝ばらけ強化 / GIF走行）</h2>
 
 <div class="box" id="players"></div>
 
@@ -84,7 +65,7 @@
       <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importData(event)">
     </label>
   </div>
-  <div class="muted">同じフォルダに <b>horse.gif</b> を置くと、馬がGIFで走ります（無いと🐎に自動切替）。</div>
+  <div class="muted">同じフォルダに <b>horse.gif</b> を置くとGIFで走る（無いと🐎）。</div>
 </div>
 
 <div class="box" id="raceInfo"></div>
@@ -107,20 +88,37 @@
 /* =========================
   基本
 ========================= */
-const KEY="keiba_gif_v1";
+const KEY="keiba_gif_names_spread_v1";
 const rand=n=>Math.floor(Math.random()*n);
 const frameClass=i=>"w"+((i%8)+1);
 function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+
+/* =========================
+  馬名生成（毎回違う・重複なし）
+========================= */
+const syll = ["サン","ライ","ブレ","ファ","ド","ル","カ","グ","ヴ","ナ","ト","キ","ラ","ス","セイ","ユウ","オウ","シン","マル","テツ","ヒメ","ゼン","ミヤ","アキ"];
+function genName(){
+  const parts = 2 + rand(2); // 2〜3語
+  let s = "";
+  for(let i=0;i<parts;i++) s += syll[rand(syll.length)];
+  return s;
+}
+function genUniqueNames(n){
+  const set = new Set();
+  while(set.size < n){
+    set.add(genName());
+  }
+  return [...set];
+}
 
 /* =========================
   保存データ
 ========================= */
 let players=[{name:"P1",money:1500},{name:"P2",money:1500},{name:"P3",money:1500}];
 
-// 10頭固定（馬1〜馬10）: 能力は固定、連勝/勝利も保存
+// 10頭の「地力」だけ固定（名前は毎回変える）
 let horseStats = Array.from({length:10}, (_,i)=>({
-  name:`馬${i+1}`,
-  powerBase: 2.2 + Math.random()*3.0,
+  powerBase: 1.8 + Math.random()*4.8, // ←ばらけ強化（1.8〜6.6）
   wins: 0,
   streak: 0
 }));
@@ -143,6 +141,12 @@ load();
 /* =========================
   バックアップ
 ========================= */
+function toast(msg, isBad=false){
+  const el = document.getElementById("result");
+  const tag = isBad ? "⚠️" : "✅";
+  el.textContent = `${tag} ${msg}\n\n` + (el.textContent||"");
+}
+
 function exportData(){
   const data = {players, horseStats, history, exportedAt: new Date().toISOString()};
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
@@ -179,14 +183,8 @@ function importData(ev){
 }
 
 /* =========================
-  UI
+  画面
 ========================= */
-function toast(msg, isBad=false){
-  const el = document.getElementById("result");
-  const tag = isBad ? "⚠️" : "✅";
-  el.textContent = `${tag} ${msg}\n\n` + (el.textContent||"");
-}
-
 function drawPlayers(){
   let html=`<h3 style="margin:0 0 8px">💰 所持金</h3>`;
   players.forEach(p=>{
@@ -224,12 +222,15 @@ function makeRaceCard(){
   pace = ["スロー","ミドル","ハイ"][rand(3)];
   distance = rand(1400)+1000;
 
-  // 脚質は内部にだけ持つ（表示しない）
+  // 名前は毎回作る（10頭分・重複なし）
+  const names = genUniqueNames(10);
+
+  // 脚質は内部（表示しない）
   const styles=["逃げ","先行","差し","追込"];
 
   horses = horseStats.map((st,i)=>({
     id:i,
-    name:st.name,
+    name:names[i],
     style:styles[rand(4)],
     power:st.powerBase,
     streak:st.streak||0,
@@ -267,7 +268,7 @@ function renderRaceInfo(){
 }
 
 /* =========================
-  オッズ（内部で脚質を反映）
+  オッズ（単勝のばらけ強化）
 ========================= */
 function styleBias(style, distance, pace){
   const isSprint = distance <= 1400;
@@ -324,15 +325,18 @@ function placePayout100BaseFromOdd(odd){
 }
 
 function assignOddsForRace(hs){
+  // ★ばらけ強化ポイント
   const houseEdge = 1.18;
-  const temp = 1.45;
-  const noise = 0.22;
+  const temp = 1.12;      // ←小さいほど人気と穴がくっきり（ばらける）
+  const noise = 0.16;     // ←入れ替え過ぎない程度に
+
   const surfM = surfaceBias(surface, going);
 
   const scores = hs.map(h=>{
     const streakBoost = 1 + (h.streak||0)*0.07;
     const condBoost = 0.90 + (h.condition-0.7)*0.6;
     const styleMult = styleBias(h.style, distance, pace);
+
     const base = Math.max(0.01, h.power * streakBoost * condBoost * styleMult * surfM);
     const logScore = Math.log(base) + (Math.random()*2-1)*noise;
     return logScore / temp;
@@ -344,9 +348,9 @@ function assignOddsForRace(hs){
   const probs = exps.map(e=>e/sumE);
 
   hs.forEach((h,i)=>{
-    let p = Math.max(0.01, probs[i]);
+    let p = Math.max(0.006, probs[i]);   // ←下限を下げて超穴を出やすく
     let odd = (houseEdge / p);
-    odd = clamp(odd, 1.1, 99.9);
+    odd = clamp(odd, 1.1, 199.9);        // ←上限を拡張（穴がもっと出る）
     h.odd = Number(odd.toFixed(1));
 
     const base = placePayout100BaseFromOdd(h.odd);
@@ -355,7 +359,7 @@ function assignOddsForRace(hs){
 }
 
 /* =========================
-  オッズ表（脚質は表示しない）
+  オッズ表
 ========================= */
 function renderOddsTable(){
   if(!horses.length){ document.getElementById("oddsTable").innerHTML=""; return; }
@@ -383,7 +387,7 @@ function renderOddsTable(){
 }
 
 /* =========================
-  賭けUI（単勝/複勝）＋締切
+  賭けUI
 ========================= */
 function buildHorseOptions(){
   return horses.map(h=>`<option value="${h.id}">${h.id+1} ${h.name}（${h.odd}倍）</option>`).join("");
@@ -428,7 +432,7 @@ function renderBetUI(){
 }
 
 /* =========================
-  走ってる馬（GIF）
+  走行（GIF）
 ========================= */
 function renderRaceLanes(){
   let html="";
@@ -456,9 +460,6 @@ window.fallbackHorse = function(id){
   if(emo) emo.style.display="inline";
 };
 
-/* =========================
-  レース（全頭ゴールまで）
-========================= */
 function goingSpeedFactor(going){
   if(going==="良") return 1.00;
   if(going==="稍重") return 0.99;
@@ -531,9 +532,6 @@ function placePayout100Final(h, finishRank, popularityRank){
   return clamp(yen, 110, 9990);
 }
 
-/* =========================
-  精算（無効は理由表示＆お金は減らない）
-========================= */
 function settleBets(){
   const first=order[0], second=order[1], third=order[2];
   const top3 = new Set([first.id, second.id, third.id]);
@@ -549,27 +547,14 @@ function settleBets(){
 
   let log = [];
   players.forEach((p,pi)=>{
-    if(p.money<=0){
-      log.push(`${p.name}: 敗退（0円）なので賭けなし`);
-      return;
-    }
+    if(p.money<=0){ log.push(`${p.name}: 敗退（0円）なので賭けなし`); return; }
 
-    const typeEl = document.getElementById(`type${pi}`);
-    const horseEl = document.getElementById(`horse${pi}`);
-    const amtEl = document.getElementById(`amt${pi}`);
+    const type = document.getElementById(`type${pi}`)?.value ?? "win";
+    const pick = Number(document.getElementById(`horse${pi}`)?.value);
+    let amt = Number(document.getElementById(`amt${pi}`)?.value);
 
-    const type = typeEl ? typeEl.value : "win";
-    const pick = horseEl ? Number(horseEl.value) : NaN;
-    let amt = amtEl ? Number(amtEl.value) : NaN;
-
-    if(!Number.isFinite(amt) || amt < 100){
-      log.push(`${p.name}: 無効（100円以上で賭けてね）`);
-      return;
-    }
-    if(!Number.isFinite(pick) || pick<0 || pick>9){
-      log.push(`${p.name}: 無効（馬の選択がおかしい）`);
-      return;
-    }
+    if(!Number.isFinite(amt) || amt < 100){ log.push(`${p.name}: 無効（100円以上）`); return; }
+    if(!Number.isFinite(pick) || pick<0 || pick>9){ log.push(`${p.name}: 無効（馬選択おかしい）`); return; }
 
     const origAmt = amt;
     if(amt > p.money) amt = p.money;
@@ -598,9 +583,6 @@ function settleBets(){
   return {log, placePayById, popRankById};
 }
 
-/* =========================
-  終了（全着順）
-========================= */
 function finishRace(){
   const popSorted=[...horses].sort((a,b)=>a.odd-b.odd);
   const popRankById = new Map();
@@ -631,10 +613,9 @@ function finishRace(){
   txt += `複勝　${first.id+1}　${rangeText(p1)}\n`;
   txt += `複勝　${second.id+1}　${rangeText(p2)}\n`;
   txt += `複勝　${third.id+1}　${rangeText(p3)}\n`;
-
   txt += `\n【精算ログ】\n` + settle.log.map(s=>"・"+s).join("\n") + "\n";
 
-  // 連勝更新（horseStatsに反映）
+  // 連勝更新（能力は固定、連勝だけ更新）
   const winnerId = first.id;
   for(let i=0;i<10;i++){
     if(i===winnerId){
@@ -663,9 +644,6 @@ function finishRace(){
   save();
 }
 
-/* =========================
-  レース開始（押した瞬間に締切＆スタート）
-========================= */
 function startRace(){
   if(!cardReady || horses.length!==10) { toast("先に出走表を作ってね", true); return; }
   if(timer) return;
@@ -688,9 +666,6 @@ function startRace(){
   }, 100);
 }
 
-/* =========================
-  リセット
-========================= */
 function resetAll(){
   if(timer){ clearInterval(timer); timer=null; }
   localStorage.removeItem(KEY);
