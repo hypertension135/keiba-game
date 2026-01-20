@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>競馬ゲーム（馬が確実に走る版）</title>
+<title>競馬ゲーム（🐎逆向き・右へ走る）</title>
 <style>
   body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f4f4f4;margin:0;padding:12px;color:#111}
   h2{margin:0 0 10px;background:#0b8f3c;color:#fff;padding:10px;border-radius:12px}
@@ -48,7 +48,7 @@
 </style>
 </head>
 <body>
-<h2>🏇 競馬ゲーム（馬が確実に走る版）</h2>
+<h2>🏇 競馬ゲーム（🐎逆向き・右へ走る）</h2>
 
 <div class="box">
   <div class="row">
@@ -57,9 +57,10 @@
     <button class="secondary" onclick="resetAll()">リセット</button>
   </div>
   <div class="muted" style="margin-top:8px">
-    ・賭け：<b>単勝/複勝</b> ・当たり：<b>賭け金×倍率</b>が戻る（開始時に賭け金は先に引く）<br>
-    ・オッズ条件：<b>1人気≤3.0</b> / <b>10人気≥150</b>（下位が固まりにくい）<br>
-    ・馬は <b>必ず右に走る</b>（時間ベース＋単調増加＋最低増分）
+    ・🐎は <b>逆向き（左向き）</b> だけど、動きは <b>右へ</b>（scaleX(-1)）<br>
+    ・賭け：単勝/複勝 ・開始時に賭け金を引いて、的中で <b>賭け金×倍率</b> が戻る<br>
+    ・オッズ条件：<b>1人気≤3.0</b> / <b>10人気≥150</b>（下位固まりにくい）<br>
+    ・馬は <b>必ず走る</b>（時間ベース＋単調増加＋最低増分）
   </div>
 </div>
 
@@ -88,7 +89,7 @@ const N=10;
 const TARGET_SECONDS=15;
 const MIN_BET=100;
 const STEP=100;
-const KEY="keiba_run_guarantee_v1";
+const KEY="keiba_run_flip_v1";
 const HISTORY_KEEP=10;
 
 /* ===== util ===== */
@@ -143,7 +144,7 @@ let dist=1600;
 let cardReady=false, bettingClosed=false;
 let lockedBets=[];
 let finishPlan=[]; // 秒
-let finishAt=[];   // performance.now() 記録
+let finishAt=[];   // performance.now()
 let raf=null, startT=null, lastT=null, bgx=0;
 
 /* ===== オッズ（条件維持＆固まりにくい） ===== */
@@ -171,7 +172,6 @@ function makeOdds(hs){
     if(r===9) odd=Math.max(LAST_MIN, odd);
     byRank[r]=odd;
   }
-  // 最小差を保証（固まり防止）
   for(let r=1;r<10;r++){
     const minGap=(r<=2)?0.2:(r<=5)?1.5:(r<=7)?4.0:6.0;
     byRank[r]=Math.max(byRank[r], byRank[r-1]+minGap);
@@ -179,9 +179,7 @@ function makeOdds(hs){
   byRank[0]=Math.min(FAV_MAX, byRank[0]);
   byRank[9]=Math.max(LAST_MIN, byRank[9]);
 
-  order.forEach((hid,rpos)=>{
-    hs[hid].winOdd=Number(clamp(byRank[rpos],1.1,999.9).toFixed(1));
-  });
+  order.forEach((hid,rpos)=> hs[hid].winOdd=Number(clamp(byRank[rpos],1.1,999.9).toFixed(1)));
 
   const pop=[...hs].sort((a,b)=>a.winOdd-b.winOdd);
   const rmap=new Map(); pop.forEach((h,i)=>rmap.set(h.id,i+1));
@@ -312,6 +310,8 @@ function renderRaceLanes(){
   document.getElementById("race").innerHTML=html;
   horses.forEach(h=>setHorseX(h.id,0,0,true));
 }
+
+/* ★ここが変更点：scaleX(-1) をJS側の transform に入れる */
 function setHorseX(id,p01,s01,init=false){
   const x=clamp(p01,0,0.96)*100;
   const horse=document.getElementById("horse"+id);
@@ -323,7 +323,7 @@ function setHorseX(id,p01,s01,init=false){
   const scale = 1 + s01*0.06;
 
   horse.style.left = x+"%";
-  horse.style.transform = `translateY(${bob*0.35}px) rotate(${tilt}deg) scale(${scale})`;
+  horse.style.transform = `translateY(${bob*0.35}px) rotate(${tilt}deg) scale(${scale}) scaleX(-1)`; // ★逆向き
   label.style.left = x+"%";
 }
 
@@ -344,7 +344,7 @@ function makeCard(){
   dist=1000+rand(1400);
   document.getElementById("infoBox").innerHTML = `<h3 style="margin:0 0 8px">📌 レース条件</h3>距離：<b>${dist}m</b> <span class="tag">約${TARGET_SECONDS}秒</span>`;
 
-  // 予定ゴール時間（時間ベース＝ほぼ一定）
+  // 予定ゴール時間（時間ベース）
   const scores=horses.map(h=>Math.log(h.power));
   const minS=Math.min(...scores), maxS=Math.max(...scores);
   const norm=s=>(maxS===minS)?0.5:(s-minS)/(maxS-minS);
@@ -372,7 +372,7 @@ function makeCard(){
   renderRaceLanes();
 }
 
-/* ===== ロック＆開始時に賭け金を引く（リアル寄り） ===== */
+/* ===== ロック＆開始時に賭け金を引く ===== */
 function lockBetsAndDeduct(){
   lockedBets=[];
   state.players.forEach((p,pi)=>{
@@ -394,7 +394,6 @@ function lockBetsAndDeduct(){
     lockedBets.push({pi,type,horseId,stake,odd,horseLabel:`${horseId+1} ${h.name}`});
   });
 
-  // 入力ロック
   state.players.forEach((_,pi)=>{
     ["type","horse","amt"].forEach(prefix=>{
       const el=document.getElementById(prefix+pi);
@@ -425,7 +424,6 @@ function startRace(){
   document.getElementById("btnStart").disabled=true;
   document.getElementById("btnStart").textContent="レース中…";
 
-  // 初期化
   horses.forEach(h=>h.lastDisp=0);
   finishAt.fill(0);
   bgx=0; startT=null; lastT=null;
@@ -436,7 +434,7 @@ function startRace(){
 
 function easeOutCubic(x){ x=clamp(x,0,1); return 1-Math.pow(1-x,3); }
 
-/* ★馬が確実に走る：時間ベース＋単調増加＋最低増分 */
+/* ★確実に走る：時間ベース＋単調増加＋最低増分 */
 function step(ts){
   if(!startT) startT=ts;
   if(!lastT) lastT=ts;
@@ -460,12 +458,10 @@ function step(ts){
     const wob=(Math.random()*2-1)*0.012*(1-base);
     let disp=clamp(base+wob,0,1);
 
-    // ★絶対後退しない＆最低増分（止まらない）
-    disp=Math.max(disp, h.lastDisp + 0.0006);
+    disp=Math.max(disp, h.lastDisp + 0.0006); // ★最低増分
     if(disp>1) disp=1;
     h.lastDisp=disp;
 
-    // スピードっぽさ
     const s01=clamp((TARGET_SECONDS/finT)*0.45,0,1);
     setHorseX(h.id, disp, s01);
 
@@ -486,7 +482,6 @@ function step(ts){
 function finishRace(){
   stopRace();
 
-  // 順位
   const order=[...horses].sort((a,b)=>finishAt[a.id]-finishAt[b.id]);
   const first=order[0], second=order[1], third=order[2];
   const top3=new Set([first.id, second.id, third.id]);
@@ -495,7 +490,6 @@ function finishRace(){
   order.forEach((h,i)=>out+=`${i+1}着：${h.id+1} ${h.name}\n`);
   out += `\n【精算】開始時に賭け金を引いています。的中したら (賭け金×倍率) が戻ります。\n`;
 
-  // 払戻
   for(const b of lockedBets){
     const p=state.players[b.pi];
     if(!p||p.dead) continue;
@@ -515,7 +509,6 @@ function finishRace(){
     }
   }
 
-  // 履歴
   state.history.push({
     when: nowStr(),
     top3: [`${first.id+1} ${first.name}`,`${second.id+1} ${second.name}`,`${third.id+1} ${third.name}`]
@@ -528,7 +521,6 @@ function finishRace(){
   renderHistory();
   save();
 
-  // 戻す
   cardReady=false;
   bettingClosed=false;
   lockedBets=[];
