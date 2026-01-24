@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>競馬ゲーム（左→右に確実に走る）</title>
+<title>競馬ゲーム（馬番だけ・左→右に走る）</title>
 <style>
   body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f4f4f4;margin:0;padding:12px;color:#111}
   h2{margin:0 0 10px;background:#0b8f3c;color:#fff;padding:10px;border-radius:12px}
+  h3{margin:0 0 8px}
   .box{background:#fff;border:1px solid #ddd;border-radius:12px;padding:10px;margin:10px 0}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   button{border:0;border-radius:10px;padding:10px 12px;background:#0b8f3c;color:#fff;font-weight:900}
@@ -24,56 +25,41 @@
   .table th{background:#f2f2f2}
   .right{text-align:right}
 
-  /* ★馬同士の間隔を詰める */
-  #race{display:grid; gap:2px; max-height:70vh; overflow:auto}
-  .laneBox{background:#fff;border:1px solid #ddd;border-radius:10px;padding:4px}
+  /* ===== レース見やすさ（間隔を詰める） ===== */
+  #race{display:grid;gap:2px;max-height:55vh;overflow:auto}
+  .laneBox{background:#fff;border:1px solid #ddd;border-radius:12px;padding:4px}
+
+  /* 馬番：丸＋塗りつぶし */
+  .laneHead{
+    width:30px;height:30px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;justify-content:center;
+    font-weight:900;
+    color:#fff;
+    background:var(--badge, #0b8f3c);
+    border:2px solid var(--badge, #0b8f3c); /* 枠も同じ色で塗る */
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+    margin-bottom:3px;
+  }
 
   .track{
-    position:relative;height:24px;border-radius:10px;overflow:hidden;margin-top:2px;
+    position:relative;height:24px;border-radius:12px;overflow:hidden;margin-top:2px;
     background:linear-gradient(#141414,#101010),
       repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 72px);
+    background-size:100% 100%,72px 100%;
+    background-position:0 0,var(--bgx,0px) 0;
   }
   .finish{position:absolute;right:10px;top:0;width:3px;height:100%;background:#fff;opacity:.85}
-
-  /* 走る本体（左→右） */
-  .runner{
-    position:absolute;left:0%;top:0;height:100%;
-    width:100%;
-    pointer-events:none;
-  }
-  @keyframes runLR{
-    from{ left:0%; }
-    to{ left:92%; } /* 右端まで */
-  }
-
-  /* ラベルは逆にならない（runnerごと動く） */
-  .label{
-    position:absolute;left:0;top:-2px;transform:translate(-4px,-10px);
-    font-size:10px;font-weight:900;color:#fff;background:rgba(0,0,0,.55);
-    border:1px solid rgba(255,255,255,.25);padding:1px 6px;border-radius:999px;
-    white-space:nowrap;
-  }
-
-  /* 馬だけ逆向き表示（左向きの見た目） */
-  .horseWrap{
-    position:absolute;left:0;top:2px;
-    transform:scaleX(-1); /* ★馬だけ反転 */
-    transform-origin:left center;
+  .horse{
+    position:absolute;left:0%;top:3px;font-size:18px;user-select:none;
     filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));
-  }
-  .horseIcon{
-    font-size:18px;
-    animation: bob .33s ease-in-out infinite;
-  }
-  @keyframes bob{
-    0%{ transform:translateY(0px); }
-    50%{ transform:translateY(-2px); }
-    100%{ transform:translateY(0px); }
+    transform-origin:center;
   }
 </style>
 </head>
 <body>
-<h2>🏇 競馬ゲーム（左→右に確実に走る）</h2>
+<h2>🏇 競馬ゲーム（レースは馬番だけ）</h2>
 
 <div class="box">
   <div class="row">
@@ -82,9 +68,9 @@
     <button class="secondary" onclick="resetAll()">リセット</button>
   </div>
   <div class="muted" style="margin-top:8px">
-    ・スタート押したら <b>絶対に左→右へ走る</b>（CSSアニメーション）<br>
-    ・賭け：単勝/複勝 ・開始時に賭け金を引いて、的中で <b>賭け金×倍率</b> が戻る<br>
-    ・オッズ条件：<b>1人気≤3.0</b> / <b>10人気≥150</b>
+    ・レース欄は <b>馬番だけ（丸＋色）</b><br>
+    ・🐎は <b>左→右に必ず動く</b>（時間ベース＋単調増加）<br>
+    ・賭け：単勝/複勝 ・開始時に賭け金を引いて、的中で <b>賭け金×倍率</b> が戻る
   </div>
 </div>
 
@@ -93,26 +79,27 @@
 <div class="box" id="oddsBox"></div>
 
 <div class="box">
-  <h3 style="margin:0 0 8px">🎟️ 賭け</h3>
+  <h3>🎟️ 賭け</h3>
   <div id="betBox"></div>
   <div id="lockedBox" class="muted"></div>
 </div>
 
 <div class="box">
-  <h3 style="margin:0 0 8px">🏁 レース</h3>
+  <h3>🏁 レース</h3>
   <div id="race"></div>
 </div>
 
 <div class="box" id="historyBox"></div>
+
 <pre id="log">「出走表（オッズ）を作る」を押してね。</pre>
 
 <script>
 /* ===== 設定 ===== */
 const N=10;
-const TARGET_SECONDS=15;     // だいたい15秒
+const TARGET_SECONDS=15;
 const MIN_BET=100;
 const STEP=100;
-const KEY="keiba_css_run_v1";
+const KEY="keiba_badge_only_v1";
 const HISTORY_KEEP=10;
 
 /* ===== util ===== */
@@ -136,14 +123,14 @@ try{
 }catch(e){}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
-/* ===== 馬名生成 ===== */
+/* ===== 馬名生成（オッズ表と賭けで使う） ===== */
 const syll=["サン","ライ","ブレ","ファ","ド","ル","カ","グ","ナ","ト","キ","ラ","ス","セイ","ユウ","オウ","シン","マル","テツ","ヒメ","ミヤ","アキ","ホシ","カゼ","ツキ","ユメ"];
 function genName(){ let s=""; const parts=2+rand(2); for(let i=0;i<parts;i++) s+=syll[rand(syll.length)]; return s; }
 function uniqueNames(n){ const set=new Set(); while(set.size<n) set.add(genName()); return [...set]; }
 
 /* ===== UI ===== */
 function drawPlayers(){
-  let html=`<h3 style="margin:0 0 8px">💰 所持金</h3>`;
+  let html=`<h3>💰 所持金</h3>`;
   state.players.forEach(p=>{
     const tag=(p.money<=0||p.dead)?`<span class="tag bad">ゲームオーバー</span>`:`<span class="tag ok">参加中</span>`;
     html+=`<div>${p.name}：<b>${p.money}</b>円 ${tag}</div>`;
@@ -152,7 +139,7 @@ function drawPlayers(){
 }
 function renderHistory(){
   const h=state.history.slice(-HISTORY_KEEP).reverse();
-  let html=`<h3 style="margin:0 0 8px">🧾 履歴</h3>`;
+  let html=`<h3>🧾 履歴</h3>`;
   if(!h.length){ html+=`<div class="muted">まだありません。</div>`; document.getElementById("historyBox").innerHTML=html; return; }
   html+=`<table class="table"><thead><tr><th>日時</th><th>1着</th><th>2着</th><th>3着</th></tr></thead><tbody>`;
   h.forEach(r=>{ html+=`<tr><td>${r.when}</td><td>${r.top3[0]}</td><td>${r.top3[1]}</td><td>${r.top3[2]}</td></tr>`; });
@@ -166,10 +153,11 @@ let horses=[];
 let dist=1600;
 let cardReady=false, bettingClosed=false;
 let lockedBets=[];
-let finishPlan=[]; // 秒（短いほど速い）
-let raceTimer=null;
+let finishPlan=[]; // 秒
+let finishAt=[];   // performance.now()
+let raf=null, startT=null, lastT=null, bgx=0;
 
-/* ===== オッズ（条件維持） ===== */
+/* ===== オッズ（例） ===== */
 function makeOdds(hs){
   const scores=hs.map(h=>Math.log(h.power)+(Math.random()*2-1)*0.22);
   const order=[...hs.keys()].sort((a,b)=>scores[b]-scores[a]);
@@ -177,9 +165,9 @@ function makeOdds(hs){
   const FAV_MAX=3.0;
   const LAST_MIN=150.0;
 
-  const last=LAST_MIN+Math.random()*70; // 150〜220
-  const fav =2.0+Math.random()*1.0;     // 2.0〜3.0
-  const mid =26 +Math.random()*28;      // 26〜54
+  const last=LAST_MIN+Math.random()*70;
+  const fav =2.0+Math.random()*1.0;
+  const mid =26 +Math.random()*28;
 
   const pow=1.22;
   const jitter=()=>Math.exp((Math.random()*2-1)*0.10);
@@ -217,7 +205,7 @@ function makeOdds(hs){
 /* ===== オッズ表 ===== */
 function renderOdds(){
   const sorted=[...horses].sort((a,b)=>a.winOdd-b.winOdd);
-  let html=`<h3 style="margin:0 0 8px">📊 オッズ（人気順）</h3>
+  let html=`<h3>📊 オッズ（人気順）</h3>
     <table class="table"><thead><tr>
       <th>人気</th><th>馬番</th><th>馬名</th><th class="right">単勝</th><th class="right">複勝</th>
     </tr></thead><tbody>`;
@@ -277,7 +265,7 @@ function renderBets(){
           </select>
         </label>
         <label>馬
-          <select id="horse${pi}" ${disabled}>${opts}</select>
+          <select id="horsePick${pi}" ${disabled}>${opts}</select>
         </label>
         <label>金額
           <input id="amt${pi}" ${disabled} type="number" inputmode="numeric"
@@ -290,7 +278,7 @@ function renderBets(){
   document.getElementById("betBox").innerHTML=html;
 
   state.players.forEach((p,pi)=>{
-    const sel=document.getElementById("horse"+pi);
+    const sel=document.getElementById("horsePick"+pi);
     if(sel) sel.value=String(defs[pi].horse);
     validateBet(pi);
     const amt=document.getElementById("amt"+pi);
@@ -316,70 +304,68 @@ function renderLocked(){
   }</div>`;
 }
 
-/* ===== レースUI ===== */
+/* ===== レーン表示（馬番だけ・丸＋色） ===== */
 function renderRaceLanes(){
+  const badgeColor=(i)=>`hsl(${(i*36)%360} 85% 45%)`;
   let html="";
   horses.forEach(h=>{
-    html+=`
-      <div class="laneBox">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:1.1">
-          <div><b>${h.id+1} ${h.name}</b></div>
-          <div style="white-space:nowrap">
-            <span class="tag">単${h.winOdd}</span><span class="tag">複${h.placeOdd}</span>
-          </div>
-        </div>
-
-        <div id="track${h.id}" class="track">
-          <div class="finish"></div>
-          <div id="runner${h.id}" class="runner">
-            <div class="label">${h.id+1} ${h.name}</div>
-            <div class="horseWrap"><div class="horseIcon">🐎</div></div>
-          </div>
-        </div>
-      </div>`;
+    html+=`<div class="laneBox" style="--badge:${badgeColor(h.id)}">
+      <div class="laneHead">${h.id+1}</div>
+      <div id="track${h.id}" class="track" style="--bgx:0px">
+        <div class="finish"></div>
+        <div id="horse${h.id}" class="horse">🐎</div>
+      </div>
+    </div>`;
   });
   document.getElementById("race").innerHTML=html;
+  horses.forEach(h=>setHorseX(h.id,0,0,true));
+}
 
-  // 初期位置に戻す
-  for(let i=0;i<N;i++){
-    const r=document.getElementById("runner"+i);
-    if(r){ r.style.animation="none"; r.style.left="0%"; }
-  }
+/* 左→右に動かす（文字は一切反転させない） */
+function setHorseX(id,p01,s01,init=false){
+  const x=clamp(p01,0,0.96)*100;
+  const horse=document.getElementById("horse"+id);
+  if(!horse) return;
+
+  const bob = init?0:Math.sin((p01*60)+(performance.now()/85))*(2+s01*6);
+  const tilt = init?0:(-2+s01*4);
+  const scale = 1 + s01*0.06;
+
+  horse.style.left = x+"%";
+  horse.style.transform = `translateY(${bob*0.35}px) rotate(${tilt}deg) scale(${scale})`;
 }
 
 /* ===== 出走表作成 ===== */
 function makeCard(){
   stopRace();
-
   const names=uniqueNames(N);
   horses = Array.from({length:N},(_,i)=>({
     id:i,
     name:names[i],
     power:1.2+Math.random()*8.5,
-    winOdd:0, placeOdd:0
+    winOdd:0, placeOdd:0,
+    lastDisp:0
   }));
   makeOdds(horses);
 
   dist=1000+rand(1400);
-  document.getElementById("infoBox").innerHTML =
-    `<h3 style="margin:0 0 8px">📌 レース条件</h3>距離：<b>${dist}m</b> <span class="tag">約${TARGET_SECONDS}秒</span>`;
+  document.getElementById("infoBox").innerHTML = `<h3>📌 レース条件</h3>距離：<b>${dist}m</b> <span class="tag">約${TARGET_SECONDS}秒</span>`;
 
-  // 速さ（短いほど速い）
   const scores=horses.map(h=>Math.log(h.power));
   const minS=Math.min(...scores), maxS=Math.max(...scores);
   const norm=s=>(maxS===minS)?0.5:(s-minS)/(maxS-minS);
 
-  const chaos = Math.random()<0.03; // ごく稀に大荒れ
   finishPlan = horses.map(h=>{
     const t=norm(Math.log(h.power));
-    let sec = TARGET_SECONDS*(1.08 - t*0.16) + (Math.random()*2-1)*0.8;
-    if(chaos && Math.random()<0.30) sec -= 1.0*(1-t);
-    return clamp(sec, TARGET_SECONDS*0.90, TARGET_SECONDS*1.10);
+    let base = TARGET_SECONDS*(1.05 - t*0.13) + (Math.random()*2-1)*0.6;
+    return clamp(base, TARGET_SECONDS*0.90, TARGET_SECONDS*1.07);
   });
+  finishAt = new Array(N).fill(0);
 
   cardReady=true;
   bettingClosed=false;
   lockedBets=[];
+  bgx=0; startT=null; lastT=null;
 
   document.getElementById("btnStart").disabled=false;
   document.getElementById("btnStart").textContent="レース開始（締切）";
@@ -397,7 +383,7 @@ function lockBetsAndDeduct(){
   state.players.forEach((p,pi)=>{
     if(p.money<=0||p.dead) return;
     const type=document.getElementById("type"+pi)?.value ?? "win";
-    const horseId=Number(document.getElementById("horse"+pi)?.value);
+    const horseId=Number(document.getElementById("horsePick"+pi)?.value);
     const amtIn=document.getElementById("amt"+pi)?.value ?? "0";
     if(!Number.isFinite(horseId)||horseId<0||horseId>=N) return;
 
@@ -406,7 +392,7 @@ function lockBetsAndDeduct(){
     stake=Math.min(stake, p.money);
     if(stake<=0) return;
 
-    p.money -= stake; // 開始時に引く
+    p.money -= stake;
     const h=horses[horseId];
     const odd=(type==="win")?h.winOdd:h.placeOdd;
 
@@ -414,7 +400,7 @@ function lockBetsAndDeduct(){
   });
 
   state.players.forEach((_,pi)=>{
-    ["type","horse","amt"].forEach(prefix=>{
+    ["type","horsePick","amt"].forEach(prefix=>{
       const el=document.getElementById(prefix+pi);
       if(el) el.disabled=true;
     });
@@ -424,9 +410,9 @@ function lockBetsAndDeduct(){
   save();
 }
 
-/* ===== レース開始（CSSで確実に動かす） ===== */
+/* ===== レース開始 ===== */
 function startRace(){
-  if(!cardReady||!horses.length) return;
+  if(!cardReady||!horses.length||raf) return;
 
   bettingClosed=true;
   state.players.forEach((_,pi)=>validateBet(pi));
@@ -442,31 +428,66 @@ function startRace(){
   document.getElementById("btnCard").disabled=true;
   document.getElementById("btnStart").disabled=true;
   document.getElementById("btnStart").textContent="レース中…";
-  document.getElementById("log").textContent="レース中…（左→右へ走ります）";
 
-  // ★ここで「確実に走る」
+  horses.forEach(h=>h.lastDisp=0);
+  finishAt.fill(0);
+  bgx=0; startT=null; lastT=null;
+
+  document.getElementById("log").textContent="レース中…";
+  raf=requestAnimationFrame(step);
+}
+
+function easeOutCubic(x){ x=clamp(x,0,1); return 1-Math.pow(1-x,3); }
+
+/* ★確実に走る：時間ベース＋単調増加＋最低増分 */
+function step(ts){
+  if(!startT) startT=ts;
+  if(!lastT) lastT=ts;
+  const dt=(ts-lastT)/1000;
+  lastT=ts;
+
+  const elapsed=(ts-startT)/1000;
+
+  // 地面の流れ
+  const leaderEst = 1/Math.max(1, Math.min(...finishPlan));
+  bgx -= (leaderEst*1100)*dt;
   for(let i=0;i<N;i++){
-    const r=document.getElementById("runner"+i);
-    if(!r) continue;
-    r.style.animation="none";       // いったん消す
-    r.style.left="0%";
-    // 次のフレームでアニメ開始（確実に発火）
-    requestAnimationFrame(()=>{
-      r.style.animation = `runLR ${finishPlan[i].toFixed(2)}s linear forwards`;
-    });
+    const tr=document.getElementById("track"+i);
+    if(tr) tr.style.setProperty("--bgx", `${bgx}px`);
   }
 
-  // 最大時間で結果発表
-  const maxSec = Math.max(...finishPlan) + 0.2;
-  raceTimer=setTimeout(finishRace, maxSec*1000);
+  let finished=0;
+  for(const h of horses){
+    const finT=finishPlan[h.id];
+    let base=easeOutCubic(elapsed/finT);
+    const wob=(Math.random()*2-1)*0.012*(1-base);
+    let disp=clamp(base+wob,0,1);
+
+    disp=Math.max(disp, h.lastDisp + 0.0006); // 最低増分で止まらない
+    if(disp>1) disp=1;
+    h.lastDisp=disp;
+
+    const s01=clamp((TARGET_SECONDS/finT)*0.45,0,1);
+    setHorseX(h.id, disp, s01);
+
+    if(disp>=1){
+      finished++;
+      if(!finishAt[h.id]) finishAt[h.id]=performance.now();
+    }
+  }
+
+  if(finished>=N || elapsed>=Math.max(...finishPlan)+0.4){
+    finishRace();
+    return;
+  }
+  raf=requestAnimationFrame(step);
 }
 
 /* ===== 終了＆精算 ===== */
 function finishRace(){
   stopRace();
 
-  // finishPlan が短い順 = 着順
-  const order=[...horses].sort((a,b)=>finishPlan[a.id]-finishPlan[b.id]);
+  const order=[...horses].sort((a,b)=>finishAt[a.id]-finishAt[b.id]);
   const first=order[0], second=order[1], third=order[2];
   const top3=new Set([first.id, second.id, third.id]);
 
@@ -500,29 +521,4 @@ function finishRace(){
   });
   if(state.history.length>60) state.history=state.history.slice(-60);
 
-  document.getElementById("log").textContent=out;
-  drawPlayers();
-  renderHistory();
-  save();
-
-  cardReady=false;
-  bettingClosed=false;
-  lockedBets=[];
-
-  document.getElementById("btnCard").disabled=false;
-  document.getElementById("btnStart").disabled=true;
-  document.getElementById("btnStart").textContent="レース開始（締切）";
-}
-
-/* ===== stop/reset ===== */
-function stopRace(){
-  if(raceTimer){ clearTimeout(raceTimer); raceTimer=null; }
-}
-function resetAll(){
-  stopRace();
-  try{ localStorage.removeItem(KEY); }catch(e){}
-  location.reload();
-}
-</script>
-</body>
-</html>
+  document.
