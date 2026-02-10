@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>競馬ゲーム（馬番だけ・左→右に走る）</title>
+<title>競馬ゲーム（次へで次のオッズ）</title>
 <style>
   body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f4f4f4;margin:0;padding:12px;color:#111}
   h2{margin:0 0 10px;background:#0b8f3c;color:#fff;padding:10px;border-radius:12px}
@@ -25,20 +25,17 @@
   .table th{background:#f2f2f2}
   .right{text-align:right}
 
-  /* ===== レース見やすさ（間隔を詰める） ===== */
+  /* レース見やすさ（間隔を詰める） */
   #race{display:grid;gap:2px;max-height:55vh;overflow:auto}
   .laneBox{background:#fff;border:1px solid #ddd;border-radius:12px;padding:4px}
 
   /* 馬番：丸＋塗りつぶし */
   .laneHead{
-    width:30px;height:30px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;justify-content:center;
-    font-weight:900;
-    color:#fff;
+    width:30px;height:30px;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-weight:900;color:#fff;
     background:var(--badge, #0b8f3c);
-    border:2px solid var(--badge, #0b8f3c); /* 枠も同じ色で塗る */
+    border:2px solid var(--badge, #0b8f3c);
     box-shadow:0 2px 6px rgba(0,0,0,.15);
     margin-bottom:3px;
   }
@@ -59,18 +56,18 @@
 </style>
 </head>
 <body>
-<h2>🏇 競馬ゲーム（レースは馬番だけ）</h2>
+<h2>🏇 競馬ゲーム（「次へ」で次のオッズ）</h2>
 
 <div class="box">
   <div class="row">
-    <button id="btnCard" onclick="makeCard()">出走表（オッズ）を作る</button>
     <button id="btnStart" class="secondary" onclick="startRace()" disabled>レース開始（締切）</button>
+    <button id="btnNext" class="secondary" onclick="nextRace()" disabled>次へ（次のオッズ）</button>
     <button class="secondary" onclick="resetAll()">リセット</button>
   </div>
   <div class="muted" style="margin-top:8px">
-    ・レース欄は <b>馬番だけ（丸＋色）</b><br>
-    ・🐎は <b>左→右に必ず動く</b>（時間ベース＋単調増加）<br>
-    ・賭け：単勝/複勝 ・開始時に賭け金を引いて、的中で <b>賭け金×倍率</b> が戻る
+    ・最初は自動でオッズ作成（ボタンなし）<br>
+    ・レース終了後に <b>「次へ」</b> を押すと次のオッズが作られる<br>
+    ・レース欄は <b>馬番だけ（丸＋色）</b> / 🐎は <b>左→右に必ず走る</b>
   </div>
 </div>
 
@@ -91,7 +88,7 @@
 
 <div class="box" id="historyBox"></div>
 
-<pre id="log">「出走表（オッズ）を作る」を押してね。</pre>
+<pre id="log"></pre>
 
 <script>
 /* ===== 設定 ===== */
@@ -99,7 +96,7 @@ const N=10;
 const TARGET_SECONDS=15;
 const MIN_BET=100;
 const STEP=100;
-const KEY="keiba_badge_only_v1";
+const KEY="keiba_next_btn_v1";
 const HISTORY_KEEP=10;
 
 /* ===== util ===== */
@@ -123,7 +120,7 @@ try{
 }catch(e){}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
-/* ===== 馬名生成（オッズ表と賭けで使う） ===== */
+/* ===== 馬名生成（オッズ表と賭け用） ===== */
 const syll=["サン","ライ","ブレ","ファ","ド","ル","カ","グ","ナ","ト","キ","ラ","ス","セイ","ユウ","オウ","シン","マル","テツ","ヒメ","ミヤ","アキ","ホシ","カゼ","ツキ","ユメ"];
 function genName(){ let s=""; const parts=2+rand(2); for(let i=0;i<parts;i++) s+=syll[rand(syll.length)]; return s; }
 function uniqueNames(n){ const set=new Set(); while(set.size<n) set.add(genName()); return [...set]; }
@@ -146,7 +143,6 @@ function renderHistory(){
   html+=`</tbody></table>`;
   document.getElementById("historyBox").innerHTML=html;
 }
-drawPlayers(); renderHistory();
 
 /* ===== 現在レース ===== */
 let horses=[];
@@ -157,7 +153,7 @@ let finishPlan=[]; // 秒
 let finishAt=[];   // performance.now()
 let raf=null, startT=null, lastT=null, bgx=0;
 
-/* ===== オッズ（例） ===== */
+/* ===== オッズ ===== */
 function makeOdds(hs){
   const scores=hs.map(h=>Math.log(h.power)+(Math.random()*2-1)*0.22);
   const order=[...hs.keys()].sort((a,b)=>scores[b]-scores[a]);
@@ -202,7 +198,6 @@ function makeOdds(hs){
   });
 }
 
-/* ===== オッズ表 ===== */
 function renderOdds(){
   const sorted=[...horses].sort((a,b)=>a.winOdd-b.winOdd);
   let html=`<h3>📊 オッズ（人気順）</h3>
@@ -304,7 +299,7 @@ function renderLocked(){
   }</div>`;
 }
 
-/* ===== レーン表示（馬番だけ・丸＋色） ===== */
+/* ===== レーン（馬番だけ） ===== */
 function renderRaceLanes(){
   const badgeColor=(i)=>`hsl(${(i*36)%360} 85% 45%)`;
   let html="";
@@ -321,7 +316,7 @@ function renderRaceLanes(){
   horses.forEach(h=>setHorseX(h.id,0,0,true));
 }
 
-/* 左→右に動かす（文字は一切反転させない） */
+/* 左→右に動かす（文字は反転させない） */
 function setHorseX(id,p01,s01,init=false){
   const x=clamp(p01,0,0.96)*100;
   const horse=document.getElementById("horse"+id);
@@ -335,9 +330,10 @@ function setHorseX(id,p01,s01,init=false){
   horse.style.transform = `translateY(${bob*0.35}px) rotate(${tilt}deg) scale(${scale})`;
 }
 
-/* ===== 出走表作成 ===== */
+/* ===== レース準備（オッズを作る） ===== */
 function makeCard(){
   stopRace();
+
   const names=uniqueNames(N);
   horses = Array.from({length:N},(_,i)=>({
     id:i,
@@ -369,12 +365,20 @@ function makeCard(){
 
   document.getElementById("btnStart").disabled=false;
   document.getElementById("btnStart").textContent="レース開始（締切）";
+  document.getElementById("btnNext").disabled=true;
+
   document.getElementById("log").textContent="賭けてから「レース開始」を押してね。";
 
   renderOdds();
   renderBets();
   renderLocked();
   renderRaceLanes();
+}
+
+/* ===== 次へ（次のオッズ作成） ===== */
+function nextRace(){
+  // 次のレース（次のオッズ）を作る
+  makeCard();
 }
 
 /* ===== ロック＆開始時に賭け金を引く ===== */
@@ -425,9 +429,9 @@ function startRace(){
   }
 
   renderLocked();
-  document.getElementById("btnCard").disabled=true;
   document.getElementById("btnStart").disabled=true;
   document.getElementById("btnStart").textContent="レース中…";
+  document.getElementById("btnNext").disabled=true;
 
   horses.forEach(h=>h.lastDisp=0);
   finishAt.fill(0);
@@ -448,7 +452,6 @@ function step(ts){
 
   const elapsed=(ts-startT)/1000;
 
-  // 地面の流れ
   const leaderEst = 1/Math.max(1, Math.min(...finishPlan));
   bgx -= (leaderEst*1100)*dt;
   for(let i=0;i<N;i++){
@@ -463,7 +466,7 @@ function step(ts){
     const wob=(Math.random()*2-1)*0.012*(1-base);
     let disp=clamp(base+wob,0,1);
 
-    disp=Math.max(disp, h.lastDisp + 0.0006); // 最低増分で止まらない
+    disp=Math.max(disp, h.lastDisp + 0.0006);
     if(disp>1) disp=1;
     h.lastDisp=disp;
 
@@ -521,4 +524,38 @@ function finishRace(){
   });
   if(state.history.length>60) state.history=state.history.slice(-60);
 
-  document.
+  document.getElementById("log").textContent = out + "\n\n👉「次へ（次のオッズ）」を押すと次のレースを作るよ。";
+
+  drawPlayers();
+  renderHistory();
+  save();
+
+  // 次へを有効化（ここが要望）
+  cardReady=false;
+  bettingClosed=false;
+  lockedBets=[];
+  document.getElementById("btnStart").disabled=true;
+  document.getElementById("btnStart").textContent="レース開始（締切）";
+  document.getElementById("btnNext").disabled=false;
+}
+
+/* ===== stop/reset ===== */
+function stopRace(){
+  if(raf){ cancelAnimationFrame(raf); raf=null; }
+  startT=null; lastT=null;
+}
+function resetAll(){
+  stopRace();
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  location.reload();
+}
+
+/* ===== 初回：自動でオッズ作成 ===== */
+window.addEventListener("DOMContentLoaded", ()=>{
+  drawPlayers();
+  renderHistory();
+  makeCard(); // ←最初から作る
+});
+</script>
+</body>
+</html>
