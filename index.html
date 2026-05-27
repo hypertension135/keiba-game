@@ -239,12 +239,13 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 <body>
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
-  <div class="notice" id="msg">50頭から12頭が出走。3人1000円スタート。まず「オッズ」を押してください。</div>
+  <div class="notice" id="msg">この画面を開くと自動でオッズと出馬表を表示します。出なければ「オッズを表示」を押してください。</div>
 
   <div id="startScreen" class="board">
+    <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
     <div class="title"><span>レース準備</span><span>ODDS</span></div>
     <div class="controls" style="justify-content:center">
-      <button class="big" onclick="showOdds()">オッズ</button>
+      <button class="big" id="oddsBtn" onclick="showOdds()">オッズを表示</button>
     </div>
   </div>
 
@@ -277,11 +278,10 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <div class="player"><h3>P2</h3><div>所持金 <span class="money" id="money1">1000</span>円</div><select id="horse1"></select><input id="bet1" type="number" min="100" step="100" value="100"></div>
         <div class="player"><h3>P3</h3><div>所持金 <span class="money" id="money2">1000</span>円</div><select id="horse2"></select><input id="bet2" type="number" min="100" step="100" value="100"></div>
       </div>
-      <div class="notice" id="selected">3人分の馬番と金額を選んでください</div>
+      <div class="notice" id="selected">3人分の馬番と金額を選んで、「投票確定・競馬場へ」を押してください</div>
       <div class="controls">
-        <button class="gold" onclick="confirmBets()">投票確定</button>
-        <button class="gold" onclick="goRace()">競馬場へ</button>
-        <button class="gray" onclick="showOdds()">オッズ作り直し</button>
+        <button class="gold" onclick="confirmAndGoRace()">投票確定・競馬場へ</button>
+        <button class="gray" onclick="showOdds()">オッズを作り直す</button>
         <button class="gray" onclick="resetMoney()">所持金リセット</button>
       </div>
     </div>
@@ -446,7 +446,7 @@ function showOdds(){
     if(e.history>0&&e.avgRank>=9)e.racePower-=.01;
   }
   drawTables();fillSelects();updateMoney();
-  selected.innerHTML="3人分の馬番と金額を選んでください";
+  selected.innerHTML="3人分の馬番と金額を選んで、「投票確定・競馬場へ」を押してください";
   msg.innerHTML="今回はこちらが指定した "+currentGrade+"。"+(upsetMode?"荒れそうな気配あり。":"人気馬が少し有利です。");
 }
 function drawTables(){
@@ -466,25 +466,70 @@ function drawTables(){
 function fillSelects(){
   for(var p=0;p<3;p++){
     var s="";
-    for(var i=0;i<entries.length;i++){var e=entries[i];s+="<option value='"+i+"'>"+e.no+"番 "+e.name+" / "+e.jockey+" / "+e.odds.toFixed(1)+"倍</option>"}
-    horseSel[p].innerHTML=s;betInp[p].value=Math.min(100,players[p].money);
+    for(var i=0;i<entries.length;i++){
+      var e=entries[i];
+      s+="<option value='"+i+"'>"+e.no+"番 "+e.name+" / "+e.jockey+" / "+e.odds.toFixed(1)+"倍</option>";
+    }
+    horseSel[p].innerHTML=s;
+    betInp[p].value=Math.min(100,players[p].money);
+    betInp[p].min=100;
+    betInp[p].step=100;
+    betInp[p].max=players[p].money;
   }
 }
 function confirmBets(){
   var text=[];
   for(var p=0;p<3;p++){
-    if(players[p].money<=0){players[p].pick=null;players[p].bet=0;text.push("P"+(p+1)+"は所持金0円で休み");continue}
+    if(players[p].money<=0){
+      players[p].pick=null;
+      players[p].bet=0;
+      text.push("P"+(p+1)+"は所持金0円で休み");
+      continue;
+    }
+
     var bet=Number(betInp[p].value);
-    if(isNaN(bet)||bet<100){msg.innerHTML="P"+(p+1)+"の賭け金は100円以上";return}
+    if(isNaN(bet) || bet<=0) bet=100;
+
+    if(bet<100){
+      msg.innerHTML="P"+(p+1)+"の賭け金は100円以上にしてください。";
+      return false;
+    }
+
     bet=Math.floor(bet/100)*100;
-    if(bet>players[p].money){msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません";return}
-    var pick=Number(horseSel[p].value);players[p].pick=pick;players[p].bet=bet;
+
+    if(bet>players[p].money){
+      msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";
+      return false;
+    }
+
+    var pick=Number(horseSel[p].value);
+    if(isNaN(pick) || !entries[pick]){
+      msg.innerHTML="P"+(p+1)+"の馬を選んでください。";
+      return false;
+    }
+
+    players[p].pick=pick;
+    players[p].bet=bet;
     text.push("P"+(p+1)+": "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
   }
-  betsConfirmed=true;selected.innerHTML="投票確定：<br>"+text.join("<br>");msg.innerHTML="投票確定。競馬場へ進んで発走してください。";
+
+  betsConfirmed=true;
+  selected.innerHTML="投票確定：<br>"+text.join("<br>");
+  msg.innerHTML="投票確定。競馬場へ進みます。";
+  return true;
+}
+
+function confirmAndGoRace(){
+  if(confirmBets()){
+    goRace();
+  }
 }
 function goRace(){
-  if(!betsConfirmed){msg.innerHTML="先に投票確定を押してください";return}
+  if(!betsConfirmed){
+    if(!confirmBets()){
+      return;
+    }
+  }
   oddsScreen.style.display="none";raceScreen.style.display="block";
   raceInfo.innerHTML=currentGrade+" 発走前";lapInfo.innerHTML="残り1200m";leaderInfo.innerHTML="先頭：--";
   makeHorses();focusCamera();
@@ -594,7 +639,19 @@ function finishRace(){
   result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / "+winner.odds.toFixed(1)+"倍）<br>上位10頭："+order+"<br><br>"+payText;
 }
 function stopRace(){running=false;if(timer){clearInterval(timer);timer=null}}
-window.onload=function(){loadRecords();updateMoney()}
+window.onload=function(){
+  loadRecords();
+  updateMoney();
+  // オッズボタンを押さなくても、自動で出馬表とオッズを出す
+  showOdds();
+  var btn=document.getElementById("oddsBtn");
+  if(btn){
+    btn.addEventListener("click",function(e){
+      e.preventDefault();
+      showOdds();
+    });
+  }
+}
 window.onresize=function(){if(raceScreen.style.display==="block")focusCamera()}
 </script>
 </body>
