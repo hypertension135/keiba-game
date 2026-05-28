@@ -129,17 +129,17 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 #world{
   position:absolute;
   left:0;top:0;
-  width:9000px;height:560px;
+  width:11500px;height:560px;
   transition:transform .06s linear;
   transform-origin:0 0;
 }
 .sky{
-  position:absolute;left:0;top:0;width:9000px;height:560px;
+  position:absolute;left:0;top:0;width:11500px;height:560px;
   background:
     linear-gradient(#c9efff 0 155px,#dff7ff 155px 205px,#91c46c 205px 238px,#6baa55 238px 100%);
 }
 .hills{
-  position:absolute;left:0;top:150px;width:9000px;height:110px;
+  position:absolute;left:0;top:150px;width:11500px;height:110px;
   background:
     radial-gradient(ellipse at 600px 90px,#6f8f65 0 310px,transparent 312px),
     radial-gradient(ellipse at 1450px 95px,#78986e 0 340px,transparent 342px),
@@ -172,7 +172,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   border-radius:50%;
 }
 .infield{
-  position:absolute;left:0;top:238px;width:9000px;height:122px;
+  position:absolute;left:0;top:238px;width:11500px;height:122px;
   background:
     repeating-linear-gradient(90deg,rgba(255,255,255,.20) 0 4px,transparent 4px 70px),
     linear-gradient(#8fd05f,#66b34a);
@@ -180,18 +180,18 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   border-bottom:3px solid rgba(255,255,255,.75);
 }
 .track{
-  position:absolute;left:0;top:370px;width:9000px;height:72px;
+  position:absolute;left:0;top:370px;width:11500px;height:72px;
   background:
     repeating-linear-gradient(0deg,rgba(255,255,255,.25) 0 2px,transparent 2px 22px),
     linear-gradient(#b58c61,#9a744e);
   box-shadow:inset 0 5px 0 rgba(255,255,255,.85),inset 0 -5px 0 rgba(255,255,255,.75);
 }
 .foreTurf{
-  position:absolute;left:0;top:442px;width:9000px;height:118px;
+  position:absolute;left:0;top:442px;width:11500px;height:118px;
   background:linear-gradient(#65b84c,#4b973c);
 }
 .railTop,.railBottom{
-  position:absolute;left:0;width:9000px;height:7px;
+  position:absolute;left:0;width:11500px;height:7px;
   background:linear-gradient(#fff,#ddd);
   border-top:1px solid #888;border-bottom:1px solid #888;z-index:4;
 }
@@ -915,15 +915,18 @@ function confirmBets(){
   applyPlayerCount();
   var text=[];
   var activeCount=0;
+
   for(var ap=0;ap<activePlayerCount;ap++){
     if(players[ap].money>0) activeCount++;
   }
+
   if(activeCount===0){
     msg.innerHTML="全員ゲームオーバーです。所持金リセットを押してください。";
     selected.innerHTML="全員脱落";
     updateMoney();
     return false;
   }
+
   for(var p=0;p<activePlayerCount;p++){
     if(players[p].money<=0){
       players[p].pick=null;
@@ -954,9 +957,15 @@ function confirmBets(){
       return false;
     }
 
+    // ここが重要：単勝/複勝を必ず保存
+    var type = betType[p] ? betType[p].value : "win";
+
     players[p].pick=pick;
     players[p].bet=bet;
-    text.push("P"+(p+1)+": "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
+    players[p].type=type;
+
+    var label = type==="place" ? "複勝" : "単勝";
+    text.push("P"+(p+1)+": "+label+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
   }
 
   betsConfirmed=true;
@@ -970,6 +979,7 @@ function confirmAndGoRace(){
     goRace();
   }
 }
+
 function goRace(){
   if(!betsConfirmed){
     if(!confirmBets()){
@@ -997,7 +1007,7 @@ function makeHorses(){
 }
 function point(t,lane){
   var startX=250,finishX=8500;
-  var x=startX+Math.max(0,Math.min(1,t))*(finishX-startX);
+  var x=startX+Math.max(0,Math.min(1.55,t))*(finishX-startX);
   var row=Math.floor(lane/6),col=lane%6;
   var y=374+col*6+row*37;
   return{x:x,y:y};
@@ -1025,7 +1035,7 @@ function focusCamera(){
   var scale = vw < 700 ? 0.72 : 0.78;
 
   // 先頭を画面の少し右寄りに置く。後ろの馬も映りやすい。
-  var x = vw*0.55 - h.x*scale;
+  var x = vw*0.48 - h.x*scale;
 
   // コース全体が画面から外れすぎないように制限
   var minX = vw - 9000*scale;
@@ -1060,11 +1070,10 @@ function stepRace(){
     var h=horses[i];
     var e=entries[i];
 
-    // ゴール後もずっと右へ走り続ける。
-    // 画面外まで行ったらゴール後の位置から少し戻して、止まって見えないようにする。
+    // ゴールした馬も止めない。右方向へずっと走り続ける。
     if(h.done){
       h.progress += h.speed*1.45 + Math.random()*0.00005;
-      if(h.progress>1.34) h.progress=1.08;
+      if(h.progress>1.65) h.progress=1.65;
       placeHorse(h);
       if(h.progress>leaderProgress) leaderProgress=h.progress;
       continue;
@@ -1086,22 +1095,22 @@ function stepRace(){
 
     h.progress += h.speed + bonus + Math.random()*.00008;
 
-    // ゴール線に到達したら着順だけ確定。馬は止めない。
+    // ゴール線に着いたら着順だけ記録。馬は止めない。
     if(h.progress>=1 && !h.done){
       h.done=true;
       finished.push(i);
     }
 
-    // ゴールした瞬間も、そのまま駆け抜ける
+    // ゴールした直後もそのまま走らせる
     if(h.done){
       h.progress += h.speed*1.45 + Math.random()*0.00005;
-      if(h.progress>1.34) h.progress=1.08;
+      if(h.progress>1.65) h.progress=1.65;
     }
 
     if(h.progress>leaderProgress) leaderProgress=h.progress;
     placeHorse(h);
 
-    // 長すぎる時だけ未到達馬を着順確定。ただし見た目は走り続ける。
+    // 時間切れ時だけ着順確定。ただし馬は止めない。
     if(elapsed>=RACE_DURATION+7000 && !h.done){
       h.done=true;
       finished.push(i);
@@ -1111,13 +1120,12 @@ function stepRace(){
   lapInfo.innerHTML="残り "+Math.max(0,Math.round((1-Math.min(1,leaderProgress))*1600))+"m";
   focusCamera();
 
-  // 最後の馬がゴールしたら、少し駆け抜けて結果だけ表示。
-  // タイマーは止めないので、馬は走り続ける。
+  // 全馬がゴールしたら結果だけ表示。タイマーは止めない。
   if(finished.length===horses.length && !raceEnding){
     raceEnding=true;
     setTimeout(function(){
       if(running && !resultShown) finishRace();
-    }, 1200);
+    }, 1000);
   }
 }
 function recordResult(){
@@ -1132,19 +1140,27 @@ function recordResult(){
 function finishRace(){
   if(resultShown) return;
   resultShown=true;
-
+  // ゴール後も馬は止めない。結果と払い戻しだけ確定。
   raceCount++;
   recordResult();
 
   var win=finished[0];
   var winner=entries[win];
+
   var order="";
   for(var i=0;i<Math.min(10,finished.length);i++){
     if(i>0) order+=" → ";
     order+=entries[finished[i]].no+"番";
   }
 
+  // 複勝は3着以内
   var top3 = finished.slice(0,3);
+  var top3Text = "";
+  for(var t=0;t<top3.length;t++){
+    if(t>0) top3Text += "・";
+    top3Text += entries[top3[t]].no+"番";
+  }
+
   var payText="";
 
   for(var p=0;p<activePlayerCount;p++){
@@ -1163,7 +1179,8 @@ function finishRace(){
     var oddsUsed=pick.odds;
 
     if(type==="place"){
-      hit = top3.indexOf(players[p].pick) >= 0;
+      // ここが重要：選んだ馬が3着以内なら的中
+      hit = top3.indexOf(players[p].pick) !== -1;
       oddsUsed = pick.placeOdds || Math.max(1.1, Math.round((pick.odds*0.18+1.1)*10)/10);
     }else{
       hit = players[p].pick === win;
@@ -1173,7 +1190,7 @@ function finishRace(){
     if(hit){
       var pay=Math.floor(players[p].bet * oddsUsed);
       players[p].money += pay;
-      payText+="P"+(p+1)+": "+typeLabel+"的中！ "+pick.no+"番 "+pick.name+" / 払戻 "+pay+"円 / 所持金 "+players[p].money+"円<br>";
+      payText+="P"+(p+1)+": "+typeLabel+"的中！ "+pick.no+"番 "+pick.name+" / "+oddsUsed.toFixed(1)+"倍 / 払戻 "+pay+"円 / 所持金 "+players[p].money+"円<br>";
     }else{
       payText+="P"+(p+1)+": "+typeLabel+"ハズレ "+pick.no+"番 "+pick.name+" / -"+players[p].bet+"円 / 所持金 "+players[p].money+"円<br>";
     }
@@ -1187,13 +1204,14 @@ function finishRace(){
   }
 
   updateMoney();
-  raceInfo.innerHTML="確定・馬は走行中";
-  lapInfo.innerHTML="着順確定";
+  raceInfo.innerHTML="確定・走行中";
+  lapInfo.innerHTML="着順確定・馬は走行中";
   focusCamera();
   betsConfirmed=false;
 
-  result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / 単勝 "+winner.odds.toFixed(1)+"倍）<br>上位10頭："+order+"<br><br>"+payText+"<br>馬はゴール後も走り続けています。新しいレースへ進むと止まります。";
+  result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / 単勝 "+winner.odds.toFixed(1)+"倍）<br>複勝対象：3着以内 "+top3Text+"<br>上位10頭："+order+"<br><br>"+payText+"<br>ゴールしても馬は止まりません。新しいレースへ進むまで走り続けます。";
 }
+
 function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
   loadRecords();
