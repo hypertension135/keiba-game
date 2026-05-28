@@ -516,7 +516,14 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   <div id="startScreen" class="board">
     <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
     <div class="title"><span>レース準備</span><span>ODDS</span></div>
-    <div class="controls" style="justify-content:center">
+    <div class="controls" style="justify-content:center;align-items:center">
+      <label style="font-size:20px;font-weight:900;color:#ffeaa5">人数</label>
+      <select id="playerCountSelect" style="font-size:20px;padding:10px;border-radius:8px">
+        <option value="1">1人</option>
+        <option value="2">2人</option>
+        <option value="3" selected>3人</option>
+        <option value="4">4人</option>
+      </select>
       <button class="big" id="oddsBtn" onclick="showOdds()">オッズを表示</button>
     </div>
   </div>
@@ -544,11 +551,12 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
     </div>
 
     <div class="board">
-      <div class="title"><span>3人投票</span><span>3 PLAYERS</span></div>
+      <div class="title"><span>人数選択・投票</span><span>3 PLAYERS</span></div>
       <div class="moneyGrid">
         <div class="player" id="playerBox0"><h3>P1 <span id="out0"></span></h3><div>所持金 <span class="money" id="money0">1000</span>円</div><select id="type0"><option value="win">単勝</option><option value="place">複勝</option></select><select id="horse0"></select><input id="bet0" type="number" min="100" step="100" value="100"></div>
         <div class="player" id="playerBox1"><h3>P2 <span id="out1"></span></h3><div>所持金 <span class="money" id="money1">1000</span>円</div><select id="type1"><option value="win">単勝</option><option value="place">複勝</option></select><select id="horse1"></select><input id="bet1" type="number" min="100" step="100" value="100"></div>
         <div class="player" id="playerBox2"><h3>P3 <span id="out2"></span></h3><div>所持金 <span class="money" id="money2">1000</span>円</div><select id="type2"><option value="win">単勝</option><option value="place">複勝</option></select><select id="horse2"></select><input id="bet2" type="number" min="100" step="100" value="100"></div>
+        <div class="player" id="playerBox3"><h3>P4 <span id="out3"></span></h3><div>所持金 <span class="money" id="money3">1000</span>円</div><select id="type3"><option value="win">単勝</option><option value="place">複勝</option></select><select id="horse3"></select><input id="bet3" type="number" min="100" step="100" value="100"></div>
       </div>
       <div class="notice" id="selected">3人分の馬番と金額を選んで、「投票確定・競馬場へ」を押してください</div>
       <div class="controls">
@@ -619,19 +627,21 @@ var STORAGE_KEY="minna_derby_rebuild_records_v1";
 var COUNT_KEY="minna_derby_rebuild_count_v1";
 
 var entries=[],horses=[],finished=[],records={},lastRun={},raceCount=0,currentGrade="G3",upsetMode=false;
-var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
+var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
+var activePlayerCount=3;
 var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false;
 
 var startScreen=document.getElementById("startScreen"),oddsScreen=document.getElementById("oddsScreen"),raceScreen=document.getElementById("raceScreen");
 var msg=document.getElementById("msg"),entryBody=document.getElementById("entryBody"),oddsBody=document.getElementById("oddsBody");
 var selected=document.getElementById("selected"),world=document.getElementById("world"),raceWindow=document.getElementById("raceWindow");
 var raceInfo=document.getElementById("raceInfo"),lapInfo=document.getElementById("lapInfo"),leaderInfo=document.getElementById("leaderInfo"),result=document.getElementById("result");
-var moneyEls=[document.getElementById("money0"),document.getElementById("money1"),document.getElementById("money2")];
-var horseSel=[document.getElementById("horse0"),document.getElementById("horse1"),document.getElementById("horse2")];
-var betType=[document.getElementById("type0"),document.getElementById("type1"),document.getElementById("type2")];
-var betInp=[document.getElementById("bet0"),document.getElementById("bet1"),document.getElementById("bet2")];
-var playerBoxes=[document.getElementById("playerBox0"),document.getElementById("playerBox1"),document.getElementById("playerBox2")];
-var outLabels=[document.getElementById("out0"),document.getElementById("out1"),document.getElementById("out2")];
+var moneyEls=[document.getElementById("money0"),document.getElementById("money1"),document.getElementById("money2"),document.getElementById("money3")];
+var horseSel=[document.getElementById("horse0"),document.getElementById("horse1"),document.getElementById("horse2"),document.getElementById("horse3")];
+var betType=[document.getElementById("type0"),document.getElementById("type1"),document.getElementById("type2"),document.getElementById("type3")];
+var betInp=[document.getElementById("bet0"),document.getElementById("bet1"),document.getElementById("bet2"),document.getElementById("bet3")];
+var playerBoxes=[document.getElementById("playerBox0"),document.getElementById("playerBox1"),document.getElementById("playerBox2"),document.getElementById("playerBox3")];
+var playerCountSelect=document.getElementById("playerCountSelect");
+var outLabels=[document.getElementById("out0"),document.getElementById("out1"),document.getElementById("out2"),document.getElementById("out3")];
 
 function rnd(a,b){return a+Math.random()*(b-a)}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
@@ -651,8 +661,24 @@ function saveRecords(){
     localStorage.setItem(COUNT_KEY,String(raceCount));
   }catch(e){}
 }
+function applyPlayerCount(){
+  activePlayerCount = playerCountSelect ? Number(playerCountSelect.value) : 3;
+  if(!activePlayerCount || activePlayerCount<1) activePlayerCount=3;
+  for(var i=0;i<4;i++){
+    if(i<activePlayerCount){
+      if(playerBoxes[i]) playerBoxes[i].style.display="block";
+    }else{
+      if(playerBoxes[i]) playerBoxes[i].style.display="none";
+      players[i].pick=null;
+      players[i].bet=0;
+    }
+  }
+}
+
 function updateMoney(){
-  for(var i=0;i<3;i++){
+  applyPlayerCount();
+  for(var i=0;i<4;i++){
+    if(i>=activePlayerCount) continue;
     moneyEls[i].innerHTML=players[i].money;
 
     var out = players[i].money <= 0;
@@ -681,7 +707,7 @@ function updateMoney(){
   }
 }
 function resetMoney(){
-  players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
+  players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
   updateMoney();
   selected.innerHTML="所持金を全員1000円に戻しました。";
 }
@@ -731,6 +757,7 @@ function frameName(no){
 }
 
 function showOdds(){
+  applyPlayerCount();
   loadRecords();
   currentGrade=autoGrade();
   upsetMode=Math.random()<0.18;
@@ -770,7 +797,7 @@ function showOdds(){
     if(e.history>0&&e.avgRank>=9)e.racePower-=.01;
   }
   drawTables();fillSelects();updateMoney();
-  selected.innerHTML="所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
+  selected.innerHTML=activePlayerCount+"人プレイです。所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
   msg.innerHTML="今回はこちらが指定した "+currentGrade+"。"+(upsetMode?"荒れそうな気配あり。":"人気馬が少し有利です。");
 }
 function drawTables(){
@@ -788,7 +815,12 @@ function drawTables(){
   oddsBody.innerHTML=h;
 }
 function fillSelects(){
-  for(var p=0;p<3;p++){
+  applyPlayerCount();
+  for(var p=0;p<4;p++){
+    if(p>=activePlayerCount){
+      if(playerBoxes[p]) playerBoxes[p].style.display="none";
+      continue;
+    }
     var s="";
     for(var i=0;i<entries.length;i++){
       var e=entries[i];
@@ -814,9 +846,10 @@ function fillSelects(){
   updateMoney();
 }
 function confirmBets(){
+  applyPlayerCount();
   var text=[];
   var activeCount=0;
-  for(var ap=0;ap<3;ap++){
+  for(var ap=0;ap<activePlayerCount;ap++){
     if(players[ap].money>0) activeCount++;
   }
   if(activeCount===0){
@@ -825,7 +858,7 @@ function confirmBets(){
     updateMoney();
     return false;
   }
-  for(var p=0;p<3;p++){
+  for(var p=0;p<activePlayerCount;p++){
     if(players[p].money<=0){
       players[p].pick=null;
       players[p].bet=0;
@@ -1026,7 +1059,7 @@ function finishRace(){
   var win=finished[0],winner=entries[win],order="";
   for(var i=0;i<Math.min(10,finished.length);i++){if(i>0)order+=" → ";order+=entries[finished[i]].no+"番"}
   var payText="";
-  for(var p=0;p<3;p++){
+  for(var p=0;p<activePlayerCount;p++){
     if(players[p].bet<=0||players[p].pick===null){payText+="P"+(p+1)+": 休み / 所持金 "+players[p].money+"円<br>";continue}
     var pick=entries[players[p].pick];
     players[p].money-=players[p].bet;
@@ -1048,7 +1081,7 @@ function finishRace(){
       payText+="P"+(p+1)+": "+typeLabel+"ハズレ "+pick.no+"番 "+pick.name+" / -"+players[p].bet+"円 / 所持金 "+players[p].money+"円<br>";
     }
   }
-  for(var op=0;op<3;op++){
+  for(var op=0;op<activePlayerCount;op++){
     if(players[op].money<=0){
       players[op].money=0;
       players[op].out=true;
