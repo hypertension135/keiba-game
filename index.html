@@ -758,6 +758,41 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   background:transparent!important;
 }
 
+
+/* ゼッケン復活：馬画像より絶対に前に出す */
+.saddle{
+  position:absolute!important;
+  z-index:9999!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  left:56px!important;
+  top:34px!important;
+  width:38px!important;
+  height:26px!important;
+  line-height:22px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:center!important;
+  border:3px solid #fff!important;
+  border-radius:6px!important;
+  color:#fff!important;
+  background:#111!important;
+  box-shadow:0 2px 4px rgba(0,0,0,.45)!important;
+  pointer-events:none!important;
+}
+.saddle.frame-red{background:#c62828!important;color:#fff!important}
+.saddle.frame-blue{background:#1565c0!important;color:#fff!important}
+.saddle.frame-yellow{background:#fdd835!important;color:#111!important}
+.saddle.frame-green{background:#2e7d32!important;color:#fff!important}
+.saddle.frame-pink{background:#ec407a!important;color:#fff!important}
+.saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:8000!important}
+.realHorseRunner{overflow:visible!important}
+
 </style>
 </head>
 <body>
