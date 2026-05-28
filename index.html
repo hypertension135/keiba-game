@@ -537,6 +537,41 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   z-index:45!important;
 }
 
+
+/* ゼッケンを最初から最後まで常時表示 */
+.saddle{
+  position:absolute!important;
+  z-index:999!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:none!important;
+  left:56px!important;
+  top:34px!important;
+  width:38px!important;
+  height:26px!important;
+  line-height:22px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:center!important;
+  border:3px solid #fff!important;
+  border-radius:6px!important;
+  box-shadow:0 2px 4px rgba(0,0,0,.55)!important;
+}
+.realHorseRunner .saddle{
+  z-index:999!important;
+}
+.frame-yellow.saddle,
+.frame-white.saddle{
+  color:#111!important;
+}
+.realHorseImg{
+  z-index:1!important;
+}
+.jockey{
+  z-index:100!important;
+}
+
 </style>
 </head>
 <body>
@@ -1024,10 +1059,10 @@ function stepRace(){
     var h=horses[i];
     var e=entries[i],bonus=0;
 
-    // ゴールした馬も、最後の馬が着くまで止まらず駆け抜ける
+    // ゴールした馬も最後の馬が着くまで、ゴールバーを越えて走り続ける
     if(h.done){
-      h.progress += h.speed*1.4 + Math.random()*0.00004;
-      if(h.progress>1.22) h.progress=1.22;
+      h.progress += h.speed*1.8 + Math.random()*0.00006;
+      if(h.progress>1.35) h.progress=1.35;
       placeHorse(h);
       if(h.progress>leaderProgress)leaderProgress=h.progress;
       continue;
@@ -1072,7 +1107,7 @@ function stepRace(){
     // 最後の馬がゴールしてから、全馬が少し駆け抜けて結果表示
     setTimeout(function(){
       if(running) finishRace();
-    }, 1800);
+    }, 2600);
   }
 }
 function recordResult(){
@@ -1091,19 +1126,31 @@ function finishRace(){
   for(var i=0;i<Math.min(10,finished.length);i++){if(i>0)order+=" → ";order+=entries[finished[i]].no+"番"}
   var payText="";
   for(var p=0;p<activePlayerCount;p++){
-    if(players[p].bet<=0||players[p].pick===null){payText+="P"+(p+1)+": 休み / 所持金 "+players[p].money+"円<br>";continue}
+    if(players[p].bet<=0||players[p].pick===null){
+      payText+="P"+(p+1)+": 休み / 所持金 "+players[p].money+"円<br>";
+      continue;
+    }
+
     var pick=entries[players[p].pick];
+    var betTypeNow=players[p].type || "win";
+    var typeLabel=betTypeNow==="place" ? "複勝" : "単勝";
+
+    // 賭け金は結果確定時に引く
     players[p].money-=players[p].bet;
+
     var hit=false;
     var oddsUsed=pick.odds;
-    var typeLabel=players[p].type==="place"?"複勝":"単勝";
-    if(players[p].type==="place"){
-      hit=finished.slice(0,3).indexOf(players[p].pick)>=0;
-      oddsUsed=pick.placeOdds;
+
+    if(betTypeNow==="place"){
+      // 複勝は3着以内で的中
+      hit = finished.slice(0,3).indexOf(players[p].pick) >= 0;
+      oddsUsed = pick.placeOdds || Math.max(1.1, Math.round((pick.odds*0.18+1.1)*10)/10);
     }else{
-      hit=players[p].pick===win;
-      oddsUsed=pick.odds;
+      // 単勝は1着だけ的中
+      hit = players[p].pick === win;
+      oddsUsed = pick.odds;
     }
+
     if(hit){
       var pay=Math.floor(players[p].bet*oddsUsed);
       players[p].money+=pay;
