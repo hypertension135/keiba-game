@@ -695,7 +695,7 @@ var COUNT_KEY="minna_derby_rebuild_count_v1";
 var entries=[],horses=[],finished=[],records={},lastRun={},raceCount=0,currentGrade="G3",upsetMode=false;
 var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
 var activePlayerCount=3;
-var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false;
+var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false,resultShown=false;
 
 var startScreen=document.getElementById("startScreen"),oddsScreen=document.getElementById("oddsScreen"),raceScreen=document.getElementById("raceScreen");
 var msg=document.getElementById("msg"),entryBody=document.getElementById("entryBody"),oddsBody=document.getElementById("oddsBody");
@@ -1040,7 +1040,7 @@ function focusCamera(){
 }
 function startRace(){
   if(running)return;
-  running=true;raceEnding=false;finished=[];raceStartTime=Date.now();
+  running=true;raceEnding=false;resultShown=false;finished=[];raceStartTime=Date.now();
   result.innerHTML=upsetMode?"レース中：約40秒。荒れ展開でも最後の差はそのまま。":"レース中：約40秒。最後まで差が残る展開です。";
   raceInfo.innerHTML=currentGrade+" 発走";
   for(var i=0;i<horses.length;i++){
@@ -1054,19 +1054,23 @@ function startRace(){
   timer=setInterval(stepRace,30);
 }
 function stepRace(){
-  var leaderProgress=0,elapsed=Date.now()-raceStartTime;
+  var leaderProgress=0, elapsed=Date.now()-raceStartTime;
+
   for(var i=0;i<horses.length;i++){
     var h=horses[i];
-    var e=entries[i],bonus=0;
+    var e=entries[i];
 
-    // ゴールした馬も最後の馬が着くまで、ゴールバーを越えて走り続ける
+    // ゴール後もずっと右へ走り続ける。
+    // 画面外まで行ったらゴール後の位置から少し戻して、止まって見えないようにする。
     if(h.done){
-      h.progress += h.speed*1.8 + Math.random()*0.00006;
-      if(h.progress>1.35) h.progress=1.35;
+      h.progress += h.speed*1.45 + Math.random()*0.00005;
+      if(h.progress>1.34) h.progress=1.08;
       placeHorse(h);
-      if(h.progress>leaderProgress)leaderProgress=h.progress;
+      if(h.progress>leaderProgress) leaderProgress=h.progress;
       continue;
     }
+
+    var bonus=0;
     if(e.style==="逃げ"&&h.progress<.35)bonus=.00008;
     if(e.style==="差し"&&h.progress>.55)bonus=.00010;
     if(e.style==="追込"&&h.progress>.72)bonus=.00014;
@@ -1074,40 +1078,46 @@ function stepRace(){
     if(e.style==="気分屋"&&Math.random()<.018)bonus+=.00055;
     if(e.popularity>=9&&Math.random()<.010)bonus+=.00075;
     if(e.popularity>=6&&Math.random()<.006)bonus+=.00050;
-    if(upsetMode){if(e.popularity>=8&&Math.random()<.030)bonus+=.00090;if(e.popularity>=5&&Math.random()<.016)bonus+=.00055;if(e.popularity<=2&&Math.random()<.010)bonus-=.00025}
-    h.progress+=h.speed+bonus+Math.random()*.00008;
-    // 最後の200mで全馬の差がなくならないよう、強制的に追いつかせる処理はなし。
-    // 遅れている馬は遅れたまま、スピード差を残してゴールする。
-    if(elapsed>RACE_DURATION && h.progress<0.96){
-      h.progress += h.speed*0.7 + Math.random()*0.00004;
+    if(upsetMode){
+      if(e.popularity>=8&&Math.random()<.030)bonus+=.00090;
+      if(e.popularity>=5&&Math.random()<.016)bonus+=.00055;
+      if(e.popularity<=2&&Math.random()<.010)bonus-=.00025;
     }
 
-    if(h.progress>leaderProgress)leaderProgress=h.progress;
+    h.progress += h.speed + bonus + Math.random()*.00008;
 
-    if(h.progress>=1){
-      h.progress=1;
+    // ゴール線に到達したら着順だけ確定。馬は止めない。
+    if(h.progress>=1 && !h.done){
       h.done=true;
-      
       finished.push(i);
     }
 
-    // 長すぎる場合だけ、残っている馬を現在の順番でゴール扱いにする
-    if(elapsed>=RACE_DURATION+7000 && !h.done){
-      h.progress=1;
-      h.done=true;
-      
-      finished.push(i);
+    // ゴールした瞬間も、そのまま駆け抜ける
+    if(h.done){
+      h.progress += h.speed*1.45 + Math.random()*0.00005;
+      if(h.progress>1.34) h.progress=1.08;
     }
+
+    if(h.progress>leaderProgress) leaderProgress=h.progress;
     placeHorse(h);
+
+    // 長すぎる時だけ未到達馬を着順確定。ただし見た目は走り続ける。
+    if(elapsed>=RACE_DURATION+7000 && !h.done){
+      h.done=true;
+      finished.push(i);
+    }
   }
-  lapInfo.innerHTML="残り "+Math.max(0,Math.round((1-leaderProgress)*1600))+"m";
+
+  lapInfo.innerHTML="残り "+Math.max(0,Math.round((1-Math.min(1,leaderProgress))*1600))+"m";
   focusCamera();
+
+  // 最後の馬がゴールしたら、少し駆け抜けて結果だけ表示。
+  // タイマーは止めないので、馬は走り続ける。
   if(finished.length===horses.length && !raceEnding){
     raceEnding=true;
-    // 最後の馬がゴールしてから、全馬が少し駆け抜けて結果表示
     setTimeout(function(){
-      if(running) finishRace();
-    }, 2600);
+      if(running && !resultShown) finishRace();
+    }, 1200);
   }
 }
 function recordResult(){
@@ -1120,56 +1130,71 @@ function recordResult(){
   saveRecords();
 }
 function finishRace(){
-  if(!running) return;
-  stopRace();raceCount++;recordResult();
-  var win=finished[0],winner=entries[win],order="";
-  for(var i=0;i<Math.min(10,finished.length);i++){if(i>0)order+=" → ";order+=entries[finished[i]].no+"番"}
+  if(resultShown) return;
+  resultShown=true;
+
+  raceCount++;
+  recordResult();
+
+  var win=finished[0];
+  var winner=entries[win];
+  var order="";
+  for(var i=0;i<Math.min(10,finished.length);i++){
+    if(i>0) order+=" → ";
+    order+=entries[finished[i]].no+"番";
+  }
+
+  var top3 = finished.slice(0,3);
   var payText="";
+
   for(var p=0;p<activePlayerCount;p++){
-    if(players[p].bet<=0||players[p].pick===null){
+    if(players[p].bet<=0 || players[p].pick===null){
       payText+="P"+(p+1)+": 休み / 所持金 "+players[p].money+"円<br>";
       continue;
     }
 
     var pick=entries[players[p].pick];
-    var betTypeNow=players[p].type || "win";
-    var typeLabel=betTypeNow==="place" ? "複勝" : "単勝";
+    var type = players[p].type || "win";
+    var typeLabel = type==="place" ? "複勝" : "単勝";
 
-    // 賭け金は結果確定時に引く
-    players[p].money-=players[p].bet;
+    players[p].money -= players[p].bet;
 
     var hit=false;
     var oddsUsed=pick.odds;
 
-    if(betTypeNow==="place"){
-      // 複勝は3着以内で的中
-      hit = finished.slice(0,3).indexOf(players[p].pick) >= 0;
+    if(type==="place"){
+      hit = top3.indexOf(players[p].pick) >= 0;
       oddsUsed = pick.placeOdds || Math.max(1.1, Math.round((pick.odds*0.18+1.1)*10)/10);
     }else{
-      // 単勝は1着だけ的中
       hit = players[p].pick === win;
       oddsUsed = pick.odds;
     }
 
     if(hit){
-      var pay=Math.floor(players[p].bet*oddsUsed);
-      players[p].money+=pay;
+      var pay=Math.floor(players[p].bet * oddsUsed);
+      players[p].money += pay;
       payText+="P"+(p+1)+": "+typeLabel+"的中！ "+pick.no+"番 "+pick.name+" / 払戻 "+pay+"円 / 所持金 "+players[p].money+"円<br>";
     }else{
       payText+="P"+(p+1)+": "+typeLabel+"ハズレ "+pick.no+"番 "+pick.name+" / -"+players[p].bet+"円 / 所持金 "+players[p].money+"円<br>";
     }
   }
+
   for(var op=0;op<activePlayerCount;op++){
     if(players[op].money<=0){
       players[op].money=0;
       players[op].out=true;
     }
   }
+
   updateMoney();
-  raceInfo.innerHTML="確定";lapInfo.innerHTML="着順確定";focusCamera();betsConfirmed=false;
-  result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / "+winner.odds.toFixed(1)+"倍）<br>上位10頭："+order+"<br><br>"+payText;
+  raceInfo.innerHTML="確定・馬は走行中";
+  lapInfo.innerHTML="着順確定";
+  focusCamera();
+  betsConfirmed=false;
+
+  result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / 単勝 "+winner.odds.toFixed(1)+"倍）<br>上位10頭："+order+"<br><br>"+payText+"<br>馬はゴール後も走り続けています。新しいレースへ進むと止まります。";
 }
-function stopRace(){running=false;raceEnding=false;if(timer){clearInterval(timer);timer=null}}
+function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
   loadRecords();
   updateMoney();
