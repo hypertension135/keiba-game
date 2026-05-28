@@ -226,7 +226,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   position:absolute;
   width:110px;height:80px;
   z-index:10;
-  filter:drop-shadow(3px 4px 3px rgba(0,0,0,.62));
+  filter:none;
 }
 .runner{
   position:absolute;left:0;top:0;width:110px;height:74px;
@@ -295,8 +295,8 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   height:auto;
   object-fit:contain;
 }
-.frameA{animation:frameA .24s infinite steps(1)}
-.frameB{animation:frameB .24s infinite steps(1)}
+.frameA{animation:frameA .32s infinite steps(1)}
+.frameB{animation:frameB .32s infinite steps(1)}
 @keyframes frameA{0%,49%{opacity:1}50%,100%{opacity:0}}
 @keyframes frameB{0%,49%{opacity:0}50%,100%{opacity:1}}
 /* ゴール後も馬は止めない。常に足アニメを続ける。 */
@@ -355,7 +355,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   width:128px!important;
   height:92px!important;
   z-index:10;
-  filter:drop-shadow(3px 4px 3px rgba(0,0,0,.62));
+  filter:none;
 }
 .realHorseRunner{
   position:absolute;
@@ -374,8 +374,8 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   height:auto!important;
   object-fit:contain;
 }
-.frameA{animation:frameA .24s infinite steps(1)}
-.frameB{animation:frameB .24s infinite steps(1)}
+.frameA{animation:frameA .32s infinite steps(1)}
+.frameB{animation:frameB .32s infinite steps(1)}
 @keyframes frameA{0%,49%{opacity:1}50%,100%{opacity:0}}
 @keyframes frameB{0%,49%{opacity:0}50%,100%{opacity:1}}
 .realHorseRunner .saddle{
@@ -411,8 +411,8 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   object-fit:contain!important;
   transform:none!important;
 }
-.frameA{animation:frameA .24s infinite steps(1)!important}
-.frameB{animation:frameB .24s infinite steps(1)!important}
+.frameA{animation:frameA .32s infinite steps(1)!important}
+.frameB{animation:frameB .32s infinite steps(1)!important}
 .realHorseRunner .saddle{
   left:50px!important;
   top:32px!important;
@@ -472,8 +472,8 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   object-fit:contain!important;
   transform:none!important;
 }
-.frameA{animation:frameA .24s infinite steps(1)!important}
-.frameB{animation:frameB .24s infinite steps(1)!important}
+.frameA{animation:frameA .32s infinite steps(1)!important}
+.frameB{animation:frameB .32s infinite steps(1)!important}
 .realHorseRunner .saddle{
   left:58px!important;
   top:36px!important;
@@ -485,6 +485,25 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseRunner .jockey{
   left:57px!important;
   top:5px!important;
+}
+
+
+/* 黒い線のチカチカ対策 */
+.leg,
+.legMotion,
+.dust{
+  display:none!important;
+}
+.realHorseImg{
+  image-rendering:auto!important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.horse,
+.realHorseRunner{
+  filter:none!important;
+  outline:none!important;
+  box-shadow:none!important;
 }
 
 </style>
@@ -601,7 +620,7 @@ var COUNT_KEY="minna_derby_rebuild_count_v1";
 
 var entries=[],horses=[],finished=[],records={},lastRun={},raceCount=0,currentGrade="G3",upsetMode=false;
 var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
-var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false;
+var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false;
 
 var startScreen=document.getElementById("startScreen"),oddsScreen=document.getElementById("oddsScreen"),raceScreen=document.getElementById("raceScreen");
 var msg=document.getElementById("msg"),entryBody=document.getElementById("entryBody"),oddsBody=document.getElementById("oddsBody");
@@ -922,7 +941,7 @@ function focusCamera(){
 }
 function startRace(){
   if(running)return;
-  running=true;finished=[];raceStartTime=Date.now();
+  running=true;raceEnding=false;finished=[];raceStartTime=Date.now();
   result.innerHTML=upsetMode?"レース中：約40秒。荒れ展開でも最後の差はそのまま。":"レース中：約40秒。最後まで差が残る展開です。";
   raceInfo.innerHTML=currentGrade+" 発走";
   for(var i=0;i<horses.length;i++){
@@ -938,8 +957,17 @@ function startRace(){
 function stepRace(){
   var leaderProgress=0,elapsed=Date.now()-raceStartTime;
   for(var i=0;i<horses.length;i++){
-    var h=horses[i];if(h.done)continue;
+    var h=horses[i];
     var e=entries[i],bonus=0;
+
+    // ゴールした馬も、最後の馬が着くまで止まらず駆け抜ける
+    if(h.done){
+      h.progress += h.speed*1.4 + Math.random()*0.00004;
+      if(h.progress>1.22) h.progress=1.22;
+      placeHorse(h);
+      if(h.progress>leaderProgress)leaderProgress=h.progress;
+      continue;
+    }
     if(e.style==="逃げ"&&h.progress<.35)bonus=.00008;
     if(e.style==="差し"&&h.progress>.55)bonus=.00010;
     if(e.style==="追込"&&h.progress>.72)bonus=.00014;
@@ -975,10 +1003,12 @@ function stepRace(){
   }
   lapInfo.innerHTML="残り "+Math.max(0,Math.round((1-leaderProgress)*1600))+"m";
   focusCamera();
-  if(finished.length===horses.length){
+  if(finished.length===horses.length && !raceEnding){
+    raceEnding=true;
+    // 最後の馬がゴールしてから、全馬が少し駆け抜けて結果表示
     setTimeout(function(){
       if(running) finishRace();
-    }, 1400);
+    }, 1800);
   }
 }
 function recordResult(){
@@ -1028,7 +1058,7 @@ function finishRace(){
   raceInfo.innerHTML="確定";lapInfo.innerHTML="着順確定";focusCamera();betsConfirmed=false;
   result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / "+winner.odds.toFixed(1)+"倍）<br>上位10頭："+order+"<br><br>"+payText;
 }
-function stopRace(){running=false;if(timer){clearInterval(timer);timer=null}}
+function stopRace(){running=false;raceEnding=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
   loadRecords();
   updateMoney();
