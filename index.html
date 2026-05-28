@@ -506,6 +506,37 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   box-shadow:none!important;
 }
 
+
+/* ゼッケン復活：馬画像より前に表示 */
+.saddle{
+  position:absolute!important;
+  z-index:50!important;
+  display:block!important;
+  opacity:1!important;
+  left:56px!important;
+  top:34px!important;
+  width:38px!important;
+  height:26px!important;
+  line-height:22px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:center!important;
+  border:3px solid #fff!important;
+  border-radius:6px!important;
+  color:#fff!important;
+  box-shadow:0 2px 3px rgba(0,0,0,.45)!important;
+}
+.frame-yellow.saddle,
+.frame-white.saddle{
+  color:#111!important;
+}
+.realHorseImg{
+  z-index:1!important;
+}
+.jockey{
+  z-index:45!important;
+}
+
 </style>
 </head>
 <body>
