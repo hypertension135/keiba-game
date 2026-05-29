@@ -962,7 +962,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <div class="title"><span id="entryTitle">出馬表</span><span>12頭出走</span></div>
         <div class="scroll">
           <table>
-            <thead><tr><th>枠番</th><th>登録No.</th><th>馬名</th><th>騎手</th><th>脚質</th><th>調子</th><th>単勝</th><th>複勝</th><th>平均</th><th>直近5戦</th></tr></thead>
+            <thead><tr><th>枠番</th><th>登録No.</th><th>馬名</th><th>騎手</th><th>脚質</th><th>展開</th><th>調子</th><th>単勝</th><th>複勝</th><th>平均</th><th>直近5戦</th></tr></thead>
             <tbody id="entryBody"></tbody>
           </table>
         </div>
@@ -1261,8 +1261,29 @@ function showOdds(){
     var boost=0;
     if(hist>0){if(avg<=2.5)boost=.24;else if(avg<=4.5)boost=.14;else if(avg<=7)boost=.04;else if(avg>=10)boost=-.12;else if(avg>=8.5)boost=-.06}
     var ability=Math.max(.1,Math.min(1.25,rnd(.2,1)+boost));
-    entries.push({no:nums[i],regNo:runners[i].index+1,name:name,jockey:js[i],jockeyColor:(i+1),style:pick(styles),mark:pick(marks),ability:ability,odds:0,placeOdds:0,popularity:0,racePower:0,avgRank:avg,history:hist});
+    entries.push({no:nums[i],regNo:runners[i].index+1,name:name,jockey:js[i],jockeyColor:(i+1),style:pick(styles),mark:pick(marks),ability:ability,odds:0,placeOdds:0,popularity:0,racePower:0,avgRank:avg,history:hist,specialMove:''});
   }
+
+  // たまに特殊展開を作る
+  // 逃げ馬：ダントツ大逃げ
+  // 差し馬：直線で爆速差し
+  var runnersNige=[];
+  var runnersSashi=[];
+  for(var si=0;si<entries.length;si++){
+    if(entries[si].style==="逃げ") runnersNige.push(entries[si]);
+    if(entries[si].style==="差し" || entries[si].style==="追込") runnersSashi.push(entries[si]);
+  }
+
+  if(runnersNige.length>0 && Math.random()<0.18){
+    var runaway=pick(runnersNige);
+    runaway.specialMove="大逃げ";
+  }
+
+  if(runnersSashi.length>0 && Math.random()<0.18){
+    var rocket=pick(runnersSashi);
+    rocket.specialMove="爆速差し";
+  }
+
   entries.sort(function(a,b){return a.no-b.no});
   var sorted=entries.slice().sort(function(a,b){return b.ability-a.ability});
   var oddsList=[rnd(1.5,2.4),rnd(3,5.8),rnd(6.2,9.8),rnd(11,16.5),rnd(18,27),rnd(30,42),rnd(45,60),rnd(62,78),rnd(80,98),rnd(100,120),rnd(125,142),rnd(148,158)];
@@ -1301,22 +1322,57 @@ function showOdds(){
   }
   drawTables();fillSelects();updateMoney();
   selected.innerHTML=activePlayerCount+"人プレイです。所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
-  msg.innerHTML=currentGrade+" の出馬表とオッズです。"+(currentGrade==="G1"?" G1は直近5戦の成績上位を選抜。":"")+" 直近5戦で倍率が変わります。";
+  msg.innerHTML=currentGrade+" の出馬表とオッズです。"+(currentGrade==="G1"?" G1は直近5戦の成績上位を選抜。":"")+" 直近5戦で倍率が変わります。たまに大逃げ・爆速差しがあります。";
 }
 function drawTables(){
   var h="";
+
   for(var i=0;i<entries.length;i++){
-    var e=entries[i],av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
-    h+="<tr"+(e.popularity===1?" class='rank1'":"")+"><td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td><td>"+e.regNo+"</td><td class='name'>"+e.name+"</td><td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td><td>"+e.style+"</td><td>"+e.mark+"</td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"</span></td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"</span></td><td>"+av+"</td><td>"+form(e.name)+"</td></tr>";
+    var e=entries[i];
+    var av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
+    var special=e.specialMove?e.specialMove:"-";
+
+    h+="<tr"+(e.popularity===1?" class='rank1'":"")+">"
+      +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
+      +"<td>"+e.regNo+"</td>"
+      +"<td class='name'>"+e.name+"</td>"
+      +"<td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td>"
+      +"<td>"+e.style+"</td>"
+      +"<td>"+special+"</td>"
+      +"<td>"+e.mark+"</td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"</span></td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"</span></td>"
+      +"<td>"+av+"</td>"
+      +"<td>"+form(e.name)+"</td>"
+      +"</tr>";
   }
+
   entryBody.innerHTML=h;
-  var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});h="";
+
+  var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});
+  h="";
+
   for(var j=0;j<sorted.length;j++){
-    var e=sorted[j],av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
-    h+="<tr"+(e.popularity===1?" class='rank1'":"")+"><td>"+currentGrade+"</td><td>"+e.popularity+"</td><td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td><td class='name'>"+e.name+"</td><td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td><td>"+av+"</td></tr>";
+    var e=sorted[j];
+    var av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
+    var special=e.specialMove?e.specialMove:"-";
+
+    h+="<tr"+(e.popularity===1?" class='rank1'":"")+">"
+      +"<td>"+currentGrade+"</td>"
+      +"<td>"+e.popularity+"</td>"
+      +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
+      +"<td class='name'>"+e.name+"</td>"
+      +"<td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td>"
+      +"<td>"+special+"</td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td>"
+      +"<td>"+av+"</td>"
+      +"</tr>";
   }
+
   oddsBody.innerHTML=h;
 }
+
 function fillSelects(){
   applyPlayerCount();
   for(var p=0;p<5;p++){
@@ -1324,11 +1380,13 @@ function fillSelects(){
       if(playerBoxes[p]) playerBoxes[p].style.display="none";
       continue;
     }
+
     var s="";
     for(var i=0;i<entries.length;i++){
       var e=entries[i];
       s+="<option value='"+i+"'>"+e.no+"番("+frameName(e.no)+"枠) "+e.name+" / 騎手色"+e.jockeyColor+" "+e.jockey+" / 単"+e.odds.toFixed(1)+" 複"+e.placeOdds.toFixed(1)+"</option>";
     }
+
     if(players[p].money<=0){
       horseSel[p].innerHTML="<option>脱落</option>";
       betInp[p].value=0;
@@ -1348,6 +1406,7 @@ function fillSelects(){
   }
   updateMoney();
 }
+
 function confirmBets(){
   applyPlayerCount();
   var text=[];
@@ -1518,12 +1577,12 @@ function focusCamera(){
   var y = vh < 580 ? 20 : 35;
 
   world.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px) scale("+scale+")";
-  leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name;
+  leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name+(entries[l].specialMove?"（"+entries[l].specialMove+"）":"");
 }
 function startRace(){
   if(running)return;
   running=true;raceEnding=false;resultShown=false;finished=[];raceStartTime=Date.now();
-  result.innerHTML="レース中です。";
+  result.innerHTML="レース中です。たまに大逃げや爆速差しが出ます。";
   raceInfo.innerHTML=currentGrade+" 発走";
   for(var i=0;i<horses.length;i++){
     var row=Math.floor(i/6),col=i%6;
@@ -1559,6 +1618,19 @@ function stepRace(){
     if(e.style==="追込"&&h.progress>.72)bonus=.00014;
     if(e.style==="まくり"&&h.progress>.45&&h.progress<.75)bonus=.00011;
     if(e.style==="気分屋"&&Math.random()<.018)bonus+=.00055;
+
+    // 特殊展開：逃げ馬がたまにダントツで逃げる
+    if(e.specialMove==="大逃げ"){
+      if(h.progress<0.58) bonus+=0.00075;
+      if(h.progress<0.25) bonus+=0.00055;
+    }
+
+    // 特殊展開：差し・追込がたまに最後にものすごい脚で差す
+    if(e.specialMove==="爆速差し"){
+      if(h.progress>0.62 && h.progress<0.95) bonus+=0.00105;
+      if(h.progress>0.78 && h.progress<1.00) bonus+=0.00075;
+    }
+
     if(e.popularity>=9&&Math.random()<.010)bonus+=.00075;
     if(e.popularity>=6&&Math.random()<.006)bonus+=.00050;
     if(upsetMode){
