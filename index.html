@@ -934,80 +934,37 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 馬の腹ゼッケン：発走からゴールまで常時表示 */
-.horse{overflow:visible!important}
-.bib,
-.horse > .bib{
+/* 馬の腹ゼッケン：元の走る処理は壊さず、ゼッケンだけ腹に固定 */
+.realHorseRunner .saddle,
+.saddle{
   position:absolute!important;
   left:46px!important;
   top:48px!important;
   width:34px!important;
   height:24px!important;
-  border-radius:5px!important;
-  border:3px solid #fff!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
+  line-height:20px!important;
   font-size:14px!important;
   font-weight:900!important;
-  color:#fff!important;
-  background:#111!important;
-  z-index:2147483647!important;
-  box-shadow:0 2px 5px rgba(0,0,0,.65)!important;
-  pointer-events:none!important;
-  opacity:1!important;
-  visibility:visible!important;
-}
-.bib.frame-red{background:#c62828!important;color:#fff!important}
-.bib.frame-blue{background:#1565c0!important;color:#fff!important}
-.bib.frame-yellow{background:#fdd835!important;color:#111!important}
-.bib.frame-green{background:#2e7d32!important;color:#fff!important}
-.bib.frame-pink{background:#ec407a!important;color:#fff!important}
-.bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
-.realHorseImg{z-index:1!important}
-.realHorseRunner{z-index:1!important}
-.jockey{z-index:2000000000!important}
-
-
-/* 腹ゼッケン完全固定：発走前・走行中・ゴール後まで常時表示 */
-.horse{
-  overflow:visible!important;
-}
-.bib,
-.horse > .bib{
-  position:absolute!important;
-  left:46px!important;
-  top:48px!important;
-  width:34px!important;
-  height:24px!important;
-  border-radius:5px!important;
+  text-align:center!important;
   border:3px solid #fff!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  font-size:14px!important;
-  font-weight:900!important;
-  color:#fff!important;
-  background:#111!important;
-  z-index:2147483647!important;
-  box-shadow:0 2px 5px rgba(0,0,0,.65)!important;
-  pointer-events:none!important;
+  border-radius:5px!important;
+  display:block!important;
   opacity:1!important;
   visibility:visible!important;
+  z-index:999999!important;
+  pointer-events:none!important;
+  background:#111!important;
+  color:#fff!important;
 }
-.bib.frame-red{background:#c62828!important;color:#fff!important}
-.bib.frame-blue{background:#1565c0!important;color:#fff!important}
-.bib.frame-yellow{background:#fdd835!important;color:#111!important}
-.bib.frame-green{background:#2e7d32!important;color:#fff!important}
-.bib.frame-pink{background:#ec407a!important;color:#fff!important}
-.bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
-.realHorseRunner .bib,
-.realHorseRunner .saddle{
-  display:none!important;
-}
+.realHorseRunner .saddle.frame-red,.saddle.frame-red{background:#c62828!important;color:#fff!important}
+.realHorseRunner .saddle.frame-blue,.saddle.frame-blue{background:#1565c0!important;color:#fff!important}
+.realHorseRunner .saddle.frame-yellow,.saddle.frame-yellow{background:#fdd835!important;color:#111!important}
+.realHorseRunner .saddle.frame-green,.saddle.frame-green{background:#2e7d32!important;color:#fff!important}
+.realHorseRunner .saddle.frame-pink,.saddle.frame-pink{background:#ec407a!important;color:#fff!important}
+.realHorseRunner .saddle.frame-white,.saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
 .realHorseImg{z-index:1!important}
-.realHorseRunner{z-index:1!important}
-.jockey{z-index:999999!important}
+.realHorseRunner{overflow:visible!important}
+.jockey{z-index:99999!important}
 
 </style>
 </head>
@@ -1506,30 +1463,26 @@ function makeHorses(){
       +"<div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div>"
       +"</div>"
       +"<div class='bib "+frameClass(e.no)+"'>"+e.no+"</div>";
+    el.innerHTML="<div class='leaderBadge'>1位</div><div class='realHorseRunner'><img class='realHorseImg frameA' src='"+horseFrames[0]+"'><img class='realHorseImg frameB' src='"+horseFrames[1]+"'><div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div><div class='saddle "+frameClass(e.no)+"'>"+e.no+"</div></div>";
     world.appendChild(el);
     var row=Math.floor(i/6),col=i%6;
     horses.push({el:el,lane:i,progress:.0005+col*.0003+row*.0005,speed:.00048+e.racePower*.00008+Math.random()*.00004,done:false,x:0,y:0});
     placeHorse(horses[i]);
   }
-  ensureBibNumbers();
 }
 
-function ensureBibNumbers(){
+function ensureSaddles(){
   for(var i=0;i<horses.length;i++){
     var el=horses[i].el;
     var e=entries[i];
-    if(!el || !e) continue;
-
-    var b=el.querySelector(":scope > .bib");
+    var b=el.querySelector(".bib");
     if(!b){
       b=document.createElement("div");
+      b.className="bib "+frameClass(e.no);
       el.appendChild(b);
     }
-
     b.textContent=e.no;
     b.className="bib "+frameClass(e.no);
-    b.style.left="46px";
-    b.style.top="48px";
     b.style.display="flex";
     b.style.visibility="visible";
     b.style.opacity="1";
@@ -1549,7 +1502,6 @@ function point(t,lane){
 
 function placeHorse(h){
   ensureSaddles();
-  ensureBibNumbers();
   var p=point(h.progress,h.lane);
   h.x=p.x;h.y=p.y;
   h.el.style.left=Math.round(p.x-66)+"px";
@@ -1602,12 +1554,9 @@ function startRace(){
     placeHorse(horses[i]);
   }
   ensureSaddles();
-  ensureBibNumbers();
-  ensureBibNumbers();
   timer=setInterval(stepRace,30);
 }
 function stepRace(){
-  ensureBibNumbers();
   ensureSaddles();
   var leaderProgress=0, elapsed=Date.now()-raceStartTime;
 
