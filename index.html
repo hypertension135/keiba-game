@@ -875,6 +875,40 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseImg{z-index:1!important}
 .jockey{z-index:999!important}
 
+
+/* 対応ゼッケン：発走からゴールまで馬の横に固定表示 */
+.horse{overflow:visible!important}
+.bib{
+  position:absolute!important;
+  z-index:2147483647!important;
+  left:70px!important;
+  top:38px!important;
+  width:36px!important;
+  height:28px!important;
+  border-radius:6px!important;
+  border:3px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  color:#fff!important;
+  background:#111!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.65)!important;
+  pointer-events:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.bib.frame-red{background:#c62828!important;color:#fff!important}
+.bib.frame-blue{background:#1565c0!important;color:#fff!important}
+.bib.frame-yellow{background:#fdd835!important;color:#111!important}
+.bib.frame-green{background:#2e7d32!important;color:#fff!important}
+.bib.frame-pink{background:#ec407a!important;color:#fff!important}
+.bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+.realHorseImg{z-index:1!important}
+.realHorseRunner{z-index:1!important}
+.jockey{z-index:2000000000!important}
+
 </style>
 </head>
 <body>
@@ -1348,13 +1382,15 @@ function makeHorses(){
   for(var i=0;i<entries.length;i++){
     var e=entries[i],el=document.createElement("div");
     el.className="horse";
-    el.innerHTML="<div class='leaderBadge'>1位</div>"
+    el.setAttribute("data-no", e.no);
+    el.innerHTML =
+      "<div class='leaderBadge'>1位</div>"
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"'>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"'>"
       +"<div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div>"
       +"</div>"
-      +"<div class='saddle "+frameClass(e.no)+"'>"+e.no+"</div>";
+      +"<div class='bib "+frameClass(e.no)+"'>"+e.no+"</div>";
     world.appendChild(el);
     var row=Math.floor(i/6),col=i%6;
     horses.push({el:el,lane:i,progress:.0005+col*.0003+row*.0005,speed:.00048+e.racePower*.00008+Math.random()*.00004,done:false,x:0,y:0});
@@ -1365,13 +1401,18 @@ function makeHorses(){
 function ensureSaddles(){
   for(var i=0;i<horses.length;i++){
     var el=horses[i].el;
-    if(!el.querySelector(".saddle")){
-      var e=entries[i];
-      var s=document.createElement("div");
-      s.className="saddle "+frameClass(e.no);
-      s.textContent=e.no;
-      el.appendChild(s);
+    var e=entries[i];
+    var b=el.querySelector(".bib");
+    if(!b){
+      b=document.createElement("div");
+      b.className="bib "+frameClass(e.no);
+      el.appendChild(b);
     }
+    b.textContent=e.no;
+    b.className="bib "+frameClass(e.no);
+    b.style.display="flex";
+    b.style.visibility="visible";
+    b.style.opacity="1";
   }
 }
 
@@ -1443,6 +1484,7 @@ function startRace(){
   timer=setInterval(stepRace,30);
 }
 function stepRace(){
+  ensureSaddles();
   var leaderProgress=0, elapsed=Date.now()-raceStartTime;
 
   for(var i=0;i<horses.length;i++){
