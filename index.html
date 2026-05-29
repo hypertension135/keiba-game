@@ -840,6 +840,41 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   z-index:8000!important;
 }
 
+
+/* 発走からゴールまで番号ゼッケンを常時表示 */
+.horse{overflow:visible!important}
+.horse > .saddle{
+  position:absolute!important;
+  z-index:2147483647!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  left:55px!important;
+  top:33px!important;
+  width:40px!important;
+  height:28px!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  border:3px solid #fff!important;
+  border-radius:6px!important;
+  color:#fff!important;
+  background:#111!important;
+  box-shadow:0 2px 4px rgba(0,0,0,.55)!important;
+  pointer-events:none!important;
+}
+.horse > .saddle.frame-red{background:#c62828!important;color:#fff!important}
+.horse > .saddle.frame-blue{background:#1565c0!important;color:#fff!important}
+.horse > .saddle.frame-yellow{background:#fdd835!important;color:#111!important}
+.horse > .saddle.frame-green{background:#2e7d32!important;color:#fff!important}
+.horse > .saddle.frame-pink{background:#ec407a!important;color:#fff!important}
+.horse > .saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+.realHorseRunner .saddle{display:none!important}
+.realHorseRunner{z-index:1!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:999!important}
+
 </style>
 </head>
 <body>
@@ -1313,13 +1348,33 @@ function makeHorses(){
   for(var i=0;i<entries.length;i++){
     var e=entries[i],el=document.createElement("div");
     el.className="horse";
-    el.innerHTML="<div class='leaderBadge'>1位</div><div class='realHorseRunner'><img class='realHorseImg frameA' src='"+horseFrames[0]+"'><img class='realHorseImg frameB' src='"+horseFrames[1]+"'><div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div></div><div class='saddle "+frameClass(e.no)+"'>"+e.no+"</div>";
+    el.innerHTML="<div class='leaderBadge'>1位</div>"
+      +"<div class='realHorseRunner'>"
+      +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"'>"
+      +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"'>"
+      +"<div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div>"
+      +"</div>"
+      +"<div class='saddle "+frameClass(e.no)+"'>"+e.no+"</div>";
     world.appendChild(el);
     var row=Math.floor(i/6),col=i%6;
     horses.push({el:el,lane:i,progress:.0005+col*.0003+row*.0005,speed:.00048+e.racePower*.00008+Math.random()*.00004,done:false,x:0,y:0});
     placeHorse(horses[i]);
   }
 }
+
+function ensureSaddles(){
+  for(var i=0;i<horses.length;i++){
+    var el=horses[i].el;
+    if(!el.querySelector(".saddle")){
+      var e=entries[i];
+      var s=document.createElement("div");
+      s.className="saddle "+frameClass(e.no);
+      s.textContent=e.no;
+      el.appendChild(s);
+    }
+  }
+}
+
 function point(t,lane){
   var startX=250,finishX=8500;
   var row=Math.floor(lane/6),col=lane%6;
@@ -1332,9 +1387,9 @@ function point(t,lane){
 }
 
 function placeHorse(h){
+  ensureSaddles();
   var p=point(h.progress,h.lane);
   h.x=p.x;h.y=p.y;
-  // 馬の座標を整数にして、小数によるチラつき・ブレを減らす
   h.el.style.left=Math.round(p.x-66)+"px";
   h.el.style.top=Math.round(p.y-55)+"px";
   h.el.style.transform="none";
@@ -1384,6 +1439,7 @@ function startRace(){
     horses[i].el.classList.remove("finished");
     placeHorse(horses[i]);
   }
+  ensureSaddles();
   timer=setInterval(stepRace,30);
 }
 function stepRace(){
