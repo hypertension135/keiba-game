@@ -1136,10 +1136,9 @@ function applyPlayerCount(){
   if(activePlayerCount>5) activePlayerCount=5;
 
   for(var i=0;i<5;i++){
-    if(i<activePlayerCount){
-      if(playerBoxes[i]) playerBoxes[i].style.display="block";
-    }else{
-      if(playerBoxes[i]) playerBoxes[i].style.display="none";
+    var visible = i < activePlayerCount;
+    if(playerBoxes[i]) playerBoxes[i].style.display = visible ? "block" : "none";
+    if(!visible){
       players[i].pick=null;
       players[i].bet=0;
       if(horseSel[i]) horseSel[i].disabled=true;
@@ -1153,6 +1152,8 @@ function updateMoney(){
   applyPlayerCount();
   for(var i=0;i<5;i++){
     if(i>=activePlayerCount) continue;
+    if(!moneyEls[i]) continue;
+
     moneyEls[i].innerHTML=players[i].money;
 
     var out = players[i].money <= 0;
@@ -1171,8 +1172,8 @@ function updateMoney(){
         betInp[i].disabled=true;
       }else{
         betInp[i].disabled=false;
-        if(Number(betInp[i].value)>players[i].money)betInp[i].value=Math.max(100,players[i].money);
-        if(Number(betInp[i].value)<=0)betInp[i].value=Math.min(100,players[i].money);
+        if(Number(betInp[i].value)>players[i].money) betInp[i].value=Math.max(100,players[i].money);
+        if(Number(betInp[i].value)<=0) betInp[i].value=Math.min(100,players[i].money);
       }
     }
 
@@ -1180,6 +1181,7 @@ function updateMoney(){
     if(betType[i]) betType[i].disabled = out;
   }
 }
+
 function resetMoney(){
   players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
   updateMoney();
@@ -1384,7 +1386,7 @@ function fillSelects(){
     var s="";
     for(var i=0;i<entries.length;i++){
       var e=entries[i];
-      s+="<option value='"+i+"'>"+e.no+"番("+frameName(e.no)+"枠) "+e.name+" / 騎手色"+e.jockeyColor+" "+e.jockey+" / 単"+e.odds.toFixed(1)+" 複"+e.placeOdds.toFixed(1)+"</option>";
+      s+="<option value='"+i+"'>"+e.no+"番("+frameName(e.no)+"枠) "+e.name+" / "+e.jockey+" / 単"+e.odds.toFixed(1)+" 複"+e.placeOdds.toFixed(1)+"</option>";
     }
 
     if(players[p].money<=0){
@@ -1434,14 +1436,12 @@ function confirmBets(){
 
     var bet=Number(betInp[p].value);
     if(isNaN(bet) || bet<=0) bet=100;
-
     if(bet<100){
       msg.innerHTML="P"+(p+1)+"の賭け金は100円以上にしてください。";
       return false;
     }
 
     bet=Math.floor(bet/100)*100;
-
     if(bet>players[p].money){
       msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";
       return false;
@@ -1453,15 +1453,12 @@ function confirmBets(){
       return false;
     }
 
-    // ここが重要：単勝/複勝を必ず保存
     var type = betType[p] ? betType[p].value : "win";
-
     players[p].pick=pick;
     players[p].bet=bet;
     players[p].type=type;
 
-    var label = type==="place" ? "複勝" : "単勝";
-    text.push("P"+(p+1)+": "+label+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
+    text.push("P"+(p+1)+": "+(type==="place"?"複勝":"単勝")+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
   }
 
   betsConfirmed=true;
@@ -1775,7 +1772,7 @@ window.onload=function(){
       applyPlayerCount();
       fillSelects();
       updateMoney();
-      selected.innerHTML=activePlayerCount+"人プレイにしました。";
+      if(selected) selected.innerHTML=activePlayerCount+"人プレイにしました。";
     });
   }
 }
