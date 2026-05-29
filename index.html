@@ -938,7 +938,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 <body>
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
-  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ「オッズを表示」を押してください。</div>
+  <div class="notice" id="msg">人数を選んでから「オッズを表示」を押すと、出馬表・オッズ・投票欄が出ます。</div>
 
   <div id="startScreen" class="board">
     <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
@@ -1325,8 +1325,24 @@ function showOdds(){
   drawTables();fillSelects();updateMoney();
   selected.innerHTML=activePlayerCount+"人プレイです。所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
   msg.innerHTML=currentGrade+" の出馬表とオッズです。"+(currentGrade==="G1"?" G1は直近5戦の成績上位を選抜。":"")+" 直近5戦で倍率が変わります。たまに大逃げ・爆速差しがあります。";
+
+  // 出馬表・オッズ・投票欄を必ず作る
+  drawTables();
+  fillSelects();
+  if(entryBody && entryBody.children.length===0){
+    drawTables();
+  }
+  if(horseSel[0] && horseSel[0].options.length===0){
+    fillSelects();
+  }
 }
 function drawTables(){
+  if(!entries || entries.length===0){
+    if(entryBody) entryBody.innerHTML="<tr><td colspan='11'>「オッズを表示」を押してください</td></tr>";
+    if(oddsBody) oddsBody.innerHTML="<tr><td colspan='9'>「オッズを表示」を押してください</td></tr>";
+    return;
+  }
+
   var h="";
 
   for(var i=0;i<entries.length;i++){
@@ -1338,7 +1354,7 @@ function drawTables(){
       +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
       +"<td>"+e.regNo+"</td>"
       +"<td class='name'>"+e.name+"</td>"
-      +"<td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td>"
+      +"<td>"+e.jockey+"</td>"
       +"<td>"+e.style+"</td>"
       +"<td>"+special+"</td>"
       +"<td>"+e.mark+"</td>"
@@ -1364,7 +1380,7 @@ function drawTables(){
       +"<td>"+e.popularity+"</td>"
       +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
       +"<td class='name'>"+e.name+"</td>"
-      +"<td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td>"
+      +"<td>"+e.jockey+"</td>"
       +"<td>"+special+"</td>"
       +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td>"
       +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td>"
@@ -1377,6 +1393,13 @@ function drawTables(){
 
 function fillSelects(){
   applyPlayerCount();
+
+  // 出馬表がまだ作れていない時は、投票欄を空にしない
+  if(!entries || entries.length===0){
+    if(selected) selected.innerHTML="先に「オッズを表示」を押してください。出馬表とオッズが出たら賭けられます。";
+    return;
+  }
+
   for(var p=0;p<5;p++){
     if(p>=activePlayerCount){
       if(playerBoxes[p]) playerBoxes[p].style.display="none";
@@ -1411,6 +1434,12 @@ function fillSelects(){
 
 function confirmBets(){
   applyPlayerCount();
+
+  if(!entries || entries.length===0){
+    showOdds();
+    msg.innerHTML="出馬表とオッズを作りました。馬を選んでからもう一度押してください。";
+    return false;
+  }
   var text=[];
   var activeCount=0;
 
@@ -1767,14 +1796,18 @@ window.onload=function(){
   loadRecords();
   applyPlayerCount();
   updateMoney();
+
   if(playerCountSelect){
     playerCountSelect.addEventListener("change",function(){
       applyPlayerCount();
-      fillSelects();
+      if(entries && entries.length>0) fillSelects();
       updateMoney();
       if(selected) selected.innerHTML=activePlayerCount+"人プレイにしました。";
     });
   }
+
+  // 開いた時点で出馬表・オッズ・投票欄を作る
+  showOdds();
 }
 window.onresize=function(){if(raceScreen.style.display==="block")focusCamera()}
 </script>
