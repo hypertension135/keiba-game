@@ -909,12 +909,56 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseRunner{z-index:1!important}
 .jockey{z-index:2000000000!important}
 
+
+/* ゼッケンを馬の腹に表示 */
+.bib,
+.horse > .bib{
+  left:46px!important;
+  top:48px!important;
+  width:34px!important;
+  height:24px!important;
+  font-size:14px!important;
+  border-radius:5px!important;
+  z-index:2147483647!important;
+}
+
+/* 古いsaddleが残っても腹位置へ */
+.saddle,
+.horse > .saddle{
+  left:46px!important;
+  top:48px!important;
+  width:34px!important;
+  height:24px!important;
+  font-size:14px!important;
+  z-index:2147483000!important;
+}
+
+
+/* ゼッケンを馬の腹に固定 */
+.bib,
+.horse > .bib,
+.saddle,
+.horse > .saddle{
+  left:46px!important;
+  top:48px!important;
+  width:34px!important;
+  height:24px!important;
+  font-size:14px!important;
+  border-radius:5px!important;
+  z-index:2147483647!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
-  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ「オッズを表示」を押してください。</div>
+  <div class="notice" id="msg">人数を選んでから「オッズを表示」を押すと、出馬表・オッズ・投票欄が出ます。</div>
 
   <div id="startScreen" class="board">
     <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
@@ -938,7 +982,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <div class="title"><span id="entryTitle">出馬表</span><span>12頭出走</span></div>
         <div class="scroll">
           <table>
-            <thead><tr><th>枠番</th><th>登録No.</th><th>馬名</th><th>騎手</th><th>脚質</th><th>調子</th><th>単勝</th><th>複勝</th><th>平均</th><th>戦績</th></tr></thead>
+            <thead><tr><th>枠番</th><th>登録No.</th><th>馬名</th><th>騎手</th><th>脚質</th><th>展開</th><th>調子</th><th>単勝</th><th>複勝</th><th>平均</th><th>直近5戦</th></tr></thead>
             <tbody id="entryBody"></tbody>
           </table>
         </div>
@@ -947,7 +991,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <div class="title"><span id="oddsTitle">単勝オッズ</span><span id="gradeBadge">G</span></div>
         <div class="scroll">
           <table>
-            <thead><tr><th>格</th><th>人気</th><th>枠番</th><th>馬名</th><th>騎手</th><th>単勝</th><th>複勝</th><th>平均</th></tr></thead>
+            <thead><tr><th>格</th><th>人気</th><th>枠番</th><th>馬名</th><th>騎手</th><th>展開</th><th>単勝</th><th>複勝</th><th>平均</th></tr></thead>
             <tbody id="oddsBody"></tbody>
           </table>
         </div>
@@ -1068,8 +1112,8 @@ var horseNames=[
 var jockeyNames=["Kシュワーバー","Aジャッジ","大谷","Bハーパー","羽月","Eモンテロ","Kローリー","山川","Wゲレーロjr.","Jソト","Mトラウト","アベシンノスケ"];
 var styles=["逃げ","先行","差し","追込","まくり","気分屋"];
 var marks=["◎","○","▲","△","☆"];
-var STORAGE_KEY="minna_derby_real_names_5custom_records_v1";
-var COUNT_KEY="minna_derby_real_names_5custom_count_v1";
+var STORAGE_KEY="minna_derby_recent5_records_v1";
+var COUNT_KEY="minna_derby_recent5_count_v2";
 
 var entries=[],horses=[],finished=[],records={},lastRun={},raceCount=0,currentGrade="G3",upsetMode=false;
 var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
@@ -1112,10 +1156,9 @@ function applyPlayerCount(){
   if(activePlayerCount>5) activePlayerCount=5;
 
   for(var i=0;i<5;i++){
-    if(i<activePlayerCount){
-      if(playerBoxes[i]) playerBoxes[i].style.display="block";
-    }else{
-      if(playerBoxes[i]) playerBoxes[i].style.display="none";
+    var visible = i < activePlayerCount;
+    if(playerBoxes[i]) playerBoxes[i].style.display = visible ? "block" : "none";
+    if(!visible){
       players[i].pick=null;
       players[i].bet=0;
       if(horseSel[i]) horseSel[i].disabled=true;
@@ -1129,6 +1172,8 @@ function updateMoney(){
   applyPlayerCount();
   for(var i=0;i<5;i++){
     if(i>=activePlayerCount) continue;
+    if(!moneyEls[i]) continue;
+
     moneyEls[i].innerHTML=players[i].money;
 
     var out = players[i].money <= 0;
@@ -1147,8 +1192,8 @@ function updateMoney(){
         betInp[i].disabled=true;
       }else{
         betInp[i].disabled=false;
-        if(Number(betInp[i].value)>players[i].money)betInp[i].value=Math.max(100,players[i].money);
-        if(Number(betInp[i].value)<=0)betInp[i].value=Math.min(100,players[i].money);
+        if(Number(betInp[i].value)>players[i].money) betInp[i].value=Math.max(100,players[i].money);
+        if(Number(betInp[i].value)<=0) betInp[i].value=Math.min(100,players[i].money);
       }
     }
 
@@ -1156,6 +1201,7 @@ function updateMoney(){
     if(betType[i]) betType[i].disabled = out;
   }
 }
+
 function resetMoney(){
   players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
   updateMoney();
@@ -1180,30 +1226,44 @@ function avgRank(name){
 }
 function select12(){
   var arr=[];
+
   for(var i=0;i<horseNames.length;i++){
-    var n=horseNames[i],last=(lastRun[n]===undefined)?-999:lastRun[n],rest=raceCount-last;
-    var score=rest*10+Math.random()*8;
-    if((records[n]||[]).length===0)score+=40;
+    var n=horseNames[i];
+    var last=(lastRun[n]===undefined)?-999:lastRun[n];
+    var rest=raceCount-last;
+    var hist=(records[n]||[]).length;
+    var avg=avgRank(n);
+
+    var score=0;
+
+    if(currentGrade==="G1"){
+      // G1は直近5戦の成績が特に良い馬を選抜
+      // 平均着順が良いほど高得点。直近5戦がある馬を優先。
+      score = (13-avg)*30 + hist*8 + Math.random()*8;
+
+      // 直近5戦でかなり強い馬はさらに優遇
+      if(hist>=3 && avg<=3.0) score += 80;
+      else if(hist>=2 && avg<=4.5) score += 35;
+
+      // 記録がない馬はG1に出にくい
+      if(hist===0) score -= 80;
+    }else{
+      // G2/G3は今まで通り、未出走・最近出てない馬も出やすい
+      score = rest*10 + Math.random()*8;
+      if(hist===0) score += 40;
+    }
+
     arr.push({name:n,index:i,score:score});
   }
+
   arr.sort(function(a,b){return b.score-a.score});
-  return shuffle(arr.slice(0,12));
-}
-function frameClass(no){
-  if(no<=2) return "frame-red";
-  if(no<=4) return "frame-blue";
-  if(no<=6) return "frame-yellow";
-  if(no<=8) return "frame-green";
-  if(no<=10) return "frame-pink";
-  return "frame-white";
-}
-function frameName(no){
-  if(no<=2) return "赤";
-  if(no<=4) return "青";
-  if(no<=6) return "黄";
-  if(no<=8) return "緑";
-  if(no<=10) return "桃";
-  return "白";
+
+  // G1は上位から12頭。G2/G3は少しシャッフルして偏りを減らす。
+  if(currentGrade==="G1"){
+    return arr.slice(0,12);
+  }else{
+    return shuffle(arr.slice(0,12));
+  }
 }
 
 function showOdds(){
@@ -1223,15 +1283,48 @@ function showOdds(){
     var boost=0;
     if(hist>0){if(avg<=2.5)boost=.24;else if(avg<=4.5)boost=.14;else if(avg<=7)boost=.04;else if(avg>=10)boost=-.12;else if(avg>=8.5)boost=-.06}
     var ability=Math.max(.1,Math.min(1.25,rnd(.2,1)+boost));
-    entries.push({no:nums[i],regNo:runners[i].index+1,name:name,jockey:js[i],jockeyColor:(i+1),style:pick(styles),mark:pick(marks),ability:ability,odds:0,placeOdds:0,popularity:0,racePower:0,avgRank:avg,history:hist});
+    entries.push({no:nums[i],regNo:runners[i].index+1,name:name,jockey:js[i],jockeyColor:(i+1),style:pick(styles),mark:pick(marks),ability:ability,odds:0,placeOdds:0,popularity:0,racePower:0,avgRank:avg,history:hist,specialMove:''});
   }
+
+  // たまに特殊展開を作る
+  // 逃げ馬：ダントツ大逃げ
+  // 差し馬：直線で爆速差し
+  var runnersNige=[];
+  var runnersSashi=[];
+  for(var si=0;si<entries.length;si++){
+    if(entries[si].style==="逃げ") runnersNige.push(entries[si]);
+    if(entries[si].style==="差し" || entries[si].style==="追込") runnersSashi.push(entries[si]);
+  }
+
+  if(runnersNige.length>0 && Math.random()<0.18){
+    var runaway=pick(runnersNige);
+    runaway.specialMove="大逃げ";
+  }
+
+  if(runnersSashi.length>0 && Math.random()<0.18){
+    var rocket=pick(runnersSashi);
+    rocket.specialMove="爆速差し";
+  }
+
   entries.sort(function(a,b){return a.no-b.no});
   var sorted=entries.slice().sort(function(a,b){return b.ability-a.ability});
   var oddsList=[rnd(1.5,2.4),rnd(3,5.8),rnd(6.2,9.8),rnd(11,16.5),rnd(18,27),rnd(30,42),rnd(45,60),rnd(62,78),rnd(80,98),rnd(100,120),rnd(125,142),rnd(148,158)];
   for(var j=0;j<sorted.length;j++){
     var e=sorted[j];e.popularity=j+1;
     var factor=1;
-    if(e.history>0){if(e.avgRank<=2.5)factor=.72;else if(e.avgRank<=4.5)factor=.84;else if(e.avgRank<=7)factor=.95;else if(e.avgRank>=10)factor=1.25;else if(e.avgRank>=8.5)factor=1.12}
+
+    // 直近5戦の成績で倍率を調整
+    // 成績が良い馬ほど倍率を低く、悪い馬ほど倍率を高くする
+    if(e.history>0){
+      if(e.avgRank<=1.8) factor=.55;       // かなり強い
+      else if(e.avgRank<=2.8) factor=.65;  // 強い
+      else if(e.avgRank<=4.0) factor=.78;  // まあ良い
+      else if(e.avgRank<=6.0) factor=.95;  // 普通
+      else if(e.avgRank<=8.0) factor=1.15; // やや悪い
+      else if(e.avgRank<=10.0) factor=1.35;// 悪い
+      else factor=1.60;                    // かなり悪い
+    }
+
     var odds=oddsList[j]*factor;
     if(j===0&&odds>3)odds=rnd(1.5,2.9);
     if(j<=2&&odds>9.9)odds=rnd(6.5,9.8);
@@ -1243,39 +1336,127 @@ function showOdds(){
     e.placeOdds=Math.round(place*10)/10;
     if(upsetMode){e.racePower=1-(j*.010)+rnd(-.095,.095);if(j>=7)e.racePower+=rnd(.015,.060)}
     else{e.racePower=1.04-(j*.025)+rnd(-.055,.055)}
-    if(e.history>0&&e.avgRank<=4.5)e.racePower+=.02;
-    if(e.history>0&&e.avgRank>=9)e.racePower-=.01;
+    // 直近5戦の成績を走力にも少し反映
+    if(e.history>0&&e.avgRank<=2.8)e.racePower+=.045;
+    else if(e.history>0&&e.avgRank<=4.5)e.racePower+=.025;
+    else if(e.history>0&&e.avgRank>=10)e.racePower-=.035;
+    else if(e.history>0&&e.avgRank>=8)e.racePower-=.020;
   }
   drawTables();fillSelects();updateMoney();
   selected.innerHTML=activePlayerCount+"人プレイです。所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
-  msg.innerHTML="今回はこちらが指定した "+currentGrade+"。"+(upsetMode?"荒れそうな気配あり。":"人気馬が少し有利です。");
+  msg.innerHTML=currentGrade+" の出馬表とオッズです。"+(currentGrade==="G1"?" G1は直近5戦の成績上位を選抜。":"")+" 直近5戦で倍率が変わります。たまに大逃げ・爆速差しがあります。";
+
+  // 出馬表・オッズ・投票欄を必ず作る
+  drawTables();
+  fillSelects();
+  if(entryBody && entryBody.children.length===0){
+    drawTables();
+  }
+  if(horseSel[0] && horseSel[0].options.length===0){
+    fillSelects();
+  }
+
+  fixOddsIfNeeded();
+  drawTables();
+  fillSelects();
 }
-function drawTables(){
-  var h="";
+
+function fixOddsIfNeeded(){
+  if(!entries || entries.length===0) return;
   for(var i=0;i<entries.length;i++){
-    var e=entries[i],av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
-    h+="<tr"+(e.popularity===1?" class='rank1'":"")+"><td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td><td>"+e.regNo+"</td><td class='name'>"+e.name+"</td><td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td><td>"+e.style+"</td><td>"+e.mark+"</td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"</span></td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"</span></td><td>"+av+"</td><td>"+form(e.name)+"</td></tr>";
+    var e=entries[i];
+
+    if(!e.odds || isNaN(e.odds)){
+      e.odds = Math.round((2.0 + i*3.5 + Math.random()*2)*10)/10;
+    }
+
+    if(!e.placeOdds || isNaN(e.placeOdds)){
+      var p = 1.1 + e.odds*0.18;
+      if(e.popularity<=3) p = Math.min(p,2.0);
+      if(e.popularity>=10) p = Math.max(p,8.0);
+      e.placeOdds = Math.round(p*10)/10;
+    }
   }
+}
+
+function drawTables(){
+  fixOddsIfNeeded();
+
+  if(!entries || entries.length===0){
+    if(entryBody) entryBody.innerHTML="<tr><td colspan='11'>オッズを表示すると出馬表が出ます</td></tr>";
+    if(oddsBody) oddsBody.innerHTML="<tr><td colspan='9'>オッズを表示するとオッズ表が出ます</td></tr>";
+    return;
+  }
+
+  var h="";
+
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    var av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
+    var special=e.specialMove?e.specialMove:"-";
+
+    h+="<tr"+(e.popularity===1?" class='rank1'":"")+">"
+      +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
+      +"<td>"+e.regNo+"</td>"
+      +"<td class='name'>"+e.name+"</td>"
+      +"<td>"+e.jockey+"</td>"
+      +"<td>"+e.style+"</td>"
+      +"<td>"+special+"</td>"
+      +"<td>"+e.mark+"</td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td>"
+      +"<td>"+av+"</td>"
+      +"<td>"+form(e.name)+"</td>"
+      +"</tr>";
+  }
+
   entryBody.innerHTML=h;
-  var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});h="";
+
+  var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});
+  h="";
+
   for(var j=0;j<sorted.length;j++){
-    var e=sorted[j],av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
-    h+="<tr"+(e.popularity===1?" class='rank1'":"")+"><td>"+currentGrade+"</td><td>"+e.popularity+"</td><td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td><td class='name'>"+e.name+"</td><td><span class='badge jc"+e.jockeyColor+"'><span class='body' style='display:inline-block;width:14px;height:14px;border:1px solid #fff;border-radius:3px;vertical-align:middle'></span></span> "+e.jockey+"</td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td><td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td><td>"+av+"</td></tr>";
+    var e=sorted[j];
+    var av=e.history>0?e.avgRank.toFixed(1)+"着":"-";
+    var special=e.specialMove?e.specialMove:"-";
+
+    h+="<tr"+(e.popularity===1?" class='rank1'":"")+">"
+      +"<td>"+currentGrade+"</td>"
+      +"<td>"+e.popularity+"</td>"
+      +"<td><span class='badge frameColor "+frameClass(e.no)+"'>"+e.no+"</span><br><small>"+frameName(e.no)+"枠</small></td>"
+      +"<td class='name'>"+e.name+"</td>"
+      +"<td>"+e.jockey+"</td>"
+      +"<td>"+special+"</td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.odds.toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+frameClass(e.no)+"'>"+e.placeOdds.toFixed(1)+"倍</span></td>"
+      +"<td>"+av+"</td>"
+      +"</tr>";
   }
+
   oddsBody.innerHTML=h;
 }
+
 function fillSelects(){
   applyPlayerCount();
+  fixOddsIfNeeded();
+
+  if(!entries || entries.length===0){
+    if(selected) selected.innerHTML="先にオッズを表示してください。";
+    return;
+  }
+
   for(var p=0;p<5;p++){
     if(p>=activePlayerCount){
       if(playerBoxes[p]) playerBoxes[p].style.display="none";
       continue;
     }
+
     var s="";
     for(var i=0;i<entries.length;i++){
       var e=entries[i];
-      s+="<option value='"+i+"'>"+e.no+"番("+frameName(e.no)+"枠) "+e.name+" / 騎手色"+e.jockeyColor+" "+e.jockey+" / 単"+e.odds.toFixed(1)+" 複"+e.placeOdds.toFixed(1)+"</option>";
+      s+="<option value='"+i+"'>"+e.no+"番("+frameName(e.no)+"枠) "+e.name+" / "+e.jockey+" / 単"+e.odds.toFixed(1)+" 複"+e.placeOdds.toFixed(1)+"</option>";
     }
+
     if(players[p].money<=0){
       horseSel[p].innerHTML="<option>脱落</option>";
       betInp[p].value=0;
@@ -1295,8 +1476,15 @@ function fillSelects(){
   }
   updateMoney();
 }
+
 function confirmBets(){
   applyPlayerCount();
+
+  if(!entries || entries.length===0){
+    showOdds();
+    msg.innerHTML="出馬表とオッズを作りました。馬を選んでからもう一度押してください。";
+    return false;
+  }
   var text=[];
   var activeCount=0;
 
@@ -1322,14 +1510,12 @@ function confirmBets(){
 
     var bet=Number(betInp[p].value);
     if(isNaN(bet) || bet<=0) bet=100;
-
     if(bet<100){
       msg.innerHTML="P"+(p+1)+"の賭け金は100円以上にしてください。";
       return false;
     }
 
     bet=Math.floor(bet/100)*100;
-
     if(bet>players[p].money){
       msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";
       return false;
@@ -1341,15 +1527,12 @@ function confirmBets(){
       return false;
     }
 
-    // ここが重要：単勝/複勝を必ず保存
     var type = betType[p] ? betType[p].value : "win";
-
     players[p].pick=pick;
     players[p].bet=bet;
     players[p].type=type;
 
-    var label = type==="place" ? "複勝" : "単勝";
-    text.push("P"+(p+1)+": "+label+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
+    text.push("P"+(p+1)+": "+(type==="place"?"複勝":"単勝")+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
   }
 
   betsConfirmed=true;
@@ -1465,12 +1648,12 @@ function focusCamera(){
   var y = vh < 580 ? 20 : 35;
 
   world.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px) scale("+scale+")";
-  leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name;
+  leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name+(entries[l].specialMove?"（"+entries[l].specialMove+"）":"");
 }
 function startRace(){
   if(running)return;
   running=true;raceEnding=false;resultShown=false;finished=[];raceStartTime=Date.now();
-  result.innerHTML=upsetMode?"レース中：約40秒。荒れ展開でも最後の差はそのまま。":"レース中：約40秒。最後まで差が残る展開です。";
+  result.innerHTML="レース中です。たまに大逃げや爆速差しが出ます。";
   raceInfo.innerHTML=currentGrade+" 発走";
   for(var i=0;i<horses.length;i++){
     var row=Math.floor(i/6),col=i%6;
@@ -1506,6 +1689,19 @@ function stepRace(){
     if(e.style==="追込"&&h.progress>.72)bonus=.00014;
     if(e.style==="まくり"&&h.progress>.45&&h.progress<.75)bonus=.00011;
     if(e.style==="気分屋"&&Math.random()<.018)bonus+=.00055;
+
+    // 特殊展開：逃げ馬がたまにダントツで逃げる
+    if(e.specialMove==="大逃げ"){
+      if(h.progress<0.58) bonus+=0.00075;
+      if(h.progress<0.25) bonus+=0.00055;
+    }
+
+    // 特殊展開：差し・追込がたまに最後にものすごい脚で差す
+    if(e.specialMove==="爆速差し"){
+      if(h.progress>0.62 && h.progress<0.95) bonus+=0.00105;
+      if(h.progress>0.78 && h.progress<1.00) bonus+=0.00075;
+    }
+
     if(e.popularity>=9&&Math.random()<.010)bonus+=.00075;
     if(e.popularity>=6&&Math.random()<.006)bonus+=.00050;
     if(upsetMode){
@@ -1552,13 +1748,27 @@ function stepRace(){
 }
 function recordResult(){
   for(var i=0;i<finished.length;i++){
-    var idx=finished[i],name=entries[idx].name;
-    if(!records[name])records[name]=[];
-    records[name].push({grade:currentGrade,rank:i+1});
+    var name=entries[finished[i]].name;
+
+    if(!records[name]) records[name]=[];
+
+    records[name].push({
+      grade:currentGrade,
+      rank:i+1
+    });
+
+    // 直近5戦記録は直近5回のみ
+    if(records[name].length>5){
+      records[name]=records[name].slice(records[name].length-5);
+    }
+
     lastRun[name]=raceCount;
   }
-  saveRecords();
+
+  localStorage.setItem(REC_KEY,JSON.stringify(records));
+  localStorage.setItem(COUNT_KEY,String(raceCount));
 }
+
 function finishRace(){
   if(resultShown) return;
   resultShown=true;
@@ -1639,14 +1849,20 @@ window.onload=function(){
   loadRecords();
   applyPlayerCount();
   updateMoney();
+
   if(playerCountSelect){
     playerCountSelect.addEventListener("change",function(){
       applyPlayerCount();
-      fillSelects();
+      if(entries && entries.length>0){
+        drawTables();
+        fillSelects();
+      }
       updateMoney();
-      selected.innerHTML=activePlayerCount+"人プレイにしました。";
+      if(selected) selected.innerHTML=activePlayerCount+"人プレイにしました。";
     });
   }
+
+  showOdds();
 }
 window.onresize=function(){if(raceScreen.style.display==="block")focusCamera()}
 </script>
