@@ -934,7 +934,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 12頭走行＋腹ゼッケン最終上書き */
+/* 修正版：スタート位置をゲートに合わせる・12頭走行・腹ゼッケン */
 .horse{
   overflow:visible!important;
   width:132px!important;
@@ -942,6 +942,12 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 .realHorseRunner{
   overflow:visible!important;
+  width:132px!important;
+  height:92px!important;
+}
+.realHorseImg{
+  width:132px!important;
+  height:92px!important;
 }
 .realHorseRunner .saddle,
 .saddle{
@@ -972,7 +978,6 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseRunner .saddle.frame-green,.saddle.frame-green{background:#2e7d32!important;color:#fff!important}
 .realHorseRunner .saddle.frame-pink,.saddle.frame-pink{background:#ec407a!important;color:#fff!important}
 .realHorseRunner .saddle.frame-white,.saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
-.realHorseImg{z-index:1!important}
 .jockey{z-index:99999!important}
 
 </style>
@@ -1040,7 +1045,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>12頭走行・腹ゼッケン・先頭追跡ライブ</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>12頭走行・スタート位置修正・腹ゼッケン</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1461,6 +1466,8 @@ function makeHorses(){
   document.querySelectorAll(".horse").forEach(function(x){x.remove()});
   horses=[];
 
+  if(!entries || entries.length===0) return;
+
   var count=Math.min(12, entries.length);
   for(var i=0;i<count;i++){
     var e=entries[i];
@@ -1484,11 +1491,12 @@ function makeHorses(){
     horses.push({
       el:el,
       lane:i,
-      progress:.0005 + col*.0010 + row*.0005,
-      speed:.00050 + e.racePower*.00008 + Math.random()*.00005,
+      progress:0,
+      speed:0.00135 + e.racePower*0.00018 + Math.random()*0.00012,
       done:false,
       x:0,
-      y:0
+      y:0,
+      startDelay:col*3+row*2
     });
 
     placeHorse(horses[i]);
@@ -1498,15 +1506,23 @@ function makeHorses(){
 }
 
 function point(t,lane){
-  var startX=250;
+  // startGate left=190px width=115px。馬はゲートのすぐ右から発走。
+  var startX=315;
   var finishX=8500;
+
   var row=Math.floor(lane/6);
   var col=lane%6;
 
-  var y=380 + col*9 + row*46;
-  var laneOffset=col*10 + row*20;
+  // トラック top 370〜442 の中に12頭を並べる
+  // 6頭ずつ2列。上段と下段を少し分ける
+  var y=374 + col*10 + row*18;
 
-  var x=startX + laneOffset + Math.max(0, Math.min(1.22,t))*(finishX-startX);
+  // ほんの少し横にずらして全頭が見えるようにする
+  var startOffset=col*7 + row*12;
+
+  var clamped=Math.max(0, Math.min(1.18, t));
+  var x=startX + startOffset + clamped*(finishX-startX);
+
   return {x:x,y:y,angle:0,flip:false};
 }
 
@@ -1521,6 +1537,7 @@ function placeHorse(h){
 
 function leader(){
   if(!horses || horses.length===0) return null;
+
   var best=0;
   for(var i=1;i<horses.length;i++){
     if(horses[i].progress>horses[best].progress) best=i;
@@ -1543,11 +1560,12 @@ function focusCamera(){
   }
 
   var win=raceWindow.getBoundingClientRect();
-  var spreadX=maxX-minX+260;
-  var spreadY=maxY-minY+170;
 
+  // スタート時はスタートゲートと馬が同じ画面に見えるようにする
+  var spreadX=maxX-minX+360;
+  var spreadY=maxY-minY+210;
   var scale=Math.min(1, win.width/spreadX, win.height/spreadY);
-  if(scale<0.60) scale=0.60;
+  if(scale<0.66) scale=0.66;
 
   var centerX=(minX+maxX)/2;
   var centerY=(minY+maxY)/2;
@@ -1555,20 +1573,24 @@ function focusCamera(){
   var x=win.width/2-centerX*scale;
   var y=win.height/2-centerY*scale;
 
-  if(y>10) y=10;
-  if(y<-120) y=-120;
+  // 上にズレすぎるのを防ぐ
+  if(y>20) y=20;
+  if(y<-110) y=-110;
 
   world.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px) scale("+scale+")";
 }
 
 function startRace(){
-  if(racing) return;
-
   if(!entries || entries.length===0){
     showOdds();
   }
   if(!horses || horses.length!==12){
     makeHorses();
+  }
+
+  if(!horses || horses.length===0){
+    result.innerHTML="馬が作れていません。オッズを表示してからもう一度押してください。";
+    return;
   }
 
   racing=true;
@@ -1577,16 +1599,25 @@ function startRace(){
   result.innerHTML="レース中です。";
   msg.innerHTML="レース中です。";
 
-  if(timer) clearInterval(timer);
-  timer=setInterval(stepRace,30);
+  // 既存timerがあれば止める
+  if(timer){
+    clearInterval(timer);
+    timer=null;
+  }
+
+  // iPhoneでも確実に動くように requestAnimationFrame を使う
+  window.__raceLastTime=null;
+  window.__raceAnimId=requestAnimationFrame(stepRace);
 }
 
-function stepRace(){
+function stepRace(now){
   if(!racing) return;
 
-  if(!horses || horses.length===0){
-    makeHorses();
-  }
+  if(window.__raceLastTime===null) window.__raceLastTime=now || performance.now();
+  var dt=((now || performance.now())-window.__raceLastTime)/16.67;
+  if(dt<0.5) dt=0.5;
+  if(dt>2.2) dt=2.2;
+  window.__raceLastTime=now || performance.now();
 
   for(var i=0;i<horses.length;i++){
     var h=horses[i];
@@ -1594,22 +1625,24 @@ function stepRace(){
     if(!h || !e) continue;
 
     var bonus=0;
-    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.00022;
-    if(e.style==="先行" && h.progress>=0.22 && h.progress<0.70) bonus+=0.00015;
-    if(e.style==="差し" && h.progress>0.58) bonus+=0.00032;
-    if(e.style==="追込" && h.progress>0.72) bonus+=0.00046;
-    if(e.style==="気分屋" && Math.random()<0.015) bonus+=0.00055;
-    if(e.popularity>=9 && Math.random()<0.010) bonus+=0.00070;
+    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.00035;
+    if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.00020;
+    if(e.style==="差し" && h.progress>0.58) bonus+=0.00040;
+    if(e.style==="追込" && h.progress>0.72) bonus+=0.00055;
+    if(e.style==="気分屋" && Math.random()<0.014) bonus+=0.00075;
+    if(e.popularity>=9 && Math.random()<0.010) bonus+=0.00075;
 
-    h.progress += h.speed + bonus + Math.random()*0.00009;
+    // レース進行。dtで端末差を吸収
+    h.progress += (h.speed + bonus + Math.random()*0.00010) * dt;
 
     if(!h.done && h.progress>=1){
       h.done=true;
       finished.push(i);
     }
 
-    if(h.progress>1.22 && h.done){
-      h.progress=1.22;
+    // ゴール後も少し駆け抜ける
+    if(h.done && h.progress>1.18){
+      h.progress=1.18;
     }
 
     placeHorse(h);
@@ -1618,20 +1651,21 @@ function stepRace(){
   var l=leader();
   if(l!==null && entries[l]){
     leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name;
+    var remain=Math.max(0,Math.round((1-horses[l].progress)*1600));
+    lapInfo.innerHTML="残り"+remain+"m";
   }
-
-  var ref=horses[l||0] ? horses[l||0].progress : 0;
-  var remain=Math.max(0,Math.round((1-ref)*1600));
-  lapInfo.innerHTML="残り"+remain+"m";
 
   focusCamera();
 
   if(finished.length>=horses.length){
-    clearInterval(timer);
-    timer=null;
     racing=false;
+    if(window.__raceAnimId) cancelAnimationFrame(window.__raceAnimId);
+    window.__raceAnimId=null;
     finishRace();
+    return;
   }
+
+  window.__raceAnimId=requestAnimationFrame(stepRace);
 }
 
 function recordResult(){
