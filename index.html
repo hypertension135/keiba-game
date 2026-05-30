@@ -934,7 +934,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 修正版：スタート位置をゲートに合わせる・12頭走行・番号つき腹ゼッケン */
+/* 修正版：スタート位置をゲートに合わせる・12頭走行・全馬番号つき腹ゼッケン */
 .horse{
   overflow:visible!important;
   width:132px!important;
@@ -1022,7 +1022,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 最終修正：馬の番号つき腹ゼッケンを必ず表示 */
+/* 最終修正：馬の全馬番号つき腹ゼッケンを必ず表示 */
 .horse{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseRunner{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseImg{z-index:1!important}
@@ -1059,7 +1059,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 番号つき番号つき腹ゼッケン：馬ごとの番号＋枠色を必ず表示 */
+/* 番号つき全馬番号つき腹ゼッケン：馬ごとの番号＋枠色を必ず表示 */
 .horse{
   overflow:visible!important;
 }
@@ -1106,6 +1106,49 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 .realHorseRunner{overflow:visible!important}
 .realHorseImg{z-index:1!important}
+.jockey{z-index:99999!important}
+
+
+/* 全馬ずっと番号つきゼッケン */
+.horse{overflow:visible!important;width:132px!important;height:92px!important}
+.realHorseRunner{overflow:visible!important;width:132px!important;height:92px!important}
+.realHorseImg{z-index:1!important}
+.horse > .bib,
+.bib{
+  position:absolute!important;
+  left:48px!important;
+  top:50px!important;
+  width:36px!important;
+  height:26px!important;
+  min-width:36px!important;
+  min-height:26px!important;
+  padding:0!important;
+  border-radius:6px!important;
+  border:3px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:16px!important;
+  line-height:20px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+  visibility:visible!important;
+  z-index:2147483647!important;
+  pointer-events:none!important;
+  background:#111!important;
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.85)!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.65)!important;
+}
+.bib.frame-red{background:#c62828!important;color:#fff!important}
+.bib.frame-blue{background:#1565c0!important;color:#fff!important}
+.bib.frame-yellow{background:#fdd835!important;color:#111!important;text-shadow:none!important}
+.bib.frame-green{background:#2e7d32!important;color:#fff!important}
+.bib.frame-pink{background:#ec407a!important;color:#fff!important}
+.bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important;text-shadow:none!important}
+.realHorseRunner .saddle,
+.saddle{display:none!important}
 .jockey{z-index:99999!important}
 
 </style>
@@ -1173,7 +1216,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>30秒・1位追跡・ゴール左端でカメラ停止・番号ゼッケン・番号つき腹ゼッケン</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>30秒・1位追跡・ゴールで止まらず駆け抜け・全馬番号ゼッケン・全馬番号つき腹ゼッケン</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1726,13 +1769,7 @@ function focusCamera(){
   if(y<-120) y=-120;
 
   var goalX=8500;
-
-  // 通常時は1位の馬を追う
   var x=win.width*.48-lead.x*scale;
-
-  // ゴール板が画面の1番左に来たらカメラ停止
-  // worldのtranslate x は、画面左に来る世界座標を決める。
-  // goalX*scale + x <= 0 になったら、ゴールが左端に来たという意味。
   var stopX=0-goalX*scale;
 
   if(!cameraLocked && x<=stopX){
@@ -1766,8 +1803,10 @@ function startRace(){
   cameraLocked=false;
   fixedGoalCamera={x:0,y:0,scale:.78};
   finished=[];
+  ensureBibs();
+
   raceInfo.innerHTML=currentGrade+" 発走";
-  result.innerHTML="レース中です。約30秒で、1位の馬を追います。ゴール板が画面の左端に来たらカメラは止まります。馬は駆け抜けます。";
+  result.innerHTML="レース中です。馬はゴールで止まらず、右へ駆け抜けます。";
   msg.innerHTML="レース中です。";
 
   if(timer){
@@ -1784,14 +1823,17 @@ function startRace(){
 }
 
 function stepRace(now){
-  ensureBibs();
   if(!racing) return;
+
+  ensureBibs();
 
   if(window.__raceLastTime===null) window.__raceLastTime=now || performance.now();
   var dt=((now || performance.now())-window.__raceLastTime)/16.67;
   if(dt<0.7) dt=0.7;
   if(dt>1.25) dt=1.25;
   window.__raceLastTime=now || performance.now();
+
+  var allPassedFar=true;
 
   for(var i=0;i<horses.length;i++){
     var h=horses[i];
@@ -1806,16 +1848,18 @@ function stepRace(now){
     if(e.style==="気分屋" && Math.random()<0.012) bonus+=0.000120;
     if(e.popularity>=9 && Math.random()<0.008) bonus+=0.000120;
 
+    // ゴール後も止めずに進ませる
     h.progress += (h.speed + bonus + Math.random()*0.000018) * dt;
 
+    // 順位はゴール通過時点で記録
     if(!h.done && h.progress>=1){
       h.done=true;
       finished.push(i);
     }
 
-    // 先頭がゴールしても馬は少し駆け抜ける。でもカメラはゴール固定。
-    if(h.done && h.progress>1.18){
-      h.progress=1.18;
+    // カメラ固定後、画面右へ駆け抜けるところまで続ける
+    if(h.progress < 1.34){
+      allPassedFar=false;
     }
 
     placeHorse(h);
@@ -1829,8 +1873,10 @@ function stepRace(now){
   }
 
   focusCamera();
+  ensureBibs();
 
-  if(finished.length>=horses.length){
+  // 全馬がゴールして、さらに右へ駆け抜けたら終了
+  if(finished.length>=horses.length && allPassedFar){
     racing=false;
     if(window.__raceAnimId) cancelAnimationFrame(window.__raceAnimId);
     window.__raceAnimId=null;
