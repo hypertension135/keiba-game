@@ -980,6 +980,47 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseRunner .saddle.frame-white,.saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
 .jockey{z-index:99999!important}
 
+
+/* 最終指定：馬の腹にゼッケン */
+.horse{
+  overflow:visible!important;
+}
+.realHorseRunner{
+  overflow:visible!important;
+}
+.realHorseRunner .saddle,
+.saddle{
+  position:absolute!important;
+  left:46px!important;
+  top:48px!important;
+  width:34px!important;
+  height:24px!important;
+  line-height:20px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  text-align:center!important;
+  border:3px solid #fff!important;
+  border-radius:5px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  z-index:999999!important;
+  pointer-events:none!important;
+  background:#111!important;
+  color:#fff!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.55)!important;
+}
+.realHorseRunner .saddle.frame-red,.saddle.frame-red{background:#c62828!important;color:#fff!important}
+.realHorseRunner .saddle.frame-blue,.saddle.frame-blue{background:#1565c0!important;color:#fff!important}
+.realHorseRunner .saddle.frame-yellow,.saddle.frame-yellow{background:#fdd835!important;color:#111!important}
+.realHorseRunner .saddle.frame-green,.saddle.frame-green{background:#2e7d32!important;color:#fff!important}
+.realHorseRunner .saddle.frame-pink,.saddle.frame-pink{background:#ec407a!important;color:#fff!important}
+.realHorseRunner .saddle.frame-white,.saddle.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:99999!important}
+
 </style>
 </head>
 <body>
@@ -1045,7 +1086,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>12頭走行・スタート位置修正・腹ゼッケン</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>約30秒レース・1位追跡・腹ゼッケン</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1451,6 +1492,10 @@ function confirmAndGoRace(){
 }
 
 function goRace(){
+  cameraLocked=false;
+  goalCameraX=null;
+  goalCameraY=null;
+  goalCameraScale=null;
   if(!betsConfirmed){
     if(!confirmBets()){
       return;
@@ -1460,8 +1505,16 @@ function goRace(){
   raceInfo.innerHTML=currentGrade+" 発走前";lapInfo.innerHTML="残り1600m";leaderInfo.innerHTML="先頭：--";
   makeHorses();focusCamera();
 }
-function backOdds(){stopRace();raceScreen.style.display="none";oddsScreen.style.display="block"}
-function newRace(){stopRace();showOdds()}
+function backOdds(){
+  cameraLocked=false;
+  goalCameraX=null;
+  goalCameraY=null;
+  goalCameraScale=null;stopRace();raceScreen.style.display="none";oddsScreen.style.display="block"}
+function newRace(){
+  cameraLocked=false;
+  goalCameraX=null;
+  goalCameraY=null;
+  goalCameraScale=null;stopRace();showOdds()}
 function makeHorses(){
   document.querySelectorAll(".horse").forEach(function(x){x.remove()});
   horses=[];
@@ -1492,7 +1545,7 @@ function makeHorses(){
       el:el,
       lane:i,
       progress:0,
-      speed:0.00135 + e.racePower*0.00018 + Math.random()*0.00012,
+      speed:.00054 + e.racePower*0.00007 + Math.random()*0.00004,
       done:false,
       x:0,
       y:0,
@@ -1551,31 +1604,29 @@ function leader(){
 function focusCamera(){
   if(!horses || horses.length===0) return;
 
-  var minX=999999,maxX=-999999,minY=999999,maxY=-999999;
+  var leadIndex=leader();
+  if(leadIndex===null || !horses[leadIndex]) return;
+
+  var lead=horses[leadIndex];
+
+  var minY=999999,maxY=-999999;
   for(var i=0;i<horses.length;i++){
-    minX=Math.min(minX,horses[i].x);
-    maxX=Math.max(maxX,horses[i].x);
     minY=Math.min(minY,horses[i].y);
     maxY=Math.max(maxY,horses[i].y);
   }
 
   var win=raceWindow.getBoundingClientRect();
 
-  // スタート時はスタートゲートと馬が同じ画面に見えるようにする
-  var spreadX=maxX-minX+360;
-  var spreadY=maxY-minY+210;
-  var scale=Math.min(1, win.width/spreadX, win.height/spreadY);
-  if(scale<0.66) scale=0.66;
+  // 1位の馬を追う。少し引きで周りも見えるようにする。
+  var scale=0.78;
+  var targetY=(minY+maxY)/2;
 
-  var centerX=(minX+maxX)/2;
-  var centerY=(minY+maxY)/2;
+  // 先頭馬を画面のやや右寄りに置く
+  var x=win.width*0.48-lead.x*scale;
+  var y=win.height*0.50-targetY*scale;
 
-  var x=win.width/2-centerX*scale;
-  var y=win.height/2-centerY*scale;
-
-  // 上にズレすぎるのを防ぐ
   if(y>20) y=20;
-  if(y<-110) y=-110;
+  if(y<-120) y=-120;
 
   world.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px) scale("+scale+")";
 }
@@ -1594,10 +1645,14 @@ function startRace(){
   }
 
   racing=true;
+  cameraLocked=false;
+  goalCameraX=null;
+  goalCameraY=null;
+  goalCameraScale=null;
   finished=[];
   raceInfo.innerHTML=currentGrade+" 発走";
-  result.innerHTML="レース中です。";
-  msg.innerHTML="レース中です。";
+  result.innerHTML="レース中です。約30秒で、1位の馬を追います。約30秒で、1位の馬を追います。";
+  msg.innerHTML="レース中です。約30秒で、1位の馬を追います。";
 
   // 既存timerがあれば止める
   if(timer){
@@ -1615,8 +1670,8 @@ function stepRace(now){
 
   if(window.__raceLastTime===null) window.__raceLastTime=now || performance.now();
   var dt=((now || performance.now())-window.__raceLastTime)/16.67;
-  if(dt<0.5) dt=0.5;
-  if(dt>2.2) dt=2.2;
+  if(dt<0.7) dt=0.7;
+  if(dt>1.4) dt=1.4;
   window.__raceLastTime=now || performance.now();
 
   for(var i=0;i<horses.length;i++){
@@ -1625,12 +1680,12 @@ function stepRace(now){
     if(!h || !e) continue;
 
     var bonus=0;
-    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.00035;
-    if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.00020;
-    if(e.style==="差し" && h.progress>0.58) bonus+=0.00040;
-    if(e.style==="追込" && h.progress>0.72) bonus+=0.00055;
-    if(e.style==="気分屋" && Math.random()<0.014) bonus+=0.00075;
-    if(e.popularity>=9 && Math.random()<0.010) bonus+=0.00075;
+    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.00010;
+    if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.00007;
+    if(e.style==="差し" && h.progress>0.58) bonus+=0.00012;
+    if(e.style==="追込" && h.progress>0.72) bonus+=0.00016;
+    if(e.style==="気分屋" && Math.random()<0.014) bonus+=0.00007;
+    if(e.popularity>=9 && Math.random()<0.010) bonus+=0.00007;
 
     // レース進行。dtで端末差を吸収
     h.progress += (h.speed + bonus + Math.random()*0.00010) * dt;
