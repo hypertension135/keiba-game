@@ -934,7 +934,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 12頭表示＋腹ゼッケン固定 */
+/* 12頭走行＋腹ゼッケン最終上書き */
 .horse{
   overflow:visible!important;
   width:132px!important;
@@ -965,7 +965,6 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   pointer-events:none!important;
   background:#111!important;
   color:#fff!important;
-  box-shadow:0 2px 5px rgba(0,0,0,.55)!important;
 }
 .realHorseRunner .saddle.frame-red,.saddle.frame-red{background:#c62828!important;color:#fff!important}
 .realHorseRunner .saddle.frame-blue,.saddle.frame-blue{background:#1565c0!important;color:#fff!important}
@@ -1041,7 +1040,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>12頭表示・腹ゼッケン・先頭追跡ライブ</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>12頭走行・腹ゼッケン・先頭追跡ライブ</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1462,16 +1461,13 @@ function makeHorses(){
   document.querySelectorAll(".horse").forEach(function(x){x.remove()});
   horses=[];
 
-  // entriesは12頭のはず。もし何かで減っていたら、ある分だけではなく最大12頭を作る。
   var count=Math.min(12, entries.length);
-
   for(var i=0;i<count;i++){
     var e=entries[i];
     var el=document.createElement("div");
     el.className="horse";
     el.setAttribute("data-no", e.no);
 
-    // 馬画像2枚＋騎手＋腹ゼッケン
     el.innerHTML="<div class='leaderBadge'>1位</div>"
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"'>"
@@ -1482,16 +1478,14 @@ function makeHorses(){
 
     world.appendChild(el);
 
-    // 12頭が1か所に固まって見えないよう、縦にも横にもずらす
     var row=Math.floor(i/6);
     var col=i%6;
-    var startGap=0.0009*col + 0.00045*row;
 
     horses.push({
       el:el,
       lane:i,
-      progress:.0005+startGap,
-      speed:.00048+e.racePower*.00008+Math.random()*.00004,
+      progress:.0005 + col*.0010 + row*.0005,
+      speed:.00050 + e.racePower*.00008 + Math.random()*.00005,
       done:false,
       x:0,
       y:0
@@ -1500,24 +1494,20 @@ function makeHorses(){
     placeHorse(horses[i]);
   }
 
-  // 作った直後に全頭を表示
   focusCamera();
 }
 
 function point(t,lane){
-  var startX=250,finishX=8500;
+  var startX=250;
+  var finishX=8500;
   var row=Math.floor(lane/6);
   var col=lane%6;
 
-  // 12頭が見えるように、縦をしっかりずらす
-  var baseY=376 + col*9 + row*46;
+  var y=380 + col*9 + row*46;
+  var laneOffset=col*10 + row*20;
 
-  // 少し横にもずらして、完全な重なりを防ぐ
-  var laneOffset=(col*10)+(row*18);
-
-  var x=startX+laneOffset+Math.max(0,Math.min(1.65,t))*(finishX-startX);
-  var y=baseY;
-  return{x:x,y:y,angle:0,flip:false};
+  var x=startX + laneOffset + Math.max(0, Math.min(1.22,t))*(finishX-startX);
+  return {x:x,y:y,angle:0,flip:false};
 }
 
 function placeHorse(h){
@@ -1530,13 +1520,19 @@ function placeHorse(h){
 }
 
 function leader(){
-  if(finished.length>0)return finished[0];
-  var best=-999,idx=0;
-  for(var i=0;i<horses.length;i++){if(!horses[i].done&&horses[i].progress>best){best=horses[i].progress;idx=i}}
-  return idx;
+  if(!horses || horses.length===0) return null;
+  var best=0;
+  for(var i=1;i<horses.length;i++){
+    if(horses[i].progress>horses[best].progress) best=i;
+  }
+
+  document.querySelectorAll(".horse").forEach(function(x){x.classList.remove("leader")});
+  if(horses[best] && horses[best].el) horses[best].el.classList.add("leader");
+  return best;
 }
+
 function focusCamera(){
-  if(!horses.length)return;
+  if(!horses || horses.length===0) return;
 
   var minX=999999,maxX=-999999,minY=999999,maxY=-999999;
   for(var i=0;i<horses.length;i++){
@@ -1547,113 +1543,97 @@ function focusCamera(){
   }
 
   var win=raceWindow.getBoundingClientRect();
-  var visibleW=win.width;
-  var visibleH=win.height;
-
-  // 先頭を追うけど、12頭全体も見えるように少し引く
-  var scale=1;
-  var spreadX=maxX-minX+220;
+  var spreadX=maxX-minX+260;
   var spreadY=maxY-minY+170;
-  scale=Math.min(1, visibleW/spreadX, visibleH/spreadY);
-  if(scale<0.62)scale=0.62;
+
+  var scale=Math.min(1, win.width/spreadX, win.height/spreadY);
+  if(scale<0.60) scale=0.60;
 
   var centerX=(minX+maxX)/2;
   var centerY=(minY+maxY)/2;
 
-  var x=visibleW/2-centerX*scale;
-  var y=visibleH/2-centerY*scale;
+  var x=win.width/2-centerX*scale;
+  var y=win.height/2-centerY*scale;
 
-  // コースが上に行きすぎないよう調整
-  if(y>20)y=20;
-  if(y<-120)y=-120;
+  if(y>10) y=10;
+  if(y<-120) y=-120;
 
   world.style.transform="translate("+Math.round(x)+"px,"+Math.round(y)+"px) scale("+scale+")";
 }
 
 function startRace(){
-  if(!horses.length)makeHorses();
-  if(running)return;
-  running=true;raceEnding=false;resultShown=false;finished=[];raceStartTime=Date.now();
-  result.innerHTML="レース中です。";
-  raceInfo.innerHTML=currentGrade+" 発走";
-  for(var i=0;i<horses.length;i++){
-    var row=Math.floor(i/6),col=i%6;
-    horses[i].progress=.0005+col*.0003+row*.0005;
-    horses[i].speed=.00048+entries[i].racePower*.00008+Math.random()*.00004;
-    horses[i].done=false;
-    horses[i].el.classList.remove("finished");
-    placeHorse(horses[i]);
+  if(racing) return;
+
+  if(!entries || entries.length===0){
+    showOdds();
   }
-  ensureSaddles();
+  if(!horses || horses.length!==12){
+    makeHorses();
+  }
+
+  racing=true;
+  finished=[];
+  raceInfo.innerHTML=currentGrade+" 発走";
+  result.innerHTML="レース中です。";
+  msg.innerHTML="レース中です。";
+
+  if(timer) clearInterval(timer);
   timer=setInterval(stepRace,30);
 }
+
 function stepRace(){
-  ensureSaddles();
-  var leaderProgress=0, elapsed=Date.now()-raceStartTime;
+  if(!racing) return;
+
+  if(!horses || horses.length===0){
+    makeHorses();
+  }
 
   for(var i=0;i<horses.length;i++){
     var h=horses[i];
     var e=entries[i];
-
-    // ゴールした馬も止めない。右方向へずっと走り続ける。
-    if(h.done){
-      h.progress += h.speed*1.45 + Math.random()*0.00005;
-      if(h.progress>1.65) h.progress=1.65;
-      placeHorse(h);
-      if(h.progress>leaderProgress) leaderProgress=h.progress;
-      continue;
-    }
+    if(!h || !e) continue;
 
     var bonus=0;
-    if(e.style==="逃げ"&&h.progress<.35)bonus=.00008;
-    if(e.style==="差し"&&h.progress>.55)bonus=.00010;
-    if(e.style==="追込"&&h.progress>.72)bonus=.00014;
-    if(e.style==="まくり"&&h.progress>.45&&h.progress<.75)bonus=.00011;
-    if(e.style==="気分屋"&&Math.random()<.018)bonus+=.00055;
-    if(e.popularity>=9&&Math.random()<.010)bonus+=.00075;
-    if(e.popularity>=6&&Math.random()<.006)bonus+=.00050;
-    if(upsetMode){
-      if(e.popularity>=8&&Math.random()<.030)bonus+=.00090;
-      if(e.popularity>=5&&Math.random()<.016)bonus+=.00055;
-      if(e.popularity<=2&&Math.random()<.010)bonus-=.00025;
-    }
+    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.00022;
+    if(e.style==="先行" && h.progress>=0.22 && h.progress<0.70) bonus+=0.00015;
+    if(e.style==="差し" && h.progress>0.58) bonus+=0.00032;
+    if(e.style==="追込" && h.progress>0.72) bonus+=0.00046;
+    if(e.style==="気分屋" && Math.random()<0.015) bonus+=0.00055;
+    if(e.popularity>=9 && Math.random()<0.010) bonus+=0.00070;
 
-    h.progress += h.speed + bonus + Math.random()*.00008;
+    h.progress += h.speed + bonus + Math.random()*0.00009;
 
-    // ゴール線に着いたら着順だけ記録。馬は止めない。
-    if(h.progress>=1 && !h.done){
+    if(!h.done && h.progress>=1){
       h.done=true;
       finished.push(i);
     }
 
-    // ゴールした直後もそのまま走らせる
-    if(h.done){
-      h.progress += h.speed*1.45 + Math.random()*0.00005;
-      if(h.progress>1.65) h.progress=1.65;
+    if(h.progress>1.22 && h.done){
+      h.progress=1.22;
     }
 
-    if(h.progress>leaderProgress) leaderProgress=h.progress;
     placeHorse(h);
-
-    // 時間切れ時だけ着順確定。ただし馬は止めない。
-    if(elapsed>=RACE_DURATION+7000 && !h.done){
-      h.done=true;
-      finished.push(i);
-    }
   }
 
-  var remainM=Math.max(0,Math.round((1-Math.min(1,leaderProgress))*1600));
-  lapInfo.innerHTML="残り "+remainM+"m";
+  var l=leader();
+  if(l!==null && entries[l]){
+    leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name;
+  }
+
+  var ref=horses[l||0] ? horses[l||0].progress : 0;
+  var remain=Math.max(0,Math.round((1-ref)*1600));
+  lapInfo.innerHTML="残り"+remain+"m";
+
   focusCamera();
 
-  // 全馬がゴールしたら結果だけ表示。タイマーは止めない。
-  if(finished.length===horses.length && !raceEnding){
-    raceEnding=true;
-    setTimeout(function(){
-      if(running && !resultShown) finishRace();
-    }, 1000);
+  if(finished.length>=horses.length){
+    clearInterval(timer);
+    timer=null;
+    racing=false;
+    finishRace();
   }
 }
+
 function recordResult(){
   for(var i=0;i<finished.length;i++){
     var idx=finished[i],name=entries[idx].name;
