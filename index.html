@@ -934,7 +934,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 修正版：スタート位置をゲートに合わせる・12頭走行・全馬番号つき馬体横ゼッケン固定 */
+/* 修正版：スタート位置をゲートに合わせる・12頭走行・全馬番号つき番号が読めるゼッケン固定 */
 .horse{
   overflow:visible!important;
   width:132px!important;
@@ -1022,7 +1022,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 最終修正：馬の全馬番号つき馬体横ゼッケン固定を必ず表示 */
+/* 最終修正：馬の全馬番号つき番号が読めるゼッケン固定を必ず表示 */
 .horse{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseRunner{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseImg{z-index:1!important}
@@ -1059,7 +1059,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 番号つき全馬番号つき馬体横ゼッケン固定：馬ごとの番号＋枠色を必ず表示 */
+/* 番号つき全馬番号つき番号が読めるゼッケン固定：馬ごとの番号＋枠色を必ず表示 */
 .horse{
   overflow:visible!important;
 }
@@ -1242,7 +1242,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* このゼッケンのまま走行：馬体横に固定して馬と一緒に動かす */
+/* 番号が読めるゼッケンのまま走行：馬体横に固定して馬と一緒に動かす */
 .horse{
   overflow:visible!important;
 }
@@ -1280,6 +1280,73 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .bib.frame-green{background:#2e7d32!important;color:#fff!important}
 .bib.frame-pink{background:#ec407a!important;color:#fff!important}
 .bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important;text-shadow:none!important}
+.realHorseRunner .saddle,
+.saddle{
+  display:none!important;
+}
+.realHorseRunner{overflow:visible!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:99999!important}
+
+
+/* 番号が読めるゼッケン：馬体横に大きく、最前面 */
+.horse{
+  overflow:visible!important;
+}
+.horse > .bib,
+.bib{
+  position:absolute!important;
+  left:64px!important;
+  top:48px!important;
+  width:44px!important;
+  height:30px!important;
+  min-width:44px!important;
+  min-height:30px!important;
+  padding:0!important;
+  border-radius:8px!important;
+  border:4px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:18px!important;
+  line-height:24px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+  visibility:visible!important;
+  z-index:2147483647!important;
+  pointer-events:none!important;
+  background:#111!important;
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.9)!important;
+  box-shadow:0 3px 7px rgba(0,0,0,.75)!important;
+}
+.horse > .numTag,
+.numTag{
+  position:absolute!important;
+  left:44px!important;
+  top:-13px!important;
+  width:32px!important;
+  height:24px!important;
+  border-radius:999px!important;
+  border:3px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:14px!important;
+  font-weight:1000!important;
+  z-index:2147483647!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.7)!important;
+}
+.bib.frame-red,.numTag.frame-red{background:#c62828!important;color:#fff!important}
+.bib.frame-blue,.numTag.frame-blue{background:#1565c0!important;color:#fff!important}
+.bib.frame-yellow,.numTag.frame-yellow{background:#fdd835!important;color:#111!important;text-shadow:none!important}
+.bib.frame-green,.numTag.frame-green{background:#2e7d32!important;color:#fff!important}
+.bib.frame-pink,.numTag.frame-pink{background:#ec407a!important;color:#fff!important}
+.bib.frame-white,.numTag.frame-white{background:#fff!important;color:#111!important;border-color:#111!important;text-shadow:none!important}
 .realHorseRunner .saddle,
 .saddle{
   display:none!important;
@@ -1353,7 +1420,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>30秒・1位追跡・ゴールで止まらず駆け抜け・全馬馬体横番号ゼッケン・全馬番号つき馬体横ゼッケン固定</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>30秒・1位追跡・ゴールで止まらず駆け抜け・全馬馬体横番号ゼッケン・全馬番号つき番号が読めるゼッケン固定</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1796,6 +1863,7 @@ function makeHorses(){
     el.setAttribute("data-no", e.no);
 
     el.innerHTML="<div class='leaderBadge'>1位</div>"
+      +"<div class='numTag "+frameClass(e.no)+"'>"+e.no+"</div>"
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"'>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"'>"
@@ -1837,18 +1905,26 @@ function ensureBibs(){
       b=document.createElement("div");
       h.el.appendChild(b);
     }
-
     b.textContent=e.no;
     b.className="bib "+frameClass(e.no);
     b.style.display="flex";
     b.style.visibility="visible";
     b.style.opacity="1";
+    b.style.left="64px";
+    b.style.top="48px";
+    b.style.width="44px";
+    b.style.height="30px";
 
-    // 今のスクショと同じように、馬体横の位置で固定
-    b.style.left="28px";
-    b.style.top="45px";
-    b.style.width="42px";
-    b.style.height="28px";
+    var t=h.el.querySelector(":scope > .numTag");
+    if(!t){
+      t=document.createElement("div");
+      h.el.appendChild(t);
+    }
+    t.textContent=e.no;
+    t.className="numTag "+frameClass(e.no);
+    t.style.display="flex";
+    t.style.visibility="visible";
+    t.style.opacity="1";
   }
 }
 
@@ -1859,11 +1935,11 @@ function point(t,lane){
   var row=Math.floor(lane/6);
   var col=lane%6;
 
-  // トラック内に12頭を上下で並べる
-  var y=376 + col*9 + row*18;
-  var startOffset=col*7 + row*12;
+  // 12頭が重なりすぎないように上下・横を広げる
+  var y=365 + col*12 + row*28;
+  var startOffset=col*12 + row*22;
 
-  var clamped=Math.max(0, Math.min(1.18, t));
+  var clamped=Math.max(0, Math.min(1.34, t));
   var x=startX + startOffset + clamped*(finishX-startX);
 
   return {x:x,y:y,angle:0,flip:false};
@@ -1949,7 +2025,7 @@ function startRace(){
   ensureBibs();
 
   raceInfo.innerHTML=currentGrade+" 発走";
-  result.innerHTML="レース中です。このゼッケンのまま全馬が走ります。";
+  result.innerHTML="レース中です。番号が読めるゼッケンのまま全馬が走ります。";
   msg.innerHTML="レース中です。";
 
   if(timer){
