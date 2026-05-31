@@ -1815,6 +1815,16 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   .bigPlayerRow small,.bigPlayerRow em{font-size:12px!important}
 }
 
+
+/* 結果表が出ても後ろの馬が走っているのを少し見えるように */
+.bigResultOverlay{
+  background:rgba(0,0,0,.35)!important;
+  pointer-events:auto!important;
+}
+.bigResultCard{
+  background:rgba(7,19,13,.94)!important;
+}
+
 </style>
 </head>
 <body>
@@ -2477,6 +2487,8 @@ function startRace(){
   }
 
   racing=true;
+  resultShown=false;
+  postResultRun=false;
   cameraLocked=false;
   fixedGoalCamera={x:0,y:0,scale:.78};
   finished=[];
@@ -2516,23 +2528,28 @@ function stepRace(now){
     if(!h || !e) continue;
 
     var bonus=0;
-    if(e.style==="逃げ" && h.progress<0.42) bonus+=0.000055;
-    if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.000040;
-    if(e.style==="差し" && h.progress>0.58) bonus+=0.000070;
-    if(e.style==="追込" && h.progress>0.72) bonus+=0.000090;
-    if(e.style==="気分屋" && Math.random()<0.012) bonus+=0.000120;
-    if(e.popularity>=9 && Math.random()<0.008) bonus+=0.000120;
+
+    // 結果表示後も馬は走る。ただし順位確定後は加速演出を少し弱める。
+    if(!resultShown){
+      if(e.style==="逃げ" && h.progress<0.42) bonus+=0.000055;
+      if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.000040;
+      if(e.style==="差し" && h.progress>0.58) bonus+=0.000070;
+      if(e.style==="追込" && h.progress>0.72) bonus+=0.000090;
+      if(e.style==="気分屋" && Math.random()<0.012) bonus+=0.000120;
+      if(e.popularity>=9 && Math.random()<0.008) bonus+=0.000120;
+    }
 
     h.progress += (h.speed + bonus + Math.random()*0.000018) * dt;
 
+    // ゴール通過した瞬間に順位を記録
     if(!h.done && h.progress>=1){
       h.done=true;
       finished.push(i);
     }
 
-    // 見た目は少し駆け抜ける。ただし結果は全馬入線したらすぐ出す。
-    if(h.done && h.progress>1.12){
-      h.progress=1.12;
+    // 結果表示後も止めず、しばらく右へ駆け抜けさせる
+    if(h.progress>1.55){
+      h.progress=1.55;
     }
 
     placeHorse(h);
@@ -2542,23 +2559,33 @@ function stepRace(now){
   if(l!==null && entries[l]){
     leaderInfo.innerHTML="先頭："+entries[l].no+"番 "+entries[l].name;
     var remain=Math.max(0,Math.round((1-horses[l].progress)*1600));
-    lapInfo.innerHTML="残り"+remain+"m";
+    lapInfo.innerHTML=resultShown ? "確定後も駆け抜け中" : "残り"+remain+"m";
   }
 
   focusCamera();
   ensureBibs();
 
-  // 全馬が入線した瞬間に結果を出す。空画面でレース中のままにしない。
-  if(finished.length>=horses.length){
-    racing=false;
-    if(window.__raceAnimId) cancelAnimationFrame(window.__raceAnimId);
-    window.__raceAnimId=null;
+  // 全馬が入線した瞬間に結果表を出す。でも馬は止めない。
+  if(!resultShown && finished.length>=horses.length){
+    resultShown=true;
+    postResultRun=true;
     finishRace();
-    setTimeout(function(){
-      var r=document.getElementById("result");
-      if(r) r.scrollIntoView({behavior:"smooth",block:"start"});
-    },100);
-    return;
+  }
+
+  // 結果表が出ても、しばらく走り続ける
+  if(resultShown){
+    var allFar=true;
+    for(var j=0;j<horses.length;j++){
+      if(horses[j].progress<1.55) allFar=false;
+    }
+
+    // 画面からかなり抜けたらアニメだけ終了
+    if(allFar){
+      racing=false;
+      if(window.__raceAnimId) cancelAnimationFrame(window.__raceAnimId);
+      window.__raceAnimId=null;
+      return;
+    }
   }
 
   window.__raceAnimId=requestAnimationFrame(stepRace);
