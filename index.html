@@ -934,7 +934,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 修正版：スタート位置をゲートに合わせる・12頭走行・全馬番号つき番号が読めるゼッケン固定 */
+/* 修正版：スタート位置をゲートに合わせる・12頭走行・全馬番号つき番号タグのみ */
 .horse{
   overflow:visible!important;
   width:132px!important;
@@ -1022,7 +1022,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 最終修正：馬の全馬番号つき番号が読めるゼッケン固定を必ず表示 */
+/* 最終修正：馬の全馬番号つき番号タグのみを必ず表示 */
 .horse{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseRunner{overflow:visible!important;width:132px!important;height:92px!important}
 .realHorseImg{z-index:1!important}
@@ -1059,7 +1059,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .jockey{z-index:99999!important}
 
 
-/* 番号つき全馬番号つき番号が読めるゼッケン固定：馬ごとの番号＋枠色を必ず表示 */
+/* 番号つき全馬番号つき番号タグのみ：馬ごとの番号＋枠色を必ず表示 */
 .horse{
   overflow:visible!important;
 }
@@ -1355,6 +1355,100 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .realHorseImg{z-index:1!important}
 .jockey{z-index:99999!important}
 
+
+/* 番号タグ：馬の背中のところに番号つきで固定 */
+.horse{
+  overflow:visible!important;
+}
+.horse > .bib,
+.bib{
+  position:absolute!important;
+  left:46px!important;
+  top:27px!important;
+  width:42px!important;
+  height:28px!important;
+  min-width:42px!important;
+  min-height:28px!important;
+  padding:0!important;
+  border-radius:7px!important;
+  border:4px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:18px!important;
+  line-height:24px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+  visibility:visible!important;
+  z-index:2147483647!important;
+  pointer-events:none!important;
+  background:#111!important;
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.9)!important;
+  box-shadow:0 3px 7px rgba(0,0,0,.75)!important;
+}
+.bib.frame-red{background:#c62828!important;color:#fff!important}
+.bib.frame-blue{background:#1565c0!important;color:#fff!important}
+.bib.frame-yellow{background:#fdd835!important;color:#111!important;text-shadow:none!important}
+.bib.frame-green{background:#2e7d32!important;color:#fff!important}
+.bib.frame-pink{background:#ec407a!important;color:#fff!important}
+.bib.frame-white{background:#fff!important;color:#111!important;border-color:#111!important;text-shadow:none!important}
+.numTag{display:none!important}
+.realHorseRunner .saddle,
+.saddle{display:none!important}
+.realHorseRunner{overflow:visible!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:99999!important}
+
+
+/* タグだけ表示：ゼッケン板なし */
+.horse{overflow:visible!important}
+.bib,
+.horse > .bib,
+.realHorseRunner .saddle,
+.saddle{display:none!important}
+.horse > .numTag,
+.numTag{
+  position:absolute!important;
+  left:44px!important;
+  top:-14px!important;
+  width:34px!important;
+  height:25px!important;
+  border-radius:999px!important;
+  border:3px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:15px!important;
+  line-height:20px!important;
+  font-weight:1000!important;
+  z-index:2147483647!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.75)!important;
+  color:#fff!important;
+  background:#111!important;
+}
+.numTag.frame-red{background:#c62828!important;color:#fff!important}
+.numTag.frame-blue{background:#1565c0!important;color:#fff!important}
+.numTag.frame-yellow{background:#fdd835!important;color:#111!important}
+.numTag.frame-green{background:#2e7d32!important;color:#fff!important}
+.numTag.frame-pink{background:#ec407a!important;color:#fff!important}
+.numTag.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+.realHorseRunner{overflow:visible!important}
+.realHorseImg{z-index:1!important}
+.jockey{z-index:99999!important}
+
+
+/* 的中結果を見やすく */
+#result{
+  font-size:18px!important;
+  line-height:1.65!important;
+}
+
 </style>
 </head>
 <body>
@@ -1420,7 +1514,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
   <div id="raceScreen">
     <div class="board">
-      <div class="title"><span>30秒・1位追跡・ゴールで止まらず駆け抜け・全馬馬体横番号ゼッケン・全馬番号つき番号が読めるゼッケン固定</span><span>2-FRAME HORSE CAMERA</span></div>
+      <div class="title"><span>30秒・1位追跡・ゴールで止まらず駆け抜け・全馬馬体横番号ゼッケン・全馬番号つき番号タグのみ</span><span>2-FRAME HORSE CAMERA</span></div>
       <div class="raceTop">
         <div class="status" id="raceInfo">発走前</div>
         <div class="status" id="lapInfo">残り1600m</div>
@@ -1758,6 +1852,13 @@ function fillSelects(){
 }
 function confirmBets(){
   applyPlayerCount();
+
+  if(!entries || entries.length===0){
+    showOdds();
+    msg.innerHTML="出馬表とオッズを作りました。馬を選んでからもう一度押してください。";
+    return false;
+  }
+
   var text=[];
   var activeCount=0;
 
@@ -1783,7 +1884,6 @@ function confirmBets(){
 
     var bet=Number(betInp[p].value);
     if(isNaN(bet) || bet<=0) bet=100;
-
     if(bet<100){
       msg.innerHTML="P"+(p+1)+"の賭け金は100円以上にしてください。";
       return false;
@@ -1802,20 +1902,20 @@ function confirmBets(){
       return false;
     }
 
-    // ここが重要：単勝/複勝を必ず保存
-    var type = betType[p] ? betType[p].value : "win";
+    var type=betType[p] ? betType[p].value : "win";
 
     players[p].pick=pick;
     players[p].bet=bet;
     players[p].type=type;
 
-    var label = type==="place" ? "複勝" : "単勝";
-    text.push("P"+(p+1)+": "+label+" "+entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
+    text.push("P"+(p+1)+"："
+      +(type==="place"?"複勝":"単勝")+" "
+      +entries[pick].no+"番 "+entries[pick].name+" に "+bet+"円");
   }
 
   betsConfirmed=true;
   selected.innerHTML="投票確定：<br>"+text.join("<br>");
-  msg.innerHTML="投票確定。競馬場へ進みます。";
+  msg.innerHTML="投票確定。競馬場へ進んで発走してください。";
   return true;
 }
 
@@ -1868,8 +1968,7 @@ function makeHorses(){
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"'>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"'>"
       +"<div class='jockey jc"+e.jockeyColor+"'><div class='helmet'></div><div class='head'></div><div class='body'></div><div class='arm'></div></div>"
-      +"</div>"
-      +"<div class='bib "+frameClass(e.no)+"'>"+e.no+"</div>";
+      +"</div>";
 
     world.appendChild(el);
 
@@ -1901,25 +2000,14 @@ function ensureBibs(){
     if(!h || !h.el || !e) continue;
 
     var b=h.el.querySelector(":scope > .bib");
-    if(!b){
-      b=document.createElement("div");
-      h.el.appendChild(b);
-    }
-    b.textContent=e.no;
-    b.className="bib "+frameClass(e.no);
-    b.style.display="flex";
-    b.style.visibility="visible";
-    b.style.opacity="1";
-    b.style.left="64px";
-    b.style.top="48px";
-    b.style.width="44px";
-    b.style.height="30px";
+    if(b) b.remove();
 
     var t=h.el.querySelector(":scope > .numTag");
     if(!t){
       t=document.createElement("div");
       h.el.appendChild(t);
     }
+
     t.textContent=e.no;
     t.className="numTag "+frameClass(e.no);
     t.style.display="flex";
@@ -2007,6 +2095,7 @@ function focusCamera(){
 }
 
 function startRace(){
+  ensureBibs();
   if(!entries || entries.length===0){
     showOdds();
   }
