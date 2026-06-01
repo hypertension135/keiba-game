@@ -1878,6 +1878,14 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   cursor:pointer!important;
 }
 
+
+/* オッズボタンを押しやすく */
+#oddsBtn{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+}
+
 </style>
 </head>
 <body>
@@ -1897,7 +1905,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <option value="4">4人</option>
         <option value="5">5人</option>
       </select>
-      <button class="big" id="oddsBtn" onclick="showOdds();return false;">オッズを表示</button>
+      <button class="big" id="oddsBtn" onclick="showOdds()">オッズを表示</button>
     </div>
   </div>
 
@@ -2176,137 +2184,69 @@ function frameName(no){
 }
 
 function showOdds(){
-  try{
-    if(typeof loadRecords==="function") loadRecords();
-    raceCount=(typeof raceCount==="number"?raceCount:0)+1;
+  applyPlayerCount();
+  loadRecords();
+  currentGrade=autoGrade();
+  upsetMode=Math.random()<0.18;
+  betsConfirmed=false;finished=[];entries=[];
+  startScreen.style.display="none";raceScreen.style.display="none";oddsScreen.style.display="block";
 
-    // G1/G2/G3
-    var r=Math.random();
-    currentGrade = r<0.18 ? "G1" : (r<0.48 ? "G2" : "G3");
+  var runners=select12();
+  var nums=shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
+  var js=shuffle(jockeyNames.slice());
 
-    // 12頭を作る
-    entries=[];
-
-    var pool=[];
-    if(typeof horseNames!=="undefined" && horseNames && horseNames.length){
-      for(var i=0;i<horseNames.length;i++) pool.push({name:horseNames[i],index:i});
-    }else{
-      for(var i=1;i<=50;i++) pool.push({name:"ホース"+i,index:i-1});
-    }
-
-    // G1は成績いい馬を少し優先。関数が壊れてたら普通にシャッフル。
-    try{
-      if(typeof select12==="function"){
-        var selected12=select12();
-        if(selected12 && selected12.length>=12) pool=selected12;
-        else pool=shuffle(pool);
-      }else{
-        pool=shuffle(pool);
-      }
-    }catch(e){
-      pool=shuffle(pool);
-    }
-
-    var picked=pool.slice(0,12);
-    var nums=[1,2,3,4,5,6,7,8,9,10,11,12];
-    nums=shuffle(nums);
-
-    var styles=["逃げ","先行","差し","追込","気分屋"];
-    var marks=["◎","○","▲","△","☆",""];
-
-    for(var j=0;j<12;j++){
-      var p=picked[j];
-      var n=p.name || ("ホース"+(j+1));
-      var hist=(typeof records!=="undefined" && records[n]) ? records[n].length : 0;
-      var avg=99;
-      try{ if(typeof avgRank==="function") avg=avgRank(n); }catch(e){ avg=99; }
-
-      var ability=0.82+Math.random()*0.36;
-      if(hist>0 && avg<=3) ability+=0.12;
-      if(hist>0 && avg>=9) ability-=0.08;
-
-      var style=styles[Math.floor(Math.random()*styles.length)];
-      var no=nums[j];
-
-      var jockeyName = (typeof jockeys!=="undefined" && jockeys[j]) ? jockeys[j] : ("騎手"+(j+1));
-
-      entries.push({
-        no:no,
-        regNo:(p.index!==undefined?p.index+1:j+1),
-        name:n,
-        jockey:jockeyName,
-        jockeyColor:(j%12)+1,
-        style:style,
-        mark:marks[j] || "",
-        ability:ability,
-        odds:0,
-        placeOdds:0,
-        popularity:0,
-        racePower:ability,
-        avgRank:avg,
-        history:hist
-      });
-    }
-
-    // 能力順で人気を作る
-    var byPower=entries.slice().sort(function(a,b){return b.ability-a.ability});
-    var baseOdds=[1.6,2.4,3.7,5.2,7.6,10.5,15.2,22.8,34.0,55.0,88.0,130.0];
-
-    for(var k=0;k<byPower.length;k++){
-      var e=byPower[k];
-      e.popularity=k+1;
-
-      var factor=1;
-      if(e.history>0){
-        if(e.avgRank<=1.8) factor=.55;
-        else if(e.avgRank<=2.8) factor=.65;
-        else if(e.avgRank<=4.0) factor=.78;
-        else if(e.avgRank<=6.0) factor=.95;
-        else if(e.avgRank<=8.0) factor=1.15;
-        else if(e.avgRank<=10.0) factor=1.35;
-        else factor=1.60;
-      }
-
-      e.odds=Math.round(baseOdds[k]*factor*(0.92+Math.random()*0.18)*10)/10;
-      if(e.odds<1.1) e.odds=1.1;
-
-      // 複勝は必ず単勝より低い
-      var place=1.1 + e.odds*0.18;
-      if(e.popularity<=3) place=Math.min(place,1.9);
-      if(e.popularity>=9) place=Math.max(place,Math.min(6.5,e.odds*0.35));
-      e.placeOdds=Math.round(place*10)/10;
-    }
-
-    // 枠番順に並べる
-    entries.sort(function(a,b){return a.no-b.no});
-
-    fixPlaceOdds();
-
-    if(typeof drawTables==="function") drawTables();
-    if(typeof fillSelects==="function") fillSelects();
-    if(typeof updateMoney==="function") updateMoney();
-
-    if(typeof msg!=="undefined" && msg){
-      msg.innerHTML=currentGrade+" の出馬表とオッズです。馬を選んで賭けてください。";
-    }
-    if(typeof selected!=="undefined" && selected){
-      selected.innerHTML="出馬表・オッズを表示しました。";
-    }
-
-    var oddsArea=document.getElementById("oddsBody");
-    if(oddsArea && oddsArea.children.length===0 && typeof drawTables==="function"){
-      drawTables();
-    }
-
-  }catch(err){
-    console.log("showOdds error",err);
-    if(typeof msg!=="undefined" && msg){
-      msg.innerHTML="オッズ表示でエラー。ページを再読み込みしてもう一度押してください。";
-    }
-    alert("オッズ表示でエラーが出ました。ページを再読み込みしてもう一度押してください。");
+  for(var i=0;i<12;i++){
+    var name=runners[i].name,avg=avgRank(name),hist=(records[name]||[]).length;
+    var boost=0;
+    if(hist>0){if(avg<=2.5)boost=.24;else if(avg<=4.5)boost=.14;else if(avg<=7)boost=.04;else if(avg>=10)boost=-.12;else if(avg>=8.5)boost=-.06}
+    var ability=Math.max(.1,Math.min(1.25,rnd(.2,1)+boost));
+    entries.push({no:nums[i],regNo:runners[i].index+1,name:name,jockey:js[i],jockeyColor:(i+1),style:pick(styles),mark:pick(marks),ability:ability,odds:0,placeOdds:0,popularity:0,racePower:0,avgRank:avg,history:hist});
   }
-}
+  entries.sort(function(a,b){return a.no-b.no});
+  var sorted=entries.slice().sort(function(a,b){return b.ability-a.ability});
+  var oddsList=[rnd(1.5,2.4),rnd(3,5.8),rnd(6.2,9.8),rnd(11,16.5),rnd(18,27),rnd(30,42),rnd(45,60),rnd(62,78),rnd(80,98),rnd(100,120),rnd(125,142),rnd(148,158)];
+  for(var j=0;j<sorted.length;j++){
+    var e=sorted[j];e.popularity=j+1;
+    var factor=1;
 
+    // 直近5戦の成績で倍率を調整
+    // 成績が良い馬ほど倍率を低く、悪い馬ほど倍率を高くする
+    if(e.history>0){
+      if(e.avgRank<=1.8) factor=.55;       // かなり強い
+      else if(e.avgRank<=2.8) factor=.65;  // 強い
+      else if(e.avgRank<=4.0) factor=.78;  // まあ良い
+      else if(e.avgRank<=6.0) factor=.95;  // 普通
+      else if(e.avgRank<=8.0) factor=1.15; // やや悪い
+      else if(e.avgRank<=10.0) factor=1.35;// 悪い
+      else factor=1.60;                    // かなり悪い
+    }
+
+    var odds=oddsList[j]*factor;
+    if(j===0&&odds>3)odds=rnd(1.5,2.9);
+    if(j<=2&&odds>9.9)odds=rnd(6.5,9.8);
+    if(j===11&&odds<140)odds=rnd(145,160);
+    e.odds=Math.round(odds*10)/10;
+    var place=1.1+(e.odds*.18);
+    if(j<=2) place=rnd(1.1,2.0);
+    if(j>=9) place=rnd(8.0,18.0);
+    e.placeOdds=Math.round(place*10)/10;
+    if(upsetMode){e.racePower=1-(j*.010)+rnd(-.095,.095);if(j>=7)e.racePower+=rnd(.015,.060)}
+    else{e.racePower=1.04-(j*.025)+rnd(-.055,.055)}
+    // 直近5戦の成績を走力にも少し反映
+    if(e.history>0&&e.avgRank<=2.8)e.racePower+=.045;
+    else if(e.history>0&&e.avgRank<=4.5)e.racePower+=.025;
+    else if(e.history>0&&e.avgRank>=10)e.racePower-=.035;
+    else if(e.history>0&&e.avgRank>=8)e.racePower-=.020;
+  }
+  drawTables();fillSelects();updateMoney();
+  selected.innerHTML=activePlayerCount+"人プレイです。所持金が0円になったプレイヤーは脱落。残った人だけ賭けられます。";
+  msg.innerHTML=currentGrade+" の出馬表とオッズです。直近5戦で倍率が変わります。";
+
+  fixPlaceOdds();
+  drawTables();
+  fillSelects();
+  if(msg) msg.innerHTML="出馬表とオッズを表示しました。馬を選んで賭けてください。";
+}
 function drawTables(){
   fixPlaceOdds();
   var h="";
@@ -2853,65 +2793,57 @@ function closeBigResult(){
 
 
 function fixPlaceOdds(){
-  try{
-    if(typeof entries==="undefined" || !entries || entries.length===0) return;
+  if(!entries || !Array.isArray(entries) || entries.length===0) return;
 
-    for(var i=0;i<entries.length;i++){
-      var e=entries[i];
-      if(!e) continue;
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    if(!e) continue;
 
-      var win=Number(e.odds);
-      var place=Number(e.placeOdds);
+    var win=Number(e.odds);
+    var place=Number(e.placeOdds);
 
-      if(!win || isNaN(win) || win<=1){
-        win=2.0+i;
-        e.odds=Math.round(win*10)/10;
-      }
-
-      if(!place || isNaN(place) || place<=0){
-        place=Math.max(1.1, win*0.32);
-      }
-
-      var maxPlace=Math.max(1.1, win*0.72);
-      if(place>=win) place=maxPlace;
-      if(place>maxPlace) place=maxPlace;
-      if(place<1.1) place=1.1;
-
-      place=Math.round(place*10)/10;
-
-      if(place>=win){
-        place=Math.round((win*0.65)*10)/10;
-        if(place>=win) place=Math.max(1.1, Math.round((win-0.1)*10)/10);
-      }
-
-      e.placeOdds=place;
+    if(!win || isNaN(win) || win<=1){
+      win=2.0+i;
+      e.odds=Math.round(win*10)/10;
     }
-  }catch(err){
-    console.log("fixPlaceOdds error",err);
+
+    if(!place || isNaN(place) || place<=0){
+      place=Math.max(1.1, win*0.28);
+    }
+
+    // 複勝は必ず単勝より低い
+    var maxPlace=Math.max(1.1, win*0.68);
+    if(place>=win) place=maxPlace;
+    if(place>maxPlace) place=maxPlace;
+    if(place<1.1) place=1.1;
+
+    place=Math.round(place*10)/10;
+    if(place>=win){
+      place=Math.round((win*0.6)*10)/10;
+      if(place>=win) place=Math.max(1.1, Math.round((win-0.1)*10)/10);
+    }
+
+    e.placeOdds=place;
   }
 }
 
+
 function attachOddsButtonFix(){
   var btn=document.getElementById("oddsBtn");
-  if(!btn){
-    var buttons=document.getElementsByTagName("button");
-    for(var i=0;i<buttons.length;i++){
-      if((buttons[i].textContent||"").indexOf("オッズ")!==-1){
-        btn=buttons[i];
-        break;
-      }
-    }
-  }
   if(btn){
     btn.onclick=function(ev){
       if(ev) ev.preventDefault();
-      showOdds();
+      try{
+        showOdds();
+      }catch(err){
+        console.log(err);
+        if(typeof msg!=="undefined" && msg) msg.innerHTML="オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。";
+      }
       return false;
     };
   }
 }
 
-window.addEventListener('load',attachOddsButtonFix);
 </script>
 </body>
 </html>
