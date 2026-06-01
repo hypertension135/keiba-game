@@ -1910,12 +1910,37 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   pointer-events:none!important;
 }
 
+
+/* オッズ画面を確実に見せる */
+#oddsScreen{
+  scroll-margin-top:20px!important;
+}
+#oddsBtn{
+  position:relative!important;
+  z-index:2147483647!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+}
+
+
+/* 最初は人数選択だけ。人数を選ぶと自動でオッズへ */
+#startScreen #oddsBtn,
+#oddsBtn{
+  display:none!important;
+}
+#playerCountSelect{
+  font-size:28px!important;
+  padding:14px 18px!important;
+  border-radius:12px!important;
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
-  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ黄色い「オッズを表示」の場所を押してください。</div>
+  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ人数を選んだら、自動で出馬表とオッズへ進みます。。</div>
 
   <div id="startScreen" class="board">
     <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
@@ -1923,13 +1948,14 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
     <div class="controls" style="justify-content:center;align-items:center">
       <label style="font-size:20px;font-weight:900;color:#ffeaa5">人数</label>
       <select id="playerCountSelect" style="font-size:20px;padding:10px;border-radius:8px">
-        <option value="1">1人</option>
-        <option value="2" selected>2人</option>
-        <option value="3">3人</option>
-        <option value="4">4人</option>
-        <option value="5">5人</option>
-      </select>
-      <div class="big" id="oddsBtn" role="button" tabindex="0" onclick="return showOddsSafe(event)" ontouchstart="return showOddsSafe(event)" onpointerdown="return showOddsSafe(event)">オッズを表示</div>
+          <option value="" selected>選んで</option>
+          <option value="1">1人</option>
+          <option value="2">2人</option>
+          <option value="3">3人</option>
+          <option value="4">4人</option>
+          <option value="5">5人</option>
+        </select>
+      <div class="big" id="oddsBtn" role="button" tabindex="0" onclick="return forceOddsScreen()" ontouchstart="return showOddsSafe(event)" onpointerdown="return showOddsSafe(event)">オッズを表示</div>
     </div>
   </div>
 
@@ -2792,6 +2818,8 @@ function finishRace(){
 
 function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
+  bindPlayerCountToOdds();
+  
   cleanupOldOverlayOnStart();
   bindOddsTouchButton();
   attachOddsButtonFix();
@@ -2872,22 +2900,8 @@ function attachOddsButtonFix(){
 
 
 function showOddsSafe(ev){
-  if(ev){
-    ev.preventDefault();
-    ev.stopPropagation();
-  }
-
-  try{
-    if(typeof showOdds==="function"){
-      showOdds();
-    }
-  }catch(err){
-    console.log(err);
-    if(typeof msg!=="undefined" && msg){
-      msg.innerHTML="オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。";
-    }
-  }
-  return false;
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  return forceOddsScreen();
 }
 
 function bindOddsTouchButton(){
@@ -2907,6 +2921,105 @@ function bindOddsTouchButton(){
 function cleanupOldOverlayOnStart(){
   var old=document.getElementById("bigResultOverlay");
   if(old) old.remove();
+}
+
+
+function forceOddsScreen(){
+  try{
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    // 画面を強制的にオッズ側へ
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    // 表が空ならもう一度描画
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML="出馬表とオッズを表示しました。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      var o=document.getElementById("oddsScreen");
+      if(o) o.scrollIntoView({behavior:"smooth",block:"start"});
+    },100);
+  }catch(err){
+    console.log(err);
+    alert("オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。");
+  }
+  return false;
+}
+
+function autoOpenOddsOnLoad(){
+  // ページを開いたら自動でオッズ画面にする
+  setTimeout(function(){
+    forceOddsScreen();
+  },250);
+}
+
+
+function goOddsAfterPlayerSelect(){
+  try{
+    var sel=document.getElementById("playerCountSelect");
+    if(sel){
+      activePlayerCount=Number(sel.value)||1;
+    }
+
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=activePlayerCount+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+    },100);
+  }catch(err){
+    console.log(err);
+    alert("人数選択後のオッズ表示でエラーが出ました。ページを再読み込みしてください。");
+  }
+  return false;
+}
+
+function bindPlayerCountToOdds(){
+  var sel=document.getElementById("playerCountSelect");
+  if(!sel) return;
+
+  sel.onchange=function(){
+    goOddsAfterPlayerSelect();
+  };
+
+  sel.addEventListener("change",function(){
+    goOddsAfterPlayerSelect();
+  });
+
+  // iPhoneで選択後にchangeが遅い場合の保険
+  sel.addEventListener("blur",function(){
+    goOddsAfterPlayerSelect();
+  });
 }
 
 </script>
