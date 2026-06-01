@@ -1886,12 +1886,36 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   cursor:pointer!important;
 }
 
+
+/* iPhoneでも押せるオッズボタン */
+#oddsBtn{
+  position:relative!important;
+  z-index:2147483647!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-tap-highlight-color:rgba(255,255,255,.35)!important;
+  cursor:pointer!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:86px!important;
+}
+#oddsBtn:active{
+  transform:scale(.98)!important;
+  filter:brightness(.95)!important;
+}
+.bigResultOverlay[style*="display: none"]{
+  pointer-events:none!important;
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
-  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ「オッズを表示」を押してください。</div>
+  <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ黄色い「オッズを表示」の場所を押してください。</div>
 
   <div id="startScreen" class="board">
     <div class="notice">※ iPhoneの「ファイル」アプリのプレビューではボタンが動かないことがあります。その場合は共有ボタンからSafariで開いてください。</div>
@@ -1905,7 +1929,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <option value="4">4人</option>
         <option value="5">5人</option>
       </select>
-      <button class="big" id="oddsBtn" onclick="showOdds()">オッズを表示</button>
+      <div class="big" id="oddsBtn" role="button" tabindex="0" onclick="return showOddsSafe(event)" ontouchstart="return showOddsSafe(event)" onpointerdown="return showOddsSafe(event)">オッズを表示</div>
     </div>
   </div>
 
@@ -2768,6 +2792,8 @@ function finishRace(){
 
 function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
+  cleanupOldOverlayOnStart();
+  bindOddsTouchButton();
   attachOddsButtonFix();
   loadRecords();
   applyPlayerCount();
@@ -2842,6 +2868,45 @@ function attachOddsButtonFix(){
       return false;
     };
   }
+}
+
+
+function showOddsSafe(ev){
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+
+  try{
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+  }catch(err){
+    console.log(err);
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML="オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。";
+    }
+  }
+  return false;
+}
+
+function bindOddsTouchButton(){
+  var btn=document.getElementById("oddsBtn");
+  if(!btn) return;
+
+  btn.onclick=showOddsSafe;
+  btn.ontouchstart=showOddsSafe;
+  btn.onpointerdown=showOddsSafe;
+
+  btn.addEventListener("click", showOddsSafe, {passive:false});
+  btn.addEventListener("touchstart", showOddsSafe, {passive:false});
+  btn.addEventListener("pointerdown", showOddsSafe, {passive:false});
+}
+
+
+function cleanupOldOverlayOnStart(){
+  var old=document.getElementById("bigResultOverlay");
+  if(old) old.remove();
 }
 
 </script>
