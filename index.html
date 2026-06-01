@@ -2176,7 +2176,6 @@ function frameName(no){
 }
 
 function showOdds(){
-  fixPlaceOdds();
   applyPlayerCount();
   loadRecords();
   currentGrade=autoGrade();
@@ -2756,6 +2755,7 @@ function finishRace(){
 
 function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
+  attachOddsButtonFix();
   loadRecords();
   applyPlayerCount();
   updateMoney();
@@ -2780,7 +2780,8 @@ function closeBigResult(){
 
 
 function fixPlaceOdds(){
-  if(!entries || entries.length===0) return;
+  if(!window.entries || !Array.isArray(entries) || entries.length===0) return;
+
   for(var i=0;i<entries.length;i++){
     var e=entries[i];
     if(!e) continue;
@@ -2788,25 +2789,45 @@ function fixPlaceOdds(){
     var win=Number(e.odds);
     var place=Number(e.placeOdds);
 
-    if(!win || isNaN(win)) win=2.0+i;
-    if(!place || isNaN(place)) place=Math.max(1.1, win*0.32);
+    if(!win || isNaN(win) || win<=1){
+      win=2.0+i;
+      e.odds=Math.round(win*10)/10;
+    }
 
-    // 複勝は必ず単勝より低くする
+    if(!place || isNaN(place) || place<=0){
+      place=Math.max(1.1, win*0.32);
+    }
+
+    // 複勝は必ず単勝より低い
     var maxPlace=Math.max(1.1, win*0.72);
     if(place>=win) place=maxPlace;
     if(place>maxPlace) place=maxPlace;
-
-    // 最低値調整
     if(place<1.1) place=1.1;
 
-    e.placeOdds=Math.round(place*10)/10;
-
-    // 丸めで同じ/上回った時の保険
-    if(e.placeOdds>=e.odds){
-      e.placeOdds=Math.max(1.1, Math.round((e.odds*0.65)*10)/10);
-      if(e.placeOdds>=e.odds) e.placeOdds=Math.max(1.1, e.odds-0.1);
-      e.placeOdds=Math.round(e.placeOdds*10)/10;
+    place=Math.round(place*10)/10;
+    if(place>=win){
+      place=Math.round((win*0.65)*10)/10;
+      if(place>=win) place=Math.max(1.1, Math.round((win-0.1)*10)/10);
     }
+
+    e.placeOdds=place;
+  }
+}
+
+
+function attachOddsButtonFix(){
+  var btn=document.getElementById("oddsBtn");
+  if(btn){
+    btn.onclick=function(ev){
+      if(ev) ev.preventDefault();
+      try{
+        showOdds();
+      }catch(err){
+        console.log(err);
+        if(typeof msg!=="undefined" && msg) msg.innerHTML="オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。";
+      }
+      return false;
+    };
   }
 }
 
