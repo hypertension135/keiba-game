@@ -1935,9 +1935,63 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   border-radius:12px!important;
 }
 
+
+/* 人数ボタン：これを押したら即オッズへ */
+.playerButtonArea{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(58px,1fr))!important;
+  gap:10px!important;
+  margin:18px auto!important;
+  max-width:760px!important;
+  position:relative!important;
+  z-index:2147483647!important;
+}
+.selectTitle{
+  grid-column:1/-1!important;
+  color:#ffeaa5!important;
+  font-size:26px!important;
+  font-weight:1000!important;
+  text-align:center!important;
+  margin-bottom:4px!important;
+}
+.playerCountBtn{
+  font-size:24px!important;
+  font-weight:1000!important;
+  padding:18px 8px!important;
+  border-radius:14px!important;
+  border:3px solid #fff2a8!important;
+  background:#e0c84e!important;
+  color:#111!important;
+  box-shadow:0 4px 0 #7c6a16!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+  position:relative!important;
+  z-index:2147483647!important;
+}
+.playerCountBtn:active{
+  transform:translateY(3px)!important;
+  box-shadow:0 1px 0 #7c6a16!important;
+}
+#playerCountSelect{
+  display:none!important;
+}
+#oddsBtn{
+  display:none!important;
+}
+
 </style>
 </head>
 <body>
+<div id="playerButtonArea" class="playerButtonArea">
+  <div class="selectTitle">人数を選んでください</div>
+  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(1)" ontouchstart="selectPlayersAndGoOdds(1)">1人</button>
+  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(2)" ontouchstart="selectPlayersAndGoOdds(2)">2人</button>
+  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(3)" ontouchstart="selectPlayersAndGoOdds(3)">3人</button>
+  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(4)" ontouchstart="selectPlayersAndGoOdds(4)">4人</button>
+  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(5)" ontouchstart="selectPlayersAndGoOdds(5)">5人</button>
+</div>
+
 <div class="wrap">
   <h1>MINNA DERBY 50 → 12 完全作り替え版</h1>
   <div class="notice" id="msg">長い直線コースをゴールまで走ります。出なければ人数を選んだら、自動で出馬表とオッズへ進みます。。</div>
@@ -2134,7 +2188,8 @@ function saveRecords(){
   }catch(e){}
 }
 function applyPlayerCount(){
-  activePlayerCount = playerCountSelect ? Number(playerCountSelect.value) : 2;
+  activePlayerCount = playerCountSelect ? Number(playerCountSelect.value) : activePlayerCount;
+  if(!activePlayerCount || activePlayerCount<1) activePlayerCount=1;
   if(!activePlayerCount || activePlayerCount<1) activePlayerCount=2;
   if(activePlayerCount>5) activePlayerCount=5;
 
@@ -2818,6 +2873,7 @@ function finishRace(){
 
 function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
 window.onload=function(){
+  bindPlayerCountButtons();
   bindPlayerCountToOdds();
   
   cleanupOldOverlayOnStart();
@@ -3009,17 +3065,79 @@ function bindPlayerCountToOdds(){
   if(!sel) return;
 
   sel.onchange=function(){
-    goOddsAfterPlayerSelect();
+    
   };
 
   sel.addEventListener("change",function(){
-    goOddsAfterPlayerSelect();
+    
   });
 
   // iPhoneで選択後にchangeが遅い場合の保険
   sel.addEventListener("blur",function(){
-    goOddsAfterPlayerSelect();
+    
   });
+}
+
+
+function selectPlayersAndGoOdds(n){
+  try{
+    n=Number(n)||1;
+    if(n<1)n=1;
+    if(n>5)n=5;
+
+    activePlayerCount=n;
+
+    var sel=document.getElementById("playerCountSelect");
+    if(sel){
+      sel.value=String(n);
+    }
+
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=n+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+    },80);
+  }catch(err){
+    console.log(err);
+    alert("人数選択でエラーが出ました。ページを再読み込みしてください。");
+  }
+  return false;
+}
+
+function bindPlayerCountButtons(){
+  var buttons=document.querySelectorAll(".playerCountBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].addEventListener("click",function(ev){
+      ev.preventDefault();
+      var n=Number(this.textContent.replace("人",""));
+      selectPlayersAndGoOdds(n);
+    },{passive:false});
+    buttons[i].addEventListener("touchstart",function(ev){
+      ev.preventDefault();
+      var n=Number(this.textContent.replace("人",""));
+      selectPlayersAndGoOdds(n);
+    },{passive:false});
+  }
 }
 
 </script>
