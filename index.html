@@ -1980,9 +1980,91 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   display:none!important;
 }
 
+
+/* 最初は人数ボタンだけ表示。タップしたらオッズへ */
+#startScreen{
+  display:block!important;
+}
+#oddsScreen{
+  display:none;
+}
+#raceScreen{
+  display:none;
+}
+.startOnlyPanel{
+  max-width:780px;
+  margin:18px auto;
+  padding:20px;
+  border:4px solid #d8c36a;
+  border-radius:18px;
+  background:#10291a;
+  text-align:center;
+  position:relative;
+  z-index:2147483647;
+}
+.startOnlyPanel h1{
+  font-size:34px;
+  color:#ffeaa5;
+  margin:0 0 10px;
+}
+.startGuide{
+  color:#fff;
+  font-size:20px;
+  font-weight:900;
+}
+.bigPlayerButtons{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+.bigPlayerBtn{
+  min-height:88px!important;
+  font-size:28px!important;
+  font-weight:1000!important;
+  border-radius:16px!important;
+  border:4px solid #fff2a8!important;
+  background:#e0c84e!important;
+  color:#111!important;
+  box-shadow:0 5px 0 #7c6a16!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+  position:relative!important;
+  z-index:2147483647!important;
+  -webkit-tap-highlight-color:rgba(255,255,255,.4)!important;
+}
+.bigPlayerBtn:active{
+  transform:translateY(4px)!important;
+  box-shadow:0 1px 0 #7c6a16!important;
+}
+.startDebugMsg{
+  margin-top:12px;
+  color:#ffeb3b;
+  font-size:16px;
+  font-weight:900;
+}
+@media(max-width:700px){
+  .bigPlayerButtons{grid-template-columns:1fr 1fr;}
+  .bigPlayerBtn{min-height:74px!important}
+}
+
 </style>
 </head>
-<body>
+<body><section id='startScreen'>
+  <div class="startOnlyPanel">
+    <h1>みんなでダービー</h1>
+    <p class="startGuide">人数を選んだら、すぐ出馬表・オッズへ進みます</p>
+    <div class="bigPlayerButtons">
+      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(1);return false;" ontouchend="window.startWithPlayers(1);return false;">1人</button>
+      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(2);return false;" ontouchend="window.startWithPlayers(2);return false;">2人</button>
+      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(3);return false;" ontouchend="window.startWithPlayers(3);return false;">3人</button>
+      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(4);return false;" ontouchend="window.startWithPlayers(4);return false;">4人</button>
+      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(5);return false;" ontouchend="window.startWithPlayers(5);return false;">5人</button>
+    </div>
+    <div id="startDebugMsg" class="startDebugMsg"></div>
+  </div>
+</section>
 <div id="playerButtonArea" class="playerButtonArea">
   <div class="selectTitle">人数を選んでください</div>
   <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(1)" ontouchstart="selectPlayersAndGoOdds(1)">1人</button>
@@ -3139,6 +3221,73 @@ function bindPlayerCountButtons(){
     },{passive:false});
   }
 }
+
+
+window.startWithPlayers=function(n){
+  try{
+    n=Number(n)||1;
+    if(n<1)n=1;
+    if(n>5)n=5;
+
+    window.activePlayerCount=n;
+    if(typeof activePlayerCount!=="undefined") activePlayerCount=n;
+
+    var dbg=document.getElementById("startDebugMsg");
+    if(dbg) dbg.textContent=n+"人で開始します…";
+
+    var sel=document.getElementById("playerCountSelect");
+    if(sel) sel.value=String(n);
+
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+
+    // 出馬表とオッズを作る
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    // 画面を強制切り替え
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.setProperty("display","none","important");
+    if(odds) odds.style.setProperty("display","block","important");
+    if(race) race.style.setProperty("display","none","important");
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=n+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      var o=document.getElementById("oddsScreen");
+      if(o) o.scrollIntoView({behavior:"smooth",block:"start"});
+    },60);
+  }catch(err){
+    console.log(err);
+    var dbg=document.getElementById("startDebugMsg");
+    if(dbg) dbg.textContent="エラー："+err.message;
+    alert("人数ボタンでエラーが出ました: "+err.message);
+  }
+  return false;
+};
+
+// iPhone対策：ボタンに直接イベントも付与
+window.addEventListener("load",function(){
+  var buttons=document.querySelectorAll(".bigPlayerBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].addEventListener("touchend",function(ev){
+      ev.preventDefault();
+      var n=parseInt(this.textContent,10);
+      window.startWithPlayers(n);
+    },{passive:false});
+    buttons[i].addEventListener("click",function(ev){
+      ev.preventDefault();
+      var n=parseInt(this.textContent,10);
+      window.startWithPlayers(n);
+    },{passive:false});
+  }
+});
 
 </script>
 </body>
