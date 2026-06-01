@@ -2049,6 +2049,18 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   .bigPlayerBtn{min-height:74px!important}
 }
 
+
+#directOddsArea{display:none;margin:16px auto;max-width:1100px;padding:14px;background:#10291a;border:4px solid #d8c36a;border-radius:16px;color:#fff;position:relative;z-index:2147483600}
+.directHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#directPlayerText{color:#ffeaa5;font-size:26px;font-weight:1000}
+.backPlayersBtn{padding:10px 14px;border-radius:10px;border:2px solid #fff2a8;background:#e0c84e;color:#111;font-weight:1000}
+.directTableWrap{max-height:360px;overflow:auto}
+.directBetArea{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.directPlayerBox{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:12px;padding:10px}
+.directPlayerBox h3{margin:0 0 8px;color:#ffeaa5}
+.directPlayerBox select,.directPlayerBox input{width:100%;margin:6px 0;padding:9px;border-radius:8px;font-size:16px}
+.directActions{margin-top:12px;text-align:center}
+
 </style>
 </head>
 <body><section id='startScreen'>
@@ -2064,6 +2076,26 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
     </div>
     <div id="startDebugMsg" class="startDebugMsg"></div>
   </div>
+
+<div id="directOddsArea" class="directOddsArea">
+  <div class="directHeader">
+    <div id="directPlayerText">人数選択済み</div>
+    <button type="button" class="backPlayersBtn" onclick="resetToPlayerButtons()">人数を選び直す</button>
+  </div>
+  <h2>出馬表</h2>
+  <div class="tableWrap directTableWrap">
+    <table><thead><tr><th>枠番</th><th>馬名</th><th>騎手</th><th>脚質</th><th>単勝</th><th>複勝</th><th>直近5戦</th></tr></thead><tbody id="directEntryBody"></tbody></table>
+  </div>
+  <h2>オッズ</h2>
+  <div class="tableWrap directTableWrap">
+    <table><thead><tr><th>人気</th><th>枠番</th><th>馬名</th><th>単勝</th><th>複勝</th></tr></thead><tbody id="directOddsBody"></tbody></table>
+  </div>
+  <h2>投票</h2>
+  <div id="directBetArea" class="directBetArea"></div>
+  <div class="directActions">
+    <button type="button" class="big" onclick="return directConfirmAndGoRace()">投票確定・競馬場へ</button>
+  </div>
+</div>
 </section>
 <div id="playerButtonArea" class="playerButtonArea">
   <div class="selectTitle">人数を選んでください</div>
@@ -3286,6 +3318,142 @@ window.addEventListener("load",function(){
       var n=parseInt(this.textContent,10);
       window.startWithPlayers(n);
     },{passive:false});
+  }
+});
+
+
+function directFrameClass(no){
+  if(typeof frameClass==="function") return frameClass(no);
+  if(no<=2) return "frame-red"; if(no<=4) return "frame-blue"; if(no<=6) return "frame-yellow";
+  if(no<=8) return "frame-green"; if(no<=10) return "frame-pink"; return "frame-white";
+}
+function directFrameName(no){
+  if(typeof frameName==="function") return frameName(no);
+  if(no<=2) return "赤"; if(no<=4) return "青"; if(no<=6) return "黄";
+  if(no<=8) return "緑"; if(no<=10) return "桃"; return "白";
+}
+function directForm(n){ return (typeof form==="function") ? form(n) : "-"; }
+
+function directMakeOddsScreen(n){
+  n=Number(n)||1; if(n<1)n=1; if(n>5)n=5;
+  window.activePlayerCount=n;
+  if(typeof activePlayerCount!=="undefined") activePlayerCount=n;
+
+  var dbg=document.getElementById("startDebugMsg");
+  if(dbg) dbg.textContent=n+"人でオッズを作成中…";
+
+  var sel=document.getElementById("playerCountSelect");
+  if(sel) sel.value=String(n);
+
+  try{
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+  }catch(e){ console.log(e); }
+
+  if(!window.entries || !entries || entries.length===0){
+    if(dbg) dbg.textContent="出馬表を作れませんでした。";
+    alert("出馬表を作れませんでした。ページを再読み込みしてください。");
+    return false;
+  }
+
+  var panel=document.querySelector(".startOnlyPanel");
+  if(panel) panel.style.display="none";
+  var direct=document.getElementById("directOddsArea");
+  if(direct) direct.style.display="block";
+
+  var oldOdds=document.getElementById("oddsScreen");
+  if(oldOdds) oldOdds.style.setProperty("display","none","important");
+  var race=document.getElementById("raceScreen");
+  if(race) race.style.setProperty("display","none","important");
+
+  var txt=document.getElementById("directPlayerText");
+  if(txt) txt.textContent=n+"人プレイ";
+
+  var eb=document.getElementById("directEntryBody");
+  var ob=document.getElementById("directOddsBody");
+  var ba=document.getElementById("directBetArea");
+
+  var h="";
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    h+="<tr><td><span class='badge frameColor "+directFrameClass(e.no)+"'>"+e.no+"</span><br><small>"+directFrameName(e.no)+"枠</small></td>"
+      +"<td class='name'>"+e.name+"</td><td>"+e.jockey+"</td><td>"+e.style+"</td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.odds).toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.placeOdds).toFixed(1)+"倍</span></td>"
+      +"<td>"+directForm(e.name)+"</td></tr>";
+  }
+  if(eb) eb.innerHTML=h;
+
+  var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});
+  h="";
+  for(var j=0;j<sorted.length;j++){
+    var e=sorted[j];
+    h+="<tr><td>"+(j+1)+"</td><td><span class='badge frameColor "+directFrameClass(e.no)+"'>"+e.no+"</span></td>"
+      +"<td class='name'>"+e.name+"</td><td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.odds).toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.placeOdds).toFixed(1)+"倍</span></td></tr>";
+  }
+  if(ob) ob.innerHTML=h;
+
+  var betHtml="";
+  for(var p=0;p<n;p++){
+    betHtml+="<div class='directPlayerBox'><h3>P"+(p+1)+"</h3><div>所持金 <span class='money'>"+players[p].money+"</span>円</div>"
+      +"<select id='directType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>"
+      +"<select id='directHorse"+p+"'>";
+    for(var k=0;k<entries.length;k++){
+      var e2=entries[k];
+      betHtml+="<option value='"+k+"'>"+e2.no+"番 "+e2.name+" / 単"+Number(e2.odds).toFixed(1)+" 複"+Number(e2.placeOdds).toFixed(1)+"</option>";
+    }
+    betHtml+="</select><input id='directBet"+p+"' type='number' min='100' step='100' value='100'></div>";
+  }
+  if(ba) ba.innerHTML=betHtml;
+
+  setTimeout(function(){ if(direct) direct.scrollIntoView({behavior:"smooth",block:"start"}); },50);
+  return false;
+}
+
+window.startWithPlayers=function(n){ return directMakeOddsScreen(n); };
+
+function resetToPlayerButtons(){
+  var direct=document.getElementById("directOddsArea");
+  if(direct) direct.style.display="none";
+  var panel=document.querySelector(".startOnlyPanel");
+  if(panel) panel.style.display="block";
+}
+
+function directConfirmAndGoRace(){
+  if(!entries || entries.length===0){ alert("出馬表がありません。人数を選び直してください。"); return false; }
+  if(typeof activePlayerCount==="undefined") activePlayerCount=1;
+
+  for(var p=0;p<activePlayerCount;p++){
+    var t=document.getElementById("directType"+p);
+    var h=document.getElementById("directHorse"+p);
+    var b=document.getElementById("directBet"+p);
+    players[p].type=t?t.value:"win";
+    players[p].pick=h?Number(h.value):0;
+    players[p].bet=b?Math.floor(Number(b.value||100)/100)*100:100;
+    if(players[p].bet<100) players[p].bet=100;
+    if(players[p].bet>players[p].money){ alert("P"+(p+1)+"は所持金より多く賭けられません。"); return false; }
+    players[p].settled=false;
+  }
+
+  if(typeof betsConfirmed!=="undefined") betsConfirmed=true;
+  var start=document.getElementById("startScreen");
+  var odds=document.getElementById("oddsScreen");
+  var race=document.getElementById("raceScreen");
+  if(start) start.style.setProperty("display","none","important");
+  if(odds) odds.style.setProperty("display","none","important");
+  if(race) race.style.setProperty("display","block","important");
+  if(typeof makeHorses==="function") makeHorses();
+  setTimeout(function(){ if(race) race.scrollIntoView({behavior:"smooth",block:"start"}); },60);
+  return false;
+}
+
+window.addEventListener("load",function(){
+  var buttons=document.querySelectorAll(".bigPlayerBtn,.playerCountBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].onclick=function(ev){ if(ev) ev.preventDefault(); return directMakeOddsScreen(parseInt(this.textContent,10)); };
+    buttons[i].ontouchend=function(ev){ if(ev) ev.preventDefault(); return directMakeOddsScreen(parseInt(this.textContent,10)); };
   }
 });
 
