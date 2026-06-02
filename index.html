@@ -2063,8 +2063,8 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 
 
 /* タップ不要：最初からオッズ画面 */
-#startScreen{display:none!important}
-#oddsScreen{display:block!important}
+#startScreen{display:block!important}
+#oddsScreen{display:none}
 #raceScreen{display:none}
 .oddsPlayerControl{
   position:sticky;
@@ -2093,6 +2093,43 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   font-size:14px;
 }
 
+
+/* タップで次の画面に進むボタン */
+[data-go],
+.bigPlayerBtn,
+.playerCountBtn{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  cursor:pointer!important;
+  position:relative!important;
+  z-index:2147483647!important;
+  -webkit-tap-highlight-color:rgba(255,255,255,.35)!important;
+}
+.bigPlayerButtons{
+  display:grid!important;
+  grid-template-columns:repeat(5,1fr)!important;
+  gap:10px!important;
+  margin:18px auto!important;
+  max-width:760px!important;
+}
+.bigPlayerBtn{
+  min-height:82px!important;
+  font-size:28px!important;
+  font-weight:1000!important;
+  border-radius:16px!important;
+  border:4px solid #fff2a8!important;
+  background:#e0c84e!important;
+  color:#111!important;
+  box-shadow:0 5px 0 #7c6a16!important;
+}
+.bigPlayerBtn:active{
+  transform:translateY(4px)!important;
+  box-shadow:0 1px 0 #7c6a16!important;
+}
+@media(max-width:700px){
+  .bigPlayerButtons{grid-template-columns:1fr 1fr!important}
+}
+
 </style>
 </head>
 <body><section id='startScreen'>
@@ -2100,11 +2137,11 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
     <h1>みんなでダービー</h1>
     <p class="startGuide">人数を選んだら、すぐ出馬表・オッズへ進みます</p>
     <div class="bigPlayerButtons">
-      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(1);return false;" ontouchend="window.startWithPlayers(1);return false;">1人</button>
-      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(2);return false;" ontouchend="window.startWithPlayers(2);return false;">2人</button>
-      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(3);return false;" ontouchend="window.startWithPlayers(3);return false;">3人</button>
-      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(4);return false;" ontouchend="window.startWithPlayers(4);return false;">4人</button>
-      <button type="button" class="bigPlayerBtn" onclick="window.startWithPlayers(5);return false;" ontouchend="window.startWithPlayers(5);return false;">5人</button>
+      <button type="button" class="bigPlayerBtn" data-go="odds" data-players="1">1人</button>
+      <button type="button" class="bigPlayerBtn" data-go="odds" data-players="2">2人</button>
+      <button type="button" class="bigPlayerBtn" data-go="odds" data-players="3">3人</button>
+      <button type="button" class="bigPlayerBtn" data-go="odds" data-players="4">4人</button>
+      <button type="button" class="bigPlayerBtn" data-go="odds" data-players="5">5人</button>
     </div>
     <div id="startDebugMsg" class="startDebugMsg"></div>
   </div>
@@ -2125,17 +2162,17 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   <h2>投票</h2>
   <div id="directBetArea" class="directBetArea"></div>
   <div class="directActions">
-    <button type="button" class="big" onclick="return directConfirmAndGoRace()">投票確定・競馬場へ</button>
+    <button type="button" class="big" onclick="return directConfirmAndGoRace()" data-go="race">投票確定・競馬場へ</button>
   </div>
 </div>
 </section>
 <div id="playerButtonArea" class="playerButtonArea">
   <div class="selectTitle">人数を選んでください</div>
-  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(1)" ontouchstart="selectPlayersAndGoOdds(1)">1人</button>
-  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(2)" ontouchstart="selectPlayersAndGoOdds(2)">2人</button>
-  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(3)" ontouchstart="selectPlayersAndGoOdds(3)">3人</button>
-  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(4)" ontouchstart="selectPlayersAndGoOdds(4)">4人</button>
-  <button type="button" class="playerCountBtn" onclick="selectPlayersAndGoOdds(5)" ontouchstart="selectPlayersAndGoOdds(5)">5人</button>
+  <button type="button" class="bigPlayerBtn" data-go="odds" data-players="1">1人</button>
+  <button type="button" class="bigPlayerBtn" data-go="odds" data-players="2">2人</button>
+  <button type="button" class="bigPlayerBtn" data-go="odds" data-players="3">3人</button>
+  <button type="button" class="bigPlayerBtn" data-go="odds" data-players="4">4人</button>
+  <button type="button" class="bigPlayerBtn" data-go="odds" data-players="5">5人</button>
 </div>
 
 <div class="wrap">
@@ -2192,7 +2229,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
       </div>
       <div class="notice" id="selected">3人分の馬番と金額を選んで、「投票確定・競馬場へ」を押してください</div>
       <div class="controls">
-        <button class="gold" onclick="confirmAndGoRace()">投票確定・競馬場へ</button>
+        <button class="gold" onclick="confirmAndGoRace()" data-go="race">投票確定・競馬場へ</button>
         <button class="gray" onclick="showOdds()">オッズを作り直す</button>
         <button class="gray" onclick="resetMoney()">所持金リセット</button>
       </div>
@@ -3592,6 +3629,109 @@ function confirmAndGoRaceSafe(){
 
 window.addEventListener("load",function(){
   setTimeout(openOddsImmediately,150);
+});
+
+
+/* タップしたら次の画面に進むコマンド */
+window.goNextScreen=function(to,n){
+  try{
+    if(n!==undefined && n!==null){
+      n=Number(n)||1;
+      if(n<1)n=1;
+      if(n>5)n=5;
+      window.activePlayerCount=n;
+      try{ activePlayerCount=n; }catch(e){}
+      var sel=document.getElementById("playerCountSelect");
+      if(sel) sel.value=String(n);
+    }
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(to==="odds"){
+      if(typeof applyPlayerCount==="function") applyPlayerCount();
+      if(typeof showOdds==="function") showOdds();
+      if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+      if(typeof drawTables==="function") drawTables();
+      if(typeof fillSelects==="function") fillSelects();
+
+      if(start) start.style.setProperty("display","none","important");
+      if(odds) odds.style.setProperty("display","block","important");
+      if(race) race.style.setProperty("display","none","important");
+
+      if(typeof msg!=="undefined" && msg){
+        msg.innerHTML=(window.activePlayerCount||activePlayerCount||1)+"人プレイです。馬を選んで賭けてください。";
+      }
+
+      setTimeout(function(){
+        if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+      },60);
+      return false;
+    }
+
+    if(to==="race"){
+      var ok=true;
+      if(typeof confirmBets==="function"){
+        ok=confirmBets();
+      }
+      if(ok===false) return false;
+
+      if(start) start.style.setProperty("display","none","important");
+      if(odds) odds.style.setProperty("display","none","important");
+      if(race) race.style.setProperty("display","block","important");
+
+      if(typeof makeHorses==="function") makeHorses();
+
+      setTimeout(function(){
+        if(race) race.scrollIntoView({behavior:"smooth",block:"start"});
+      },60);
+      return false;
+    }
+  }catch(err){
+    console.log(err);
+    alert("画面移動エラー："+err.message);
+  }
+  return false;
+};
+
+window.startWithPlayers=function(n){
+  return window.goNextScreen("odds",n);
+};
+
+window.tapGo=function(el,event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var to=el.getAttribute("data-go")||"odds";
+  var n=el.getAttribute("data-players");
+  return window.goNextScreen(to,n);
+};
+
+function bindTapGoButtons(){
+  var els=document.querySelectorAll("[data-go], .bigPlayerBtn, .playerCountBtn");
+  for(var i=0;i<els.length;i++){
+    var el=els[i];
+
+    if(el.classList.contains("bigPlayerBtn") || el.classList.contains("playerCountBtn")){
+      var n=parseInt(el.textContent,10);
+      el.setAttribute("data-go","odds");
+      el.setAttribute("data-players",String(n||1));
+    }
+
+    el.onclick=function(ev){ return window.tapGo(this,ev); };
+    el.ontouchend=function(ev){ return window.tapGo(this,ev); };
+    el.onpointerup=function(ev){ return window.tapGo(this,ev); };
+
+    el.addEventListener("click",function(ev){ return window.tapGo(this,ev); },{passive:false});
+    el.addEventListener("touchend",function(ev){ return window.tapGo(this,ev); },{passive:false});
+    el.addEventListener("pointerup",function(ev){ return window.tapGo(this,ev); },{passive:false});
+  }
+}
+
+window.addEventListener("load",function(){
+  bindTapGoButtons();
 });
 
 </script>
