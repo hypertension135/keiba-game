@@ -2338,7 +2338,8 @@ var COUNT_KEY="minna_derby_recent5_count_v1";
 var entries=[],horses=[],finished=[],records={},lastRun={},raceCount=0,currentGrade="G3",upsetMode=false;
 var players=[{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false},{money:1000,pick:null,bet:0,type:'win',out:false}];
 var activePlayerCount=2;
-var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false,resultShown=false;
+// ゲーム全体で使う変数。削除するとエラーになるので注意。cameraLockedはカメラ固定フラグ。
+var running=false,timer=null,raceStartTime=0,RACE_DURATION=52000,betsConfirmed=false,raceEnding=false,resultShown=false,cameraLocked=false;
 
 var startScreen=document.getElementById("startScreen"),oddsScreen=document.getElementById("oddsScreen"),raceScreen=document.getElementById("raceScreen");
 var msg=document.getElementById("msg"),entryBody=document.getElementById("entryBody"),oddsBody=document.getElementById("oddsBody");
@@ -3049,7 +3050,8 @@ function finishRace(){
     +"<div class='bigRank'><span class='rankNo'>2</span><span class='horseNo'>"+entries[finished[1]].no+"番</span><span class='horseName'>"+entries[finished[1]].name+"</span><span class='oddsText'>2着</span></div>"
     +"<div class='bigRank'><span class='rankNo'>3</span><span class='horseNo'>"+entries[finished[2]].no+"番</span><span class='horseName'>"+entries[finished[2]].name+"</span><span class='oddsText'>3着</span></div>"
     +"</div><div class='bigPayText'>"+payText+"</div>"
-    +"<button class='closeResultBtn' onclick="closeBigResult()">閉じる</button>"
+    // onclick の中はシングルクォート ' で囲むこと。ダブルクォート " にすると構文エラーになる。
+    +"<button class='closeResultBtn' onclick='closeBigResult()'>閉じる</button>"
     +"</div></div>";
   raceWindow.insertAdjacentHTML("beforeend",overlay);
 }
