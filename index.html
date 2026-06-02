@@ -2130,6 +2130,57 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
   .bigPlayerButtons{grid-template-columns:1fr 1fr!important}
 }
 
+
+/* 元ファイル用：全頭スタート地点＋土の上を走行 */
+.horse{
+  overflow:visible!important;
+  width:132px!important;
+  height:92px!important;
+}
+.realHorseRunner{
+  overflow:visible!important;
+  width:132px!important;
+  height:92px!important;
+}
+.realHorseImg{
+  width:132px!important;
+  height:92px!important;
+  object-fit:contain!important;
+}
+.bib,.horse > .bib,.realHorseRunner .saddle,.saddle{
+  display:none!important;
+}
+.horse > .numTag,
+.numTag{
+  position:absolute!important;
+  left:44px!important;
+  top:-14px!important;
+  width:34px!important;
+  height:25px!important;
+  border-radius:999px!important;
+  border:3px solid #fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:15px!important;
+  line-height:20px!important;
+  font-weight:1000!important;
+  z-index:2147483647!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+  box-shadow:0 2px 5px rgba(0,0,0,.75)!important;
+  color:#fff!important;
+  background:#111!important;
+}
+.numTag.frame-red{background:#c62828!important;color:#fff!important}
+.numTag.frame-blue{background:#1565c0!important;color:#fff!important}
+.numTag.frame-yellow{background:#fdd835!important;color:#111!important}
+.numTag.frame-green{background:#2e7d32!important;color:#fff!important}
+.numTag.frame-pink{background:#ec407a!important;color:#fff!important}
+.numTag.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+
 </style>
 </head>
 <body><section id='startScreen'>
@@ -2706,9 +2757,6 @@ function makeHorses(){
 
     world.appendChild(el);
 
-    var row=Math.floor(i/6);
-    var col=i%6;
-
     horses.push({
       el:el,
       lane:i,
@@ -2722,7 +2770,7 @@ function makeHorses(){
     placeHorse(horses[i]);
   }
 
-  ensureBibs();
+  if(typeof ensureBibs==="function") ensureBibs();
   focusCamera();
 }
 
@@ -2747,9 +2795,6 @@ function ensureBibs(){
     t.style.display="flex";
     t.style.visibility="visible";
     t.style.opacity="1";
-    t.style.left="44px";
-    t.style.top="-14px";
-    t.style.zIndex="2147483647";
   }
 }
 
@@ -2760,11 +2805,14 @@ function point(t,lane){
   var row=Math.floor(lane/6);
   var col=lane%6;
 
-  // 12頭が重なりすぎないように上下・横を広げる
-  var y=365 + col*12 + row*28;
-  var startOffset=col*12 + row*22;
+  // 土の範囲内に全頭を入れる。馬画像のtopは y-55 なのでここで調整。
+  var laneYs=[406,418,430,442,454,466,410,422,434,446,458,470];
+  var y=laneYs[lane] || 436;
 
-  var clamped=Math.max(0, Math.min(1.34, t));
+  // スタート地点内で全頭が見えるよう、少しだけ横にずらす。
+  var startOffset=col*12 + row*6;
+
+  var clamped=Math.max(0,Math.min(1.55,t));
   var x=startX + startOffset + clamped*(finishX-startX);
 
   return {x:x,y:y,angle:0,flip:false};
@@ -2777,7 +2825,7 @@ function placeHorse(h){
   h.el.style.left=Math.round(p.x-66)+"px";
   h.el.style.top=Math.round(p.y-55)+"px";
   h.el.style.transform="none";
-  ensureBibs();
+  if(typeof ensureBibs==="function") ensureBibs();
 }
 
 function leader(){
@@ -2816,14 +2864,15 @@ function focusCamera(){
   var x=win.width*.48-lead.x*scale;
   var stopX=0-goalX*scale;
 
-  if(!cameraLocked && x<=stopX){
+  if(typeof cameraLocked!=="undefined" && !cameraLocked && x<=stopX){
     cameraLocked=true;
+    if(typeof fixedGoalCamera==="undefined") fixedGoalCamera={x:0,y:0,scale:.78};
     fixedGoalCamera.scale=scale;
     fixedGoalCamera.x=stopX;
     fixedGoalCamera.y=y;
   }
 
-  if(cameraLocked){
+  if(typeof cameraLocked!=="undefined" && cameraLocked){
     world.style.transform="translate("+Math.round(fixedGoalCamera.x)+"px,"+Math.round(fixedGoalCamera.y)+"px) scale("+fixedGoalCamera.scale+")";
     return;
   }
