@@ -2181,6 +2181,20 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 .numTag.frame-pink{background:#ec407a!important;color:#fff!important}
 .numTag.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
 
+
+/* 気まぐれ天気 */
+.weatherInfo{background:#072018!important;border:2px solid #d8c36a!important;color:#ffeaa5!important}
+.weatherLayer{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;pointer-events:none!important;z-index:50!important;overflow:hidden!important}
+.weather-cloudy{background:rgba(180,190,200,.14)!important}
+.weather-rain{background:rgba(40,80,120,.16)!important}
+.weather-heavyRain{background:rgba(20,45,80,.28)!important}
+.weather-fog{background:rgba(230,230,230,.38)!important;backdrop-filter:blur(1px)}
+.weatherLayer i{position:absolute!important;top:-30px!important;width:2px!important;height:34px!important;background:rgba(190,230,255,.75)!important;transform:rotate(18deg)!important;animation:rainFall linear infinite!important}
+.weather-heavyRain i{width:3px!important;height:45px!important;background:rgba(210,240,255,.88)!important}
+@keyframes rainFall{from{transform:translateY(-50px) rotate(18deg)}to{transform:translateY(700px) rotate(18deg)}}
+.weatherLayer b{position:absolute!important;left:-160px!important;width:150px!important;height:4px!important;border-radius:999px!important;background:rgba(255,255,255,.75)!important;animation:windLine 1.4s linear infinite!important}
+@keyframes windLine{from{transform:translateX(0)}to{transform:translateX(1250px)}}
+
 </style>
 </head>
 <body><section id='startScreen'>
@@ -2722,7 +2736,9 @@ function goRace(){
   }
   oddsScreen.style.display="none";raceScreen.style.display="block";
   raceInfo.innerHTML=currentGrade+" 発走前";lapInfo.innerHTML="残り1600m";leaderInfo.innerHTML="先頭：--";
-  makeHorses();focusCamera();
+  makeHorses();
+  if(!currentWeather) chooseWeather();
+  applyWeatherView();focusCamera();
 }
 function backOdds(){
   cameraLocked=false;
@@ -2881,6 +2897,8 @@ function focusCamera(){
 }
 
 function startRace(){
+  chooseWeather();
+  applyWeatherView();
   ensureBibs();
   if(!entries || entries.length===0){
     showOdds();
@@ -2899,6 +2917,15 @@ function startRace(){
   cameraLocked=false;
   fixedGoalCamera={x:0,y:0,scale:.78};
   finished=[];
+
+  if(horses){
+    for(var dc=0;dc<horses.length;dc++){
+      horses[dc].deepCloserChecked=false;
+      horses[dc].deepCloserBoost=false;
+      horses[dc].deepCloserBoostEnd=1.03;
+    }
+  }
+
   resultShown=false;
   resultFinishedAnimation=false;
   for(var si=0;si<players.length;si++){players[si].settled=false;}
@@ -2938,6 +2965,7 @@ function stepRace(now){
     if(!h || !e) continue;
 
     var bonus=0;
+    bonus += maybeStartDeepCloserBoost(e,h);
     if(!resultShown){
       if(e.style==="逃げ" && h.progress<0.42) bonus+=0.000055;
       if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.000040;
@@ -2947,7 +2975,8 @@ function stepRace(now){
       if(e.popularity>=9 && Math.random()<0.008) bonus+=0.000120;
     }
 
-    h.progress += (h.speed + bonus + Math.random()*0.000018) * dt;
+    var wb=weatherSpeedBonus(e,h); var ws=currentWeather?currentWeather.speed:1; var wc=currentWeather?currentWeather.chaos:0;
+    h.progress += ((h.speed*ws) + bonus + wb + Math.random()*(0.000018+wc)) * dt;
 
     if(!h.done && h.progress>=1){
       h.done=true;
@@ -3565,6 +3594,8 @@ function directConfirmAndGoRace(){
   if(odds) odds.style.setProperty("display","none","important");
   if(race) race.style.setProperty("display","block","important");
   if(typeof makeHorses==="function") makeHorses();
+  if(!currentWeather) chooseWeather();
+  applyWeatherView();
   setTimeout(function(){ if(race) race.scrollIntoView({behavior:"smooth",block:"start"}); },60);
   return false;
 }
@@ -3671,6 +3702,8 @@ function confirmAndGoRaceSafe(){
       if(odds) odds.style.setProperty("display","none","important");
       if(race) race.style.setProperty("display","block","important");
       if(typeof makeHorses==="function") makeHorses();
+  if(!currentWeather) chooseWeather();
+  applyWeatherView();
     }
   }catch(err){
     alert("競馬場へ進むところでエラー："+err.message);
@@ -3784,6 +3817,106 @@ function bindTapGoButtons(){
 window.addEventListener("load",function(){
   bindTapGoButtons();
 });
+
+
+var currentWeather=null;
+
+function chooseWeather(){
+  var list=[
+    {key:"sunny",name:"晴れ",mark:"☀️",w:38,speed:1.00,chaos:0,msg:"良馬場"},
+    {key:"cloudy",name:"くもり",mark:"☁️",w:24,speed:.99,chaos:.000010,msg:"少し重い"},
+    {key:"rain",name:"雨",mark:"🌧️",w:18,speed:.94,chaos:.000030,msg:"差しが来やすい"},
+    {key:"heavyRain",name:"大雨",mark:"⛈️",w:7,speed:.89,chaos:.000055,msg:"かなり荒れる"},
+    {key:"wind",name:"強風",mark:"💨",w:8,speed:.96,chaos:.000050,msg:"展開が乱れる"},
+    {key:"fog",name:"霧",mark:"🌫️",w:5,speed:.97,chaos:.000040,msg:"読みにくい"}
+  ];
+  var total=0; for(var i=0;i<list.length;i++) total+=list[i].w;
+  var r=Math.random()*total, a=0;
+  for(var j=0;j<list.length;j++){a+=list[j].w;if(r<=a){currentWeather=list[j];return currentWeather;}}
+  currentWeather=list[0]; return currentWeather;
+}
+
+function applyWeatherView(){
+  if(!currentWeather) chooseWeather();
+  var old=document.getElementById("weatherLayer"); if(old) old.remove();
+  var layer=document.createElement("div");
+  layer.id="weatherLayer";
+  layer.className="weatherLayer weather-"+currentWeather.key;
+  if(currentWeather.key==="rain" || currentWeather.key==="heavyRain"){
+    for(var i=0;i<70;i++){
+      var d=document.createElement("i");
+      d.style.left=(Math.random()*100)+"%";
+      d.style.animationDelay=(Math.random()*1.3)+"s";
+      d.style.animationDuration=(0.45+Math.random()*0.4)+"s";
+      layer.appendChild(d);
+    }
+  }
+  if(currentWeather.key==="wind"){
+    for(var w=0;w<12;w++){
+      var b=document.createElement("b");
+      b.style.top=(40+Math.random()*75)+"%";
+      b.style.animationDelay=(Math.random()*1.5)+"s";
+      layer.appendChild(b);
+    }
+  }
+  var rw=document.getElementById("raceWindow"); if(rw) rw.appendChild(layer);
+
+  var info=document.getElementById("weatherInfo");
+  if(!info){
+    info=document.createElement("div");
+    info.id="weatherInfo";
+    info.className="status weatherInfo";
+    var top=document.querySelector(".raceTop");
+    if(top) top.appendChild(info);
+  }
+  info.innerHTML=currentWeather.mark+" 天気："+currentWeather.name+"<br><small>"+currentWeather.msg+"</small>";
+}
+
+function weatherSpeedBonus(e,h){
+  if(!currentWeather) return 0;
+  var bonus=0;
+    bonus += maybeStartDeepCloserBoost(e,h);
+  if(currentWeather.key==="rain" || currentWeather.key==="heavyRain"){
+    if(e.style==="逃げ" && h.progress>0.55) bonus-=0.000035;
+    if(e.style==="先行" && h.progress>0.60) bonus-=0.000020;
+    if(e.style==="差し" && h.progress>0.62) bonus+=0.000040;
+    if(e.style==="追込" && h.progress>0.72) bonus+=0.000050;
+  }
+  if(currentWeather.key==="wind"){
+    if(e.style==="気分屋" && Math.random()<0.02) bonus+=0.000120;
+    if(e.popularity>=9 && Math.random()<0.012) bonus+=0.000100;
+  }
+  if(currentWeather.key==="fog" && Math.random()<0.015){
+    bonus+=(Math.random()<0.5 ? -0.000050 : 0.000080);
+  }
+  return bonus;
+}
+
+
+function maybeStartDeepCloserBoost(e,h){
+  if(!h.deepCloserChecked && h.progress>=0.74){
+    h.deepCloserChecked=true;
+
+    // 追込馬だけ、残り400mくらいからかなり低確率で超加速
+    if(e.style==="追込"){
+      var chance=0.04;
+      if(currentWeather && (currentWeather.key==="rain" || currentWeather.key==="heavyRain" || currentWeather.key==="fog")){
+        chance=0.07;
+      }
+
+      if(Math.random()<chance){
+        h.deepCloserBoost=true;
+        h.deepCloserBoostEnd=1.03;
+      }
+    }
+  }
+
+  if(h.deepCloserBoost && h.progress<h.deepCloserBoostEnd){
+    return 0.00023 + Math.random()*0.00010;
+  }
+
+  return 0;
+}
 
 </script>
 </body>
