@@ -2131,121 +2131,28 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
 }
 
 
-/* 元ファイル用：全頭スタート地点＋土の上を走行 */
-.horse{
-  overflow:visible!important;
-  width:132px!important;
-  height:92px!important;
-}
-.realHorseRunner{
-  overflow:visible!important;
-  width:132px!important;
-  height:92px!important;
-}
-.realHorseImg{
-  width:132px!important;
-  height:92px!important;
-  object-fit:contain!important;
-}
-.bib,.horse > .bib,.realHorseRunner .saddle,.saddle{
-  display:none!important;
-}
-.horse > .numTag,
-.numTag{
-  position:absolute!important;
-  left:44px!important;
-  top:-14px!important;
-  width:34px!important;
-  height:25px!important;
-  border-radius:999px!important;
-  border:3px solid #fff!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  text-align:center!important;
-  font-size:15px!important;
-  line-height:20px!important;
-  font-weight:1000!important;
-  z-index:2147483647!important;
-  opacity:1!important;
-  visibility:visible!important;
-  pointer-events:none!important;
-  box-shadow:0 2px 5px rgba(0,0,0,.75)!important;
-  color:#fff!important;
-  background:#111!important;
-}
-.numTag.frame-red{background:#c62828!important;color:#fff!important}
-.numTag.frame-blue{background:#1565c0!important;color:#fff!important}
-.numTag.frame-yellow{background:#fdd835!important;color:#111!important}
-.numTag.frame-green{background:#2e7d32!important;color:#fff!important}
-.numTag.frame-pink{background:#ec407a!important;color:#fff!important}
-.numTag.frame-white{background:#fff!important;color:#111!important;border-color:#111!important}
+/* 最終保険ボタン */
+#emergencyRaceControls{position:fixed!important;left:8px!important;right:8px!important;bottom:8px!important;z-index:2147483647!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;pointer-events:auto!important}
+#emergencyRaceControls .emBtn{margin:0!important;padding:14px 8px!important;border-radius:12px!important;border:3px solid #fff!important;font-size:20px!important;font-weight:1000!important;pointer-events:auto!important;touch-action:manipulation!important;box-shadow:0 3px 8px rgba(0,0,0,.45)!important}
+#emergencyRaceControls .odds{background:#ffd54f!important;color:#111!important}
+#emergencyRaceControls .start{background:#d32f2f!important;color:#fff!important}
+button[data-go="startRace"],button[data-go="newOdds"]{position:relative!important;z-index:2147483600!important;pointer-events:auto!important;touch-action:manipulation!important}
+body{padding-bottom:78px!important}
 
 
-/* 気まぐれ天気 */
-.weatherInfo{background:#072018!important;border:2px solid #d8c36a!important;color:#ffeaa5!important}
-.weatherLayer{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;pointer-events:none!important;z-index:50!important;overflow:hidden!important}
-.weather-cloudy{background:rgba(180,190,200,.14)!important}
-.weather-rain{background:rgba(40,80,120,.16)!important}
-.weather-heavyRain{background:rgba(20,45,80,.28)!important}
-.weather-fog{background:rgba(230,230,230,.38)!important;backdrop-filter:blur(1px)}
-.weatherLayer i{position:absolute!important;top:-30px!important;width:2px!important;height:34px!important;background:rgba(190,230,255,.75)!important;transform:rotate(18deg)!important;animation:rainFall linear infinite!important}
-.weather-heavyRain i{width:3px!important;height:45px!important;background:rgba(210,240,255,.88)!important}
-@keyframes rainFall{from{transform:translateY(-50px) rotate(18deg)}to{transform:translateY(700px) rotate(18deg)}}
-.weatherLayer b{position:absolute!important;left:-160px!important;width:150px!important;height:4px!important;border-radius:999px!important;background:rgba(255,255,255,.75)!important;animation:windLine 1.4s linear infinite!important}
-@keyframes windLine{from{transform:translateX(0)}to{transform:translateX(1250px)}}
-
-
-/* 馬券2枚購入 */
-.ticketBox{background:rgba(255,255,255,.07)!important;border:2px solid rgba(255,255,255,.16)!important;border-radius:10px!important;padding:8px!important;margin:8px 0!important}
-.ticketTitle{color:#ffeaa5!important;font-size:16px!important;font-weight:1000!important;margin-bottom:4px!important}
-.plusTicketBtn{width:100%!important;background:#ffd54f!important;color:#111!important;border:3px solid #fff!important;font-size:18px!important;font-weight:1000!important;padding:10px!important;border-radius:10px!important}
-.miniBtn{width:100%!important;font-size:15px!important;font-weight:900!important;padding:8px!important;border-radius:8px!important}
-.redMini{background:#b71c1c!important;color:#fff!important}
-.twoTicketResult{grid-template-columns:42px 76px 1.5fr 100px 105px!important}
-.twoTicketResult small{line-height:1.35!important}
-
-
-/* 人数ボタン確実版 */
-.fixedPlayerButtons{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:10px!important;margin:18px auto!important;max-width:760px!important;position:relative!important;z-index:2147483647!important}
-.selectTitle{grid-column:1/-1!important;color:#ffeaa5!important;font-size:26px!important;font-weight:1000!important;text-align:center!important}
-.fixedPlayerBtn{min-height:86px!important;font-size:28px!important;font-weight:1000!important;border-radius:16px!important;border:4px solid #fff2a8!important;background:#e0c84e!important;color:#111!important;box-shadow:0 5px 0 #7c6a16!important;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;position:relative!important;z-index:2147483647!important}
-.fixedPlayerBtn:active{transform:translateY(4px)!important;box-shadow:0 1px 0 #7c6a16!important}
-.directOddsArea{display:none;margin:16px auto;max-width:1100px;padding:14px;background:#10291a;border:4px solid #d8c36a;border-radius:16px;color:#fff;position:relative;z-index:2147483600}
-.directHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-#directPlayerText{color:#ffeaa5;font-size:26px;font-weight:1000}
-.backPlayersBtn{padding:10px 14px;border-radius:10px;border:2px solid #fff2a8;background:#e0c84e;color:#111;font-weight:1000}
-.directBetArea{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.directPlayerBox{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:12px;padding:10px}
-.directPlayerBox h3{margin:0 0 8px;color:#ffeaa5}
-.directPlayerBox select,.directPlayerBox input{width:100%;margin:6px 0;padding:9px;border-radius:8px;font-size:16px}
-@media(max-width:700px){.fixedPlayerButtons{grid-template-columns:1fr 1fr!important}}
+/* 馬券は1枚だけ：2枚目と追加ボタンを消す */
+.plusTicketBtn,
+.redMini,
+button[onclick*="directAddTicket"],
+button[onclick*="addTicket"],
+button[onclick*="directRemoveTicket"],
+button[onclick*="removeTicket"]{display:none!important}
+.ticketBox:nth-of-type(n+2){display:none!important}
+[id$="_2"]{display:none!important}
 
 </style>
 </head>
-<body>
-<div id="fixedPlayerButtons" class="fixedPlayerButtons">
-  <div class="selectTitle">人数を選んでください</div>
-  <button type="button" class="fixedPlayerBtn" data-p="1">1人</button>
-  <button type="button" class="fixedPlayerBtn" data-p="2">2人</button>
-  <button type="button" class="fixedPlayerBtn" data-p="3">3人</button>
-  <button type="button" class="fixedPlayerBtn" data-p="4">4人</button>
-  <button type="button" class="fixedPlayerBtn" data-p="5">5人</button>
-</div>
-<div id="directOddsArea" class="directOddsArea">
-  <div class="directHeader">
-    <div id="directPlayerText">人数選択済み</div>
-    <button type="button" class="backPlayersBtn" onclick="resetToPlayerButtons()">人数を選び直す</button>
-  </div>
-  <h2>出馬表</h2>
-  <div class="scroll"><table><thead><tr><th>枠番</th><th>馬名</th><th>騎手</th><th>脚質</th><th>単勝</th><th>複勝</th><th>直近5戦</th></tr></thead><tbody id="directEntryBody"></tbody></table></div>
-  <h2>オッズ</h2>
-  <div class="scroll"><table><thead><tr><th>人気</th><th>枠番</th><th>馬名</th><th>単勝</th><th>複勝</th></tr></thead><tbody id="directOddsBody"></tbody></table></div>
-  <h2>投票</h2>
-  <div id="directBetArea" class="directBetArea"></div>
-  <div class="directActions"><button type="button" class="big" onclick="return directConfirmAndGoRace()">投票確定・競馬場へ</button></div>
-</div>
-<section id='startScreen'>
+<body><section id='startScreen'>
   <div class="startOnlyPanel">
     <h1>みんなでダービー</h1>
     <p class="startGuide">人数を選んだら、すぐ出馬表・オッズへ進みます</p>
@@ -2358,7 +2265,7 @@ tr:nth-child(even){background:rgba(255,255,255,.04)}
         <div class="status" id="leaderInfo">先頭：--</div>
       </div>
       <div class="controls">
-        <button class="red" onclick="startRace()">発走</button>
+        <button class="red" onclick="startRace()" onclick="return forceStartRace(event)" data-go="startRace">発走</button>
         <button class="gray" onclick="backOdds()">オッズに戻る</button>
         <button class="gold" onclick="newRace()">新しいレース</button>
       </div>
@@ -2668,103 +2575,58 @@ function fillSelects(){
   if(typeof fixPlaceOdds==="function") fixPlaceOdds();
   var area=document.getElementById("betArea");
   if(!area) return;
-
   var html="";
   for(var p=0;p<activePlayerCount;p++){
+    if(!players[p]) continue;
+    players[p].ticketCount=1;
     var out=players[p].money<=0 || players[p].out;
     html+="<div class='player "+(out?"out":"")+"'>";
     html+="<h3>プレイヤー"+(p+1)+" "+(out?"<span class='outLabel'>脱落</span>":"")+"</h3>";
     html+="<div>所持金 <span class='money'>"+players[p].money+"</span>円</div>";
-
-    if(out){
-      html+="<div class='outLabel'>ゲームオーバー</div></div>";
-      continue;
+    if(out){html+="<div class='outLabel'>ゲームオーバー</div></div>";continue;}
+    html+="<div class='ticketBox'><div class='ticketTitle'>馬券</div>";
+    html+="<select id='betType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>";
+    html+="<select id='horseSel"+p+"'>";
+    for(var i=0;i<entries.length;i++){
+      var e=entries[i];
+      html+="<option value='"+i+"'>"+e.no+"番 "+e.name+" / 単"+Number(e.odds).toFixed(1)+" 複"+Number(e.placeOdds).toFixed(1)+"</option>";
     }
-
-    var count=getPlayerTicketCount(p);
-    html+=ticketSelectHtml(p,0);
-
-    if(count>=2){
-      html+=ticketSelectHtml(p,1);
-      html+="<button type='button' class='miniBtn redMini' onclick='return removeTicket("+p+")'>− 馬券2を消す</button>";
-    }else{
-      html+="<button type='button' class='plusTicketBtn' onclick='return addTicket("+p+")'>＋ 馬券を追加</button>";
-    }
-
-    html+="</div>";
+    html+="</select><input id='betInp"+p+"' type='number' min='100' step='100' value='100'></div></div>";
   }
   area.innerHTML=html;
+  forceSingleTickets();
 }
 
 function confirmBets(){
   if(typeof applyPlayerCount==="function") applyPlayerCount();
-
   if(!entries || entries.length===0){
     if(typeof showOdds==="function") showOdds();
     if(msg) msg.innerHTML="出馬表とオッズを作りました。馬を選んでからもう一度押してください。";
     return false;
   }
-
   var text=[];
   for(var p=0;p<activePlayerCount;p++){
-    if(players[p].money<=0 || players[p].out){
-      players[p].tickets=[];
-      players[p].out=true;
-      text.push("P"+(p+1)+"：脱落");
-      continue;
-    }
-
-    var count=getPlayerTicketCount(p);
-    var tickets=[];
-    var totalBet=0;
-
-    for(var t=0;t<count;t++){
-      var suffix=t===0 ? "" : "_2";
-      var betEl=document.getElementById("betInp"+p+suffix);
-      var horseEl=document.getElementById("horseSel"+p+suffix);
-      var typeEl=document.getElementById("betType"+p+suffix);
-
-      var bet=betEl ? Number(betEl.value) : 100;
-      if(isNaN(bet) || bet<=0) bet=100;
-      bet=Math.floor(bet/100)*100;
-      if(bet<100){
-        if(msg) msg.innerHTML="P"+(p+1)+"の馬券"+(t+1)+"は100円以上にしてください。";
-        return false;
-      }
-
-      var pick=horseEl ? Number(horseEl.value) : 0;
-      if(isNaN(pick) || !entries[pick]){
-        if(msg) msg.innerHTML="P"+(p+1)+"の馬券"+(t+1)+"の馬を選んでください。";
-        return false;
-      }
-
-      var type=typeEl ? typeEl.value : "win";
-      tickets.push({pick:pick,bet:bet,type:type});
-      totalBet+=bet;
-    }
-
-    if(totalBet>players[p].money){
-      if(msg) msg.innerHTML="P"+(p+1)+"は馬券の合計が所持金より多いです。";
-      return false;
-    }
-
-    players[p].tickets=tickets;
-    players[p].pick=tickets[0].pick;
-    players[p].bet=tickets[0].bet;
-    players[p].type=tickets[0].type;
-
-    var line="P"+(p+1)+"：";
-    for(var q=0;q<tickets.length;q++){
-      var tk=tickets[q];
-      line+="馬券"+(q+1)+" "+(tk.type==="place"?"複勝":"単勝")+" "+entries[tk.pick].no+"番 "+entries[tk.pick].name+" "+tk.bet+"円";
-      if(q<tickets.length-1) line+=" / ";
-    }
-    text.push(line);
+    if(players[p].money<=0 || players[p].out){players[p].tickets=[];players[p].out=true;text.push("P"+(p+1)+"：脱落");continue;}
+    var betEl=document.getElementById("betInp"+p);
+    var horseEl=document.getElementById("horseSel"+p);
+    var typeEl=document.getElementById("betType"+p);
+    var bet=betEl?Number(betEl.value):100;
+    if(isNaN(bet)||bet<=0) bet=100;
+    bet=Math.floor(bet/100)*100;
+    if(bet<100){if(msg) msg.innerHTML="P"+(p+1)+"は100円以上にしてください。";return false;}
+    if(bet>players[p].money){if(msg) msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";return false;}
+    var pick=horseEl?Number(horseEl.value):0;
+    if(isNaN(pick)||!entries[pick]){if(msg) msg.innerHTML="P"+(p+1)+"の馬を選んでください。";return false;}
+    var type=typeEl?typeEl.value:"win";
+    players[p].ticketCount=1;
+    players[p].tickets=[{pick:pick,bet:bet,type:type}];
+    players[p].pick=pick;players[p].bet=bet;players[p].type=type;
+    text.push("P"+(p+1)+"："+(type==="place"?"複勝":"単勝")+" "+entries[pick].no+"番 "+entries[pick].name+" "+bet+"円");
   }
-
   betsConfirmed=true;
   if(selected) selected.innerHTML="投票確定：<br>"+text.join("<br>");
   if(msg) msg.innerHTML="投票確定。競馬場へ進んで発走してください。";
+  forceSingleTickets();
   return true;
 }
 
@@ -2786,9 +2648,7 @@ function goRace(){
   }
   oddsScreen.style.display="none";raceScreen.style.display="block";
   raceInfo.innerHTML=currentGrade+" 発走前";lapInfo.innerHTML="残り1600m";leaderInfo.innerHTML="先頭：--";
-  makeHorses();
-  if(!currentWeather) chooseWeather();
-  applyWeatherView();focusCamera();
+  makeHorses();focusCamera();
 }
 function backOdds(){
   cameraLocked=false;
@@ -2823,6 +2683,9 @@ function makeHorses(){
 
     world.appendChild(el);
 
+    var row=Math.floor(i/6);
+    var col=i%6;
+
     horses.push({
       el:el,
       lane:i,
@@ -2836,7 +2699,7 @@ function makeHorses(){
     placeHorse(horses[i]);
   }
 
-  if(typeof ensureBibs==="function") ensureBibs();
+  ensureBibs();
   focusCamera();
 }
 
@@ -2861,6 +2724,9 @@ function ensureBibs(){
     t.style.display="flex";
     t.style.visibility="visible";
     t.style.opacity="1";
+    t.style.left="44px";
+    t.style.top="-14px";
+    t.style.zIndex="2147483647";
   }
 }
 
@@ -2871,14 +2737,11 @@ function point(t,lane){
   var row=Math.floor(lane/6);
   var col=lane%6;
 
-  // 土の範囲内に全頭を入れる。馬画像のtopは y-55 なのでここで調整。
-  var laneYs=[406,418,430,442,454,466,410,422,434,446,458,470];
-  var y=laneYs[lane] || 436;
+  // 12頭が重なりすぎないように上下・横を広げる
+  var y=365 + col*12 + row*28;
+  var startOffset=col*12 + row*22;
 
-  // スタート地点内で全頭が見えるよう、少しだけ横にずらす。
-  var startOffset=col*12 + row*6;
-
-  var clamped=Math.max(0,Math.min(1.55,t));
+  var clamped=Math.max(0, Math.min(1.34, t));
   var x=startX + startOffset + clamped*(finishX-startX);
 
   return {x:x,y:y,angle:0,flip:false};
@@ -2891,7 +2754,7 @@ function placeHorse(h){
   h.el.style.left=Math.round(p.x-66)+"px";
   h.el.style.top=Math.round(p.y-55)+"px";
   h.el.style.transform="none";
-  if(typeof ensureBibs==="function") ensureBibs();
+  ensureBibs();
 }
 
 function leader(){
@@ -2930,15 +2793,14 @@ function focusCamera(){
   var x=win.width*.48-lead.x*scale;
   var stopX=0-goalX*scale;
 
-  if(typeof cameraLocked!=="undefined" && !cameraLocked && x<=stopX){
+  if(!cameraLocked && x<=stopX){
     cameraLocked=true;
-    if(typeof fixedGoalCamera==="undefined") fixedGoalCamera={x:0,y:0,scale:.78};
     fixedGoalCamera.scale=scale;
     fixedGoalCamera.x=stopX;
     fixedGoalCamera.y=y;
   }
 
-  if(typeof cameraLocked!=="undefined" && cameraLocked){
+  if(cameraLocked){
     world.style.transform="translate("+Math.round(fixedGoalCamera.x)+"px,"+Math.round(fixedGoalCamera.y)+"px) scale("+fixedGoalCamera.scale+")";
     return;
   }
@@ -2947,55 +2809,7 @@ function focusCamera(){
 }
 
 function startRace(){
-  chooseWeather();
-  applyWeatherView();
-  ensureBibs();
-  if(!entries || entries.length===0){
-    showOdds();
-  }
-  if(!horses || horses.length!==12){
-    makeHorses();
-  }
-  if(!horses || horses.length===0){
-    result.innerHTML="馬が作れていません。オッズを表示してからもう一度押してください。";
-    return;
-  }
-
-  racing=true;
-  resultShown=false;
-  postResultRun=false;
-  cameraLocked=false;
-  fixedGoalCamera={x:0,y:0,scale:.78};
-  finished=[];
-
-  if(horses){
-    for(var dc=0;dc<horses.length;dc++){
-      horses[dc].deepCloserChecked=false;
-      horses[dc].deepCloserBoost=false;
-      horses[dc].deepCloserBoostEnd=1.03;
-    }
-  }
-
-  resultShown=false;
-  resultFinishedAnimation=false;
-  for(var si=0;si<players.length;si++){players[si].settled=false;}
-  ensureBibs();
-
-  raceInfo.innerHTML=currentGrade+" 発走";
-  result.innerHTML="レース中です。番号が読めるゼッケンのまま全馬が走ります。";
-  msg.innerHTML="レース中です。";
-
-  if(timer){
-    clearInterval(timer);
-    timer=null;
-  }
-  if(window.__raceAnimId){
-    cancelAnimationFrame(window.__raceAnimId);
-    window.__raceAnimId=null;
-  }
-
-  window.__raceLastTime=null;
-  window.__raceAnimId=requestAnimationFrame(stepRace);
+  return forceStartRace();
 }
 
 function stepRace(now){
@@ -3015,7 +2829,6 @@ function stepRace(now){
     if(!h || !e) continue;
 
     var bonus=0;
-    bonus += maybeStartDeepCloserBoost(e,h);
     if(!resultShown){
       if(e.style==="逃げ" && h.progress<0.42) bonus+=0.000055;
       if(e.style==="先行" && h.progress>=0.20 && h.progress<0.70) bonus+=0.000040;
@@ -3025,8 +2838,7 @@ function stepRace(now){
       if(e.popularity>=9 && Math.random()<0.008) bonus+=0.000120;
     }
 
-    var wb=weatherSpeedBonus(e,h); var ws=currentWeather?currentWeather.speed:1; var wc=currentWeather?currentWeather.chaos:0;
-    h.progress += ((h.speed*ws) + bonus + wb + Math.random()*(0.000018+wc)) * dt;
+    h.progress += (h.speed + bonus + Math.random()*0.000018) * dt;
 
     if(!h.done && h.progress>=1){
       h.done=true;
@@ -3095,211 +2907,948 @@ function recordResult(){
   saveRecords();
 }
 function finishRace(){
-  if(typeof forceFinishOrderIfNeeded==="function") forceFinishOrderIfNeeded();
-  if(typeof recordResult==="function") recordResult();
+  fixPlaceOdds();
+  if(resultShown) return;
+  resultShown=true;
+  // ターンなし。直線ゴール駆け抜け。黒線チカチカ軽減。ゴール後も馬は止めない。結果と払い戻しだけ確定。
+  raceCount++;
+  recordResult();
 
-  var order=finished.slice();
-  var first=order[0], second=order[1], third=order[2];
-  if(first===undefined || second===undefined || third===undefined){
-    result.innerHTML="<div class='resultBoard'><div class='resultTitle'>結果エラー</div>もう一度、新しいレースをしてください。</div>";
-    return;
+  var win=finished[0];
+  var winner=entries[win];
+
+  var order="";
+  for(var i=0;i<Math.min(10,finished.length);i++){
+    if(i>0) order+=" → ";
+    order+=entries[finished[i]].no+"番";
   }
-  var top3=[first,second,third];
 
-  var board="<div class='bigResultOverlay' id='bigResultOverlay'><div class='bigResultCard'>";
-  board+="<div class='bigResultTitle'>確定</div><div class='bigTop3'>";
-  board+="<div class='bigRank first'><span class='rankNo'>1</span><span class='horseNo'>"+entries[first].no+"番</span><span class='horseName'>"+entries[first].name+"</span><span class='oddsText'>単 "+entries[first].odds.toFixed(1)+"倍</span></div>";
-  board+="<div class='bigRank'><span class='rankNo'>2</span><span class='horseNo'>"+entries[second].no+"番</span><span class='horseName'>"+entries[second].name+"</span><span class='oddsText'>2着</span></div>";
-  board+="<div class='bigRank'><span class='rankNo'>3</span><span class='horseNo'>"+entries[third].no+"番</span><span class='horseName'>"+entries[third].name+"</span><span class='oddsText'>3着</span></div>";
-  board+="</div><div class='bigPlayers'><div class='bigPlayersTitle'>当たり・ハズレ / 残金</div>";
+  // 複勝は3着以内
+  var top3 = finished.slice(0,3);
+  var top3Text = "";
+  for(var t=0;t<top3.length;t++){
+    if(t>0) top3Text += "・";
+    top3Text += entries[top3[t]].no+"番";
+  }
 
-  var smallHtml="<div class='resultBoard'><div class='resultTitle'>確定</div><div class='playerResultPanel'><div class='playerResultTitle'>当たり・ハズレ / 残金</div>";
+  var payText="";
 
   for(var p=0;p<activePlayerCount;p++){
-    var tickets=players[p].tickets || [];
-    if(!tickets.length && players[p].pick!==null && players[p].pick!==undefined && players[p].bet>0){
-      tickets=[{pick:players[p].pick,bet:players[p].bet,type:players[p].type||"win"}];
-    }
-
-    if(!tickets.length){
-      board+="<div class='bigPlayerRow lose'><span>P"+(p+1)+"</span><b>投票なし</b><em>残金 "+players[p].money+"円</em></div>";
-      smallHtml+="<div class='playerResult lose'><span class='pname'>P"+(p+1)+"</span><span class='judgement'>投票なし</span><span class='cash'>残金 "+players[p].money+"円</span></div>";
+    if(players[p].bet<=0 || players[p].pick===null){
+      payText+="P"+(p+1)+": 休み / 所持金 "+players[p].money+"円<br>";
       continue;
     }
 
-    var totalBet=0,totalPay=0,hitCount=0,detail=[];
-    for(var t=0;t<tickets.length;t++){
-      var tk=tickets[t];
-      var horse=entries[tk.pick];
-      if(!horse) continue;
-      var hit=false,pay=0;
-      if(tk.type==="win"){
-        hit=(tk.pick===first);
-        if(hit) pay=Math.floor(tk.bet*horse.odds);
-      }else{
-        hit=(top3.indexOf(tk.pick)!==-1);
-        if(hit) pay=Math.floor(tk.bet*horse.placeOdds);
-      }
-      totalBet+=tk.bet;
-      totalPay+=pay;
-      if(hit) hitCount++;
-      detail.push("馬券"+(t+1)+" "+(tk.type==="place"?"複勝":"単勝")+" "+horse.no+"番 "+(hit?"当たり":"ハズレ")+" 払戻"+pay+"円");
+    var pick=entries[players[p].pick];
+    var type = players[p].type || "win";
+    var typeLabel = type==="place" ? "複勝" : "単勝";
+
+    players[p].money -= players[p].bet;
+
+    var hit=false;
+    var oddsUsed=pick.odds;
+
+    if(type==="place"){
+      // ここが重要：選んだ馬が3着以内なら的中
+      hit = top3.indexOf(players[p].pick) !== -1;
+      oddsUsed = pick.placeOdds || Math.max(1.1, Math.round((pick.odds*0.18+1.1)*10)/10);
+    }else{
+      hit = players[p].pick === win;
+      oddsUsed = pick.odds;
     }
 
-    if(!players[p].settled){
-      players[p].money-=totalBet;
-      players[p].money+=totalPay;
-      if(players[p].money<0) players[p].money=0;
-      if(players[p].money<=0) players[p].out=true;
-      players[p].settled=true;
+    if(hit){
+      var pay=Math.floor(players[p].bet * oddsUsed);
+      players[p].money += pay;
+      payText+="P"+(p+1)+": "+typeLabel+"的中！ "+pick.no+"番 "+pick.name+" / "+oddsUsed.toFixed(1)+"倍 / 払戻 "+pay+"円 / 所持金 "+players[p].money+"円<br>";
+    }else{
+      payText+="P"+(p+1)+": "+typeLabel+"ハズレ "+pick.no+"番 "+pick.name+" / -"+players[p].bet+"円 / 所持金 "+players[p].money+"円<br>";
     }
-
-    var anyHit=hitCount>0;
-    board+="<div class='bigPlayerRow "+(anyHit?"hit":"lose")+" twoTicketResult'><span>P"+(p+1)+"</span><b>"+(anyHit?"当たり":"ハズレ")+"</b><small>"+detail.join("<br>")+"</small><small>合計払戻 "+totalPay+"円</small><em>残金 "+players[p].money+"円</em></div>";
-    smallHtml+="<div class='playerResult "+(anyHit?"hit":"lose")+"'><span class='pname'>P"+(p+1)+"</span><span class='judgement'>"+(anyHit?"当たり":"ハズレ")+"</span><span class='ticket'>"+detail.join("<br>")+"</span><span class='pay'>合計払戻 "+totalPay+"円</span><span class='cash'>残金 "+players[p].money+"円</span></div>";
   }
 
-  board+="</div><button class='closeResultBtn' onclick='closeBigResult ? closeBigResult() : document.getElementById(\"bigResultOverlay\").remove()'>閉じる</button></div></div>";
-  smallHtml+="</div><div class='orderLine'>上位3頭："+entries[first].no+"番 → "+entries[second].no+"番 → "+entries[third].no+"番</div></div>";
+  for(var op=0;op<activePlayerCount;op++){
+    if(players[op].money<=0){
+      players[op].money=0;
+      players[op].out=true;
+    }
+  }
 
-  result.innerHTML=smallHtml;
+  updateMoney();
+  raceInfo.innerHTML="確定・走行中";
+  lapInfo.innerHTML="着順確定・馬は走行中";
+  focusCamera();
+  betsConfirmed=false;
+
+  result.innerHTML="【確定】<br>1着："+crown(currentGrade)+" "+currentGrade+" "+winner.no+"番 "+winner.name+"（"+winner.jockey+" / 単勝 "+winner.odds.toFixed(1)+"倍）<br>複勝対象：3着以内 "+top3Text+"<br>上位10頭："+order+"<br><br>"+payText+"<br>ターンなし。直線のゴールを駆け抜けて終わります。";
+
+  var oldOverlay=document.getElementById("bigResultOverlay");
+  if(oldOverlay) oldOverlay.remove();
+  var overlay="<div class='bigResultOverlay' id='bigResultOverlay'><div class='bigResultCard'>"
+    +"<div class='bigResultTitle'>確定</div>"
+    +"<div class='bigTop3'>"
+    +"<div class='bigRank first'><span class='rankNo'>1</span><span class='horseNo'>"+entries[finished[0]].no+"番</span><span class='horseName'>"+entries[finished[0]].name+"</span><span class='oddsText'>単 "+entries[finished[0]].odds.toFixed(1)+"倍</span></div>"
+    +"<div class='bigRank'><span class='rankNo'>2</span><span class='horseNo'>"+entries[finished[1]].no+"番</span><span class='horseName'>"+entries[finished[1]].name+"</span><span class='oddsText'>2着</span></div>"
+    +"<div class='bigRank'><span class='rankNo'>3</span><span class='horseNo'>"+entries[finished[2]].no+"番</span><span class='horseName'>"+entries[finished[2]].name+"</span><span class='oddsText'>3着</span></div>"
+    +"</div><div class='bigPayText'>"+payText+"</div>"
+    // onclick の中はシングルクォート ' で囲むこと。ダブルクォート " にすると構文エラーになる。
+    +"<button class='closeResultBtn' onclick='closeBigResult()'>閉じる</button>"
+    +"</div></div>";
+  raceWindow.insertAdjacentHTML("beforeend",overlay);
+}
+
+function stopRace(){running=false;raceEnding=false;resultShown=false;if(timer){clearInterval(timer);timer=null}}
+window.onload=function(){
+  bindPlayerCountButtons();
+  bindPlayerCountToOdds();
+  
+  cleanupOldOverlayOnStart();
+  bindOddsTouchButton();
+  attachOddsButtonFix();
+  loadRecords();
+  applyPlayerCount();
+  updateMoney();
+  if(playerCountSelect){
+    playerCountSelect.addEventListener("change",function(){
+      applyPlayerCount();
+      fillSelects();
+      updateMoney();
+      selected.innerHTML=activePlayerCount+"人プレイにしました。";
+    });
+  }
+}
+window.onresize=function(){if(raceScreen.style.display==="block")focusCamera()}
+
+function closeBigResult(){
+  var x=document.getElementById("bigResultOverlay");
+  if(x){
+    x.style.display="none";
+    x.remove();
+  }
+}
+
+
+function fixPlaceOdds(){
+  if(!entries || !Array.isArray(entries) || entries.length===0) return;
+
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    if(!e) continue;
+
+    var win=Number(e.odds);
+    var place=Number(e.placeOdds);
+
+    if(!win || isNaN(win) || win<=1){
+      win=2.0+i;
+      e.odds=Math.round(win*10)/10;
+    }
+
+    if(!place || isNaN(place) || place<=0){
+      place=Math.max(1.1, win*0.28);
+    }
+
+    // 複勝は必ず単勝より低い
+    var maxPlace=Math.max(1.1, win*0.68);
+    if(place>=win) place=maxPlace;
+    if(place>maxPlace) place=maxPlace;
+    if(place<1.1) place=1.1;
+
+    place=Math.round(place*10)/10;
+    if(place>=win){
+      place=Math.round((win*0.6)*10)/10;
+      if(place>=win) place=Math.max(1.1, Math.round((win-0.1)*10)/10);
+    }
+
+    e.placeOdds=place;
+  }
+}
+
+
+function attachOddsButtonFix(){
+  var btn=document.getElementById("oddsBtn");
+  if(btn){
+    btn.onclick=function(ev){
+      if(ev) ev.preventDefault();
+      try{
+        showOdds();
+      }catch(err){
+        console.log(err);
+        if(typeof msg!=="undefined" && msg) msg.innerHTML="オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。";
+      }
+      return false;
+    };
+  }
+}
+
+
+function showOddsSafe(ev){
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  return forceOddsScreen();
+}
+
+function bindOddsTouchButton(){
+  var btn=document.getElementById("oddsBtn");
+  if(!btn) return;
+
+  btn.onclick=showOddsSafe;
+  btn.ontouchstart=showOddsSafe;
+  btn.onpointerdown=showOddsSafe;
+
+  btn.addEventListener("click", showOddsSafe, {passive:false});
+  btn.addEventListener("touchstart", showOddsSafe, {passive:false});
+  btn.addEventListener("pointerdown", showOddsSafe, {passive:false});
+}
+
+
+function cleanupOldOverlayOnStart(){
   var old=document.getElementById("bigResultOverlay");
   if(old) old.remove();
-  if(typeof raceWindow!=="undefined" && raceWindow) raceWindow.insertAdjacentHTML("beforeend",board);
-  else document.body.insertAdjacentHTML("beforeend",board);
-
-  raceInfo.innerHTML="確定";
-  lapInfo.innerHTML="結果確定";
-  leaderInfo.innerHTML="勝者："+entries[first].no+"番 "+entries[first].name;
-  if(typeof updateMoney==="function") updateMoney();
 }
+
+
+function forceOddsScreen(){
+  try{
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    // 画面を強制的にオッズ側へ
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    // 表が空ならもう一度描画
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML="出馬表とオッズを表示しました。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      var o=document.getElementById("oddsScreen");
+      if(o) o.scrollIntoView({behavior:"smooth",block:"start"});
+    },100);
+  }catch(err){
+    console.log(err);
+    alert("オッズ表示でエラーが出ました。新しいレースを押してからもう一度押してください。");
+  }
+  return false;
+}
+
+function autoOpenOddsOnLoad(){
+  // ページを開いたら自動でオッズ画面にする
+  setTimeout(function(){
+    forceOddsScreen();
+  },250);
+}
+
+
+function goOddsAfterPlayerSelect(){
+  try{
+    var sel=document.getElementById("playerCountSelect");
+    if(sel){
+      activePlayerCount=Number(sel.value)||1;
+    }
+
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=activePlayerCount+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+    },100);
+  }catch(err){
+    console.log(err);
+    alert("人数選択後のオッズ表示でエラーが出ました。ページを再読み込みしてください。");
+  }
+  return false;
+}
+
+function bindPlayerCountToOdds(){
+  var sel=document.getElementById("playerCountSelect");
+  if(!sel) return;
+
+  sel.onchange=function(){
+    
+  };
+
+  sel.addEventListener("change",function(){
+    
+  });
+
+  // iPhoneで選択後にchangeが遅い場合の保険
+  sel.addEventListener("blur",function(){
+    
+  });
+}
+
+
+function selectPlayersAndGoOdds(n){
+  try{
+    n=Number(n)||1;
+    if(n<1)n=1;
+    if(n>5)n=5;
+
+    activePlayerCount=n;
+
+    var sel=document.getElementById("playerCountSelect");
+    if(sel){
+      sel.value=String(n);
+    }
+
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+
+    if(typeof showOdds==="function"){
+      showOdds();
+    }
+
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.display="none";
+    if(odds) odds.style.display="block";
+    if(race) race.style.display="none";
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=n+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+    },80);
+  }catch(err){
+    console.log(err);
+    alert("人数選択でエラーが出ました。ページを再読み込みしてください。");
+  }
+  return false;
+}
+
+function bindPlayerCountButtons(){
+  var buttons=document.querySelectorAll(".playerCountBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].addEventListener("click",function(ev){
+      ev.preventDefault();
+      var n=Number(this.textContent.replace("人",""));
+      selectPlayersAndGoOdds(n);
+    },{passive:false});
+    buttons[i].addEventListener("touchstart",function(ev){
+      ev.preventDefault();
+      var n=Number(this.textContent.replace("人",""));
+      selectPlayersAndGoOdds(n);
+    },{passive:false});
+  }
+}
+
+
+window.startWithPlayers=function(n){
+  try{
+    n=Number(n)||1;
+    if(n<1)n=1;
+    if(n>5)n=5;
+
+    window.activePlayerCount=n;
+    if(typeof activePlayerCount!=="undefined") activePlayerCount=n;
+
+    var dbg=document.getElementById("startDebugMsg");
+    if(dbg) dbg.textContent=n+"人で開始します…";
+
+    var sel=document.getElementById("playerCountSelect");
+    if(sel) sel.value=String(n);
+
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+
+    // 出馬表とオッズを作る
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    // 画面を強制切り替え
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.setProperty("display","none","important");
+    if(odds) odds.style.setProperty("display","block","important");
+    if(race) race.style.setProperty("display","none","important");
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML=n+"人プレイです。馬を選んで賭けてください。";
+    }
+
+    setTimeout(function(){
+      var o=document.getElementById("oddsScreen");
+      if(o) o.scrollIntoView({behavior:"smooth",block:"start"});
+    },60);
+  }catch(err){
+    console.log(err);
+    var dbg=document.getElementById("startDebugMsg");
+    if(dbg) dbg.textContent="エラー："+err.message;
+    alert("人数ボタンでエラーが出ました: "+err.message);
+  }
+  return false;
+};
+
+// iPhone対策：ボタンに直接イベントも付与
+window.addEventListener("load",function(){
+  var buttons=document.querySelectorAll(".bigPlayerBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].addEventListener("touchend",function(ev){
+      ev.preventDefault();
+      var n=parseInt(this.textContent,10);
+      window.startWithPlayers(n);
+    },{passive:false});
+    buttons[i].addEventListener("click",function(ev){
+      ev.preventDefault();
+      var n=parseInt(this.textContent,10);
+      window.startWithPlayers(n);
+    },{passive:false});
+  }
+});
 
 
 function directFrameClass(no){
   if(typeof frameClass==="function") return frameClass(no);
-  if(no<=2) return "frame-red";
-  if(no<=4) return "frame-blue";
-  if(no<=6) return "frame-yellow";
-  if(no<=8) return "frame-green";
-  if(no<=10) return "frame-pink";
-  return "frame-white";
+  if(no<=2) return "frame-red"; if(no<=4) return "frame-blue"; if(no<=6) return "frame-yellow";
+  if(no<=8) return "frame-green"; if(no<=10) return "frame-pink"; return "frame-white";
 }
 function directFrameName(no){
-  if(no<=2) return "赤";
-  if(no<=4) return "青";
-  if(no<=6) return "黄";
-  if(no<=8) return "緑";
-  if(no<=10) return "桃";
-  return "白";
+  if(typeof frameName==="function") return frameName(no);
+  if(no<=2) return "赤"; if(no<=4) return "青"; if(no<=6) return "黄";
+  if(no<=8) return "緑"; if(no<=10) return "桃"; return "白";
 }
-function directFormName(n){
-  if(typeof form==="function") return form(n);
-  return "-";
-}
-function directTicketHtml(p,t){
-  var suffix=t===0 ? "" : "_2";
-  var label=t===0 ? "馬券1" : "馬券2";
-  var html="<div class='ticketBox'><div class='ticketTitle'>"+label+"</div>";
-  html+="<select id='directType"+p+suffix+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>";
-  html+="<select id='directHorse"+p+suffix+"'>";
-  for(var k=0;k<entries.length;k++){
-    var e=entries[k];
-    html+="<option value='"+k+"'>"+e.no+"番 "+e.name+" / 単"+Number(e.odds).toFixed(1)+" 複"+Number(e.placeOdds).toFixed(1)+"</option>";
-  }
-  html+="</select><input id='directBet"+p+suffix+"' type='number' min='100' step='100' value='100'></div>";
-  return html;
-}
-function renderDirectOdds(n){
+function directForm(n){ return (typeof form==="function") ? form(n) : "-"; }
+
+function directMakeOddsScreen(n){
   n=Number(n)||1; if(n<1)n=1; if(n>5)n=5;
-  window.activePlayerCount=n; try{activePlayerCount=n;}catch(e){}
-  var sel=document.getElementById("playerCountSelect"); if(sel) sel.value=String(n);
-  try{ if(typeof applyPlayerCount==="function") applyPlayerCount(); }catch(e){}
-  try{ if(typeof showOdds==="function") showOdds(); }catch(e){}
-  try{ if(typeof fixPlaceOdds==="function") fixPlaceOdds(); }catch(e){}
-  if(!window.entries || !entries || entries.length===0){ alert("出馬表を作れませんでした。ページを再読み込みしてください。"); return false; }
+  window.activePlayerCount=n;
+  if(typeof activePlayerCount!=="undefined") activePlayerCount=n;
 
-  var fixed=document.getElementById("fixedPlayerButtons"); if(fixed) fixed.style.display="none";
-  var oldPanel=document.querySelector(".startOnlyPanel"); if(oldPanel) oldPanel.style.display="none";
-  var direct=document.getElementById("directOddsArea"); if(direct) direct.style.display="block";
-  var oldOdds=document.getElementById("oddsScreen"); if(oldOdds) oldOdds.style.setProperty("display","none","important");
-  var race=document.getElementById("raceScreen"); if(race) race.style.setProperty("display","none","important");
-  var txt=document.getElementById("directPlayerText"); if(txt) txt.textContent=n+"人プレイ";
+  var dbg=document.getElementById("startDebugMsg");
+  if(dbg) dbg.textContent=n+"人でオッズを作成中…";
 
-  var eb=document.getElementById("directEntryBody"), ob=document.getElementById("directOddsBody"), ba=document.getElementById("directBetArea");
+  var sel=document.getElementById("playerCountSelect");
+  if(sel) sel.value=String(n);
+
+  try{
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+  }catch(e){ console.log(e); }
+
+  if(!window.entries || !entries || entries.length===0){
+    if(dbg) dbg.textContent="出馬表を作れませんでした。";
+    alert("出馬表を作れませんでした。ページを再読み込みしてください。");
+    return false;
+  }
+
+  var panel=document.querySelector(".startOnlyPanel");
+  if(panel) panel.style.display="none";
+  var direct=document.getElementById("directOddsArea");
+  if(direct) direct.style.display="block";
+
+  var oldOdds=document.getElementById("oddsScreen");
+  if(oldOdds) oldOdds.style.setProperty("display","none","important");
+  var race=document.getElementById("raceScreen");
+  if(race) race.style.setProperty("display","none","important");
+
+  var txt=document.getElementById("directPlayerText");
+  if(txt) txt.textContent=n+"人プレイ";
+
+  var eb=document.getElementById("directEntryBody");
+  var ob=document.getElementById("directOddsBody");
+  var ba=document.getElementById("directBetArea");
+
   var h="";
   for(var i=0;i<entries.length;i++){
     var e=entries[i];
-    h+="<tr><td><span class='badge frameColor "+directFrameClass(e.no)+"'>"+e.no+"</span><br><small>"+directFrameName(e.no)+"枠</small></td><td class='name'>"+e.name+"</td><td>"+e.jockey+"</td><td>"+e.style+"</td><td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.odds).toFixed(1)+"倍</span></td><td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.placeOdds).toFixed(1)+"倍</span></td><td>"+directFormName(e.name)+"</td></tr>";
+    h+="<tr><td><span class='badge frameColor "+directFrameClass(e.no)+"'>"+e.no+"</span><br><small>"+directFrameName(e.no)+"枠</small></td>"
+      +"<td class='name'>"+e.name+"</td><td>"+e.jockey+"</td><td>"+e.style+"</td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.odds).toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.placeOdds).toFixed(1)+"倍</span></td>"
+      +"<td>"+directForm(e.name)+"</td></tr>";
   }
   if(eb) eb.innerHTML=h;
+
   var sorted=entries.slice().sort(function(a,b){return a.odds-b.odds});
   h="";
   for(var j=0;j<sorted.length;j++){
-    var e2=sorted[j];
-    h+="<tr><td>"+(j+1)+"</td><td><span class='badge frameColor "+directFrameClass(e2.no)+"'>"+e2.no+"</span></td><td class='name'>"+e2.name+"</td><td><span class='oddsCell "+directFrameClass(e2.no)+"'>"+Number(e2.odds).toFixed(1)+"倍</span></td><td><span class='oddsCell "+directFrameClass(e2.no)+"'>"+Number(e2.placeOdds).toFixed(1)+"倍</span></td></tr>";
+    var e=sorted[j];
+    h+="<tr><td>"+(j+1)+"</td><td><span class='badge frameColor "+directFrameClass(e.no)+"'>"+e.no+"</span></td>"
+      +"<td class='name'>"+e.name+"</td><td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.odds).toFixed(1)+"倍</span></td>"
+      +"<td><span class='oddsCell "+directFrameClass(e.no)+"'>"+Number(e.placeOdds).toFixed(1)+"倍</span></td></tr>";
   }
   if(ob) ob.innerHTML=h;
+
   var betHtml="";
   for(var p=0;p<n;p++){
-    if(players[p] && !players[p].ticketCount) players[p].ticketCount=1;
-    betHtml+="<div class='directPlayerBox'><h3>P"+(p+1)+"</h3><div>所持金 <span class='money'>"+players[p].money+"</span>円</div>";
-    betHtml+=directTicketHtml(p,0);
-    var count=(players[p] && players[p].ticketCount===2)?2:1;
-    if(count>=2){
-      betHtml+=directTicketHtml(p,1);
-      betHtml+="<button type='button' class='miniBtn redMini' onclick='return directRemoveTicket("+p+")'>− 馬券2を消す</button>";
-    }else{
-      betHtml+="<button type='button' class='plusTicketBtn' onclick='return directAddTicket("+p+")'>＋ 馬券を追加</button>";
+    betHtml+="<div class='directPlayerBox'><h3>P"+(p+1)+"</h3><div>所持金 <span class='money'>"+players[p].money+"</span>円</div>"
+      +"<select id='directType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>"
+      +"<select id='directHorse"+p+"'>";
+    for(var k=0;k<entries.length;k++){
+      var e2=entries[k];
+      betHtml+="<option value='"+k+"'>"+e2.no+"番 "+e2.name+" / 単"+Number(e2.odds).toFixed(1)+" 複"+Number(e2.placeOdds).toFixed(1)+"</option>";
     }
-    betHtml+="</div>";
+    betHtml+="</select><input id='directBet"+p+"' type='number' min='100' step='100' value='100'></div>";
   }
   if(ba) ba.innerHTML=betHtml;
+
   setTimeout(function(){ if(direct) direct.scrollIntoView({behavior:"smooth",block:"start"}); },50);
   return false;
 }
-function directAddTicket(p){ players[p].ticketCount=2; return renderDirectOdds(activePlayerCount||1); }
-function directRemoveTicket(p){ players[p].ticketCount=1; return renderDirectOdds(activePlayerCount||1); }
+
+window.startWithPlayers=function(n){ return directMakeOddsScreen(n); };
+
 function resetToPlayerButtons(){
-  var direct=document.getElementById("directOddsArea"); if(direct) direct.style.display="none";
-  var fixed=document.getElementById("fixedPlayerButtons"); if(fixed) fixed.style.display="grid";
+  var direct=document.getElementById("directOddsArea");
+  if(direct) direct.style.display="none";
+  var panel=document.querySelector(".startOnlyPanel");
+  if(panel) panel.style.display="block";
 }
+
 function directConfirmAndGoRace(){
+  if(!entries || entries.length===0){ alert("出馬表がありません。人数を選び直してください。"); return false; }
+  if(typeof activePlayerCount==="undefined") activePlayerCount=1;
+
+  for(var p=0;p<activePlayerCount;p++){
+    var t=document.getElementById("directType"+p);
+    var h=document.getElementById("directHorse"+p);
+    var b=document.getElementById("directBet"+p);
+    players[p].type=t?t.value:"win";
+    players[p].pick=h?Number(h.value):0;
+    players[p].bet=b?Math.floor(Number(b.value||100)/100)*100:100;
+    if(players[p].bet<100) players[p].bet=100;
+    if(players[p].bet>players[p].money){ alert("P"+(p+1)+"は所持金より多く賭けられません。"); return false; }
+    players[p].settled=false;
+  }
+
+  if(typeof betsConfirmed!=="undefined") betsConfirmed=true;
+  var start=document.getElementById("startScreen");
+  var odds=document.getElementById("oddsScreen");
+  var race=document.getElementById("raceScreen");
+  if(start) start.style.setProperty("display","none","important");
+  if(odds) odds.style.setProperty("display","none","important");
+  if(race) race.style.setProperty("display","block","important");
+  if(typeof makeHorses==="function") makeHorses();
+  setTimeout(function(){ if(race) race.scrollIntoView({behavior:"smooth",block:"start"}); },60);
+  return false;
+}
+
+window.addEventListener("load",function(){
+  var buttons=document.querySelectorAll(".bigPlayerBtn,.playerCountBtn");
+  for(var i=0;i<buttons.length;i++){
+    buttons[i].onclick=function(ev){ if(ev) ev.preventDefault(); return directMakeOddsScreen(parseInt(this.textContent,10)); };
+    buttons[i].ontouchend=function(ev){ if(ev) ev.preventDefault(); return directMakeOddsScreen(parseInt(this.textContent,10)); };
+  }
+});
+
+
+function openOddsImmediately(){
   try{
-    var n=activePlayerCount||1;
-    for(var p=0;p<n;p++){
-      var count=(players[p] && players[p].ticketCount===2)?2:1;
-      var tickets=[], total=0;
-      for(var t=0;t<count;t++){
-        var suffix=t===0?"":"_2";
-        var typeEl=document.getElementById("directType"+p+suffix), horseEl=document.getElementById("directHorse"+p+suffix), betEl=document.getElementById("directBet"+p+suffix);
-        var bet=betEl?Math.floor(Number(betEl.value||100)/100)*100:100; if(bet<100) bet=100;
-        var pick=horseEl?Number(horseEl.value):0;
-        var type=typeEl?typeEl.value:"win";
-        total+=bet; tickets.push({pick:pick,bet:bet,type:type});
-      }
-      if(total>players[p].money){ alert("P"+(p+1)+"は馬券の合計が所持金より多いです。"); return false; }
-      players[p].tickets=tickets; players[p].pick=tickets[0].pick; players[p].bet=tickets[0].bet; players[p].type=tickets[0].type; players[p].settled=false;
+    if(typeof activePlayerCount==="undefined" || !activePlayerCount || activePlayerCount<1){
+      window.activePlayerCount=2;
+      try{ activePlayerCount=2; }catch(e){}
     }
+
+    var sel=document.getElementById("playerCountSelect");
+    if(sel){
+      if(!sel.value || Number(sel.value)<1) sel.value=String(window.activePlayerCount||2);
+    }
+
+    if(typeof applyPlayerCount==="function") applyPlayerCount();
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(start) start.style.setProperty("display","none","important");
+    if(odds) odds.style.setProperty("display","block","important");
+    if(race) race.style.setProperty("display","none","important");
+
+    addPlayerCountControlToOdds();
+
+    if(typeof msg!=="undefined" && msg){
+      msg.innerHTML="人数を選んで、馬と金額を決めてください。";
+    }
+  }catch(err){
+    console.log(err);
+    var body=document.body || document.documentElement;
+    if(body){
+      var d=document.createElement("div");
+      d.style.cssText="position:fixed;left:10px;right:10px;top:10px;background:#b00020;color:#fff;z-index:2147483647;padding:12px;border-radius:8px;font-weight:900";
+      d.textContent="オッズ画面の表示でエラー："+err.message;
+      body.appendChild(d);
+    }
+  }
+}
+
+function addPlayerCountControlToOdds(){
+  var odds=document.getElementById("oddsScreen");
+  if(!odds) return;
+
+  if(document.getElementById("oddsPlayerControl")) return;
+
+  var div=document.createElement("div");
+  div.id="oddsPlayerControl";
+  div.className="oddsPlayerControl";
+  div.innerHTML=
+    "<label>人数：</label>"
+    +"<select id='oddsPlayerSelect'>"
+    +"<option value='1'>1人</option>"
+    +"<option value='2'>2人</option>"
+    +"<option value='3'>3人</option>"
+    +"<option value='4'>4人</option>"
+    +"<option value='5'>5人</option>"
+    +"</select>"
+    +"<span class='oddsPlayerHelp'>人数を変えると投票欄が変わります</span>";
+
+  odds.insertBefore(div, odds.firstChild);
+
+  var s=document.getElementById("oddsPlayerSelect");
+  if(s){
+    s.value=String(window.activePlayerCount||2);
+    s.onchange=function(){
+      window.activePlayerCount=Number(this.value)||2;
+      try{ activePlayerCount=window.activePlayerCount; }catch(e){}
+      var old=document.getElementById("playerCountSelect");
+      if(old) old.value=String(window.activePlayerCount);
+      if(typeof applyPlayerCount==="function") applyPlayerCount();
+      if(typeof fillSelects==="function") fillSelects();
+      if(typeof msg!=="undefined" && msg) msg.innerHTML=window.activePlayerCount+"人プレイです。";
+    };
+  }
+}
+
+function confirmAndGoRaceSafe(){
+  try{
+    if(typeof confirmBets==="function"){
+      if(!confirmBets()) return false;
+    }
+    if(typeof goRace==="function"){
+      goRace();
+    }else{
+      var odds=document.getElementById("oddsScreen");
+      var race=document.getElementById("raceScreen");
+      if(odds) odds.style.setProperty("display","none","important");
+      if(race) race.style.setProperty("display","block","important");
+      if(typeof makeHorses==="function") makeHorses();
+    }
+  }catch(err){
+    alert("競馬場へ進むところでエラー："+err.message);
+  }
+  return false;
+}
+
+window.addEventListener("load",function(){
+  setTimeout(openOddsImmediately,150);
+});
+
+
+/* タップしたら次の画面に進むコマンド */
+window.goNextScreen=function(to,n){
+  try{
+    if(n!==undefined && n!==null){
+      n=Number(n)||1;
+      if(n<1)n=1;
+      if(n>5)n=5;
+      window.activePlayerCount=n;
+      try{ activePlayerCount=n; }catch(e){}
+      var sel=document.getElementById("playerCountSelect");
+      if(sel) sel.value=String(n);
+    }
+
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+
+    if(to==="odds"){
+      if(typeof applyPlayerCount==="function") applyPlayerCount();
+      if(typeof showOdds==="function") showOdds();
+      if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+      if(typeof drawTables==="function") drawTables();
+      if(typeof fillSelects==="function") fillSelects();
+
+      if(start) start.style.setProperty("display","none","important");
+      if(odds) odds.style.setProperty("display","block","important");
+      if(race) race.style.setProperty("display","none","important");
+
+      if(typeof msg!=="undefined" && msg){
+        msg.innerHTML=(window.activePlayerCount||activePlayerCount||1)+"人プレイです。馬を選んで賭けてください。";
+      }
+
+      setTimeout(function(){
+        if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"});
+      },60);
+      return false;
+    }
+
+    if(to==="race"){
+      var ok=true;
+      if(typeof confirmBets==="function"){
+        ok=confirmBets();
+      }
+      if(ok===false) return false;
+
+      if(start) start.style.setProperty("display","none","important");
+      if(odds) odds.style.setProperty("display","none","important");
+      if(race) race.style.setProperty("display","block","important");
+
+      if(typeof makeHorses==="function") makeHorses();
+
+      setTimeout(function(){
+        if(race) race.scrollIntoView({behavior:"smooth",block:"start"});
+      },60);
+      return false;
+    }
+  }catch(err){
+    console.log(err);
+    alert("画面移動エラー："+err.message);
+  }
+  return false;
+};
+
+window.startWithPlayers=function(n){
+  return window.goNextScreen("odds",n);
+};
+
+window.tapGo=function(el,event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var to=el.getAttribute("data-go")||"odds";
+  var n=el.getAttribute("data-players");
+  return window.goNextScreen(to,n);
+};
+
+function bindTapGoButtons(){
+  var els=document.querySelectorAll("[data-go], .bigPlayerBtn, .playerCountBtn");
+  for(var i=0;i<els.length;i++){
+    var el=els[i];
+
+    if(el.classList.contains("bigPlayerBtn") || el.classList.contains("playerCountBtn")){
+      var n=parseInt(el.textContent,10);
+      el.setAttribute("data-go","odds");
+      el.setAttribute("data-players",String(n||1));
+    }
+
+    el.onclick=function(ev){ return window.tapGo(this,ev); };
+    el.ontouchend=function(ev){ return window.tapGo(this,ev); };
+    el.onpointerup=function(ev){ return window.tapGo(this,ev); };
+
+    el.addEventListener("click",function(ev){ return window.tapGo(this,ev); },{passive:false});
+    el.addEventListener("touchend",function(ev){ return window.tapGo(this,ev); },{passive:false});
+    el.addEventListener("pointerup",function(ev){ return window.tapGo(this,ev); },{passive:false});
+  }
+}
+
+window.addEventListener("load",function(){
+  bindTapGoButtons();
+});
+
+
+/* ===== 最終保険：新しいオッズ・発走を必ず動かす ===== */
+function forceNewOdds(ev){
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  try{
+    racing=false;
+    if(window.__raceAnimId){cancelAnimationFrame(window.__raceAnimId);window.__raceAnimId=null;}
+    if(typeof timer!=="undefined" && timer){clearInterval(timer);timer=null;}
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
+    if(start) start.style.setProperty("display","none","important");
+    if(odds) odds.style.setProperty("display","block","important");
+    if(race) race.style.setProperty("display","none","important");
+    if(typeof showOdds==="function") showOdds();
+    if(typeof fixPlaceOdds==="function") fixPlaceOdds();
+    if(typeof drawTables==="function") drawTables();
+    if(typeof fillSelects==="function") fillSelects();
+    if(typeof updateMoney==="function") updateMoney();
+    if(typeof betsConfirmed!=="undefined") betsConfirmed=false;
+    if(typeof selected!=="undefined" && selected) selected.innerHTML="新しい出馬表とオッズを表示しました。馬券を選んでください。";
+    if(typeof msg!=="undefined" && msg) msg.innerHTML="新しいオッズを作りました。";
+    setTimeout(function(){if(odds) odds.scrollIntoView({behavior:"smooth",block:"start"}); bindCriticalButtons();},80);
+  }catch(err){console.log(err); alert("新しいオッズでエラー："+err.message);}
+  return false;
+}
+function collectDirectTicketsIfNeeded(){
+  try{
+    if(!document.getElementById("directBetArea")) return true;
+    var n=typeof activePlayerCount!=="undefined" ? activePlayerCount : 1;
+    for(var p=0;p<n;p++){
+      if(!players[p]) continue;
+      var tickets=[]; var count=(players[p].ticketCount===2)?2:1; var total=0;
+      for(var t=0;t<count;t++){
+        var suffix=t===0 ? "" : "_2";
+        var typeEl=document.getElementById("directType"+p+suffix);
+        var horseEl=document.getElementById("directHorse"+p+suffix);
+        var betEl=document.getElementById("directBet"+p+suffix);
+        if(!horseEl && !betEl && !typeEl) continue;
+        var bet=betEl ? Math.floor(Number(betEl.value||100)/100)*100 : 100;
+        if(bet<100) bet=100;
+        var pick=horseEl ? Number(horseEl.value) : 0;
+        var type=typeEl ? typeEl.value : "win";
+        tickets.push({pick:pick,bet:bet,type:type}); total+=bet;
+      }
+      if(tickets.length){
+        if(total>players[p].money){alert("P"+(p+1)+"は馬券の合計が所持金より多いです。"); return false;}
+        players[p].tickets=tickets; players[p].pick=tickets[0].pick; players[p].bet=tickets[0].bet; players[p].type=tickets[0].type;
+      }
+    }
+  }catch(e){console.log(e);}
+  return true;
+}
+function forceStartRace(ev){
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  try{
+    if(collectDirectTicketsIfNeeded()===false) return false;
+    if(typeof confirmBets==="function" && !betsConfirmed){var ok=confirmBets(); if(ok===false) return false;}
     if(typeof betsConfirmed!=="undefined") betsConfirmed=true;
-    var start=document.getElementById("startScreen"), odds=document.getElementById("oddsScreen"), race=document.getElementById("raceScreen");
+    if(!entries || entries.length===0){if(typeof showOdds==="function") showOdds();}
+    if(!entries || entries.length===0){alert("出馬表がありません。新しいオッズを押してください。"); return false;}
+    var start=document.getElementById("startScreen");
+    var odds=document.getElementById("oddsScreen");
+    var race=document.getElementById("raceScreen");
     if(start) start.style.setProperty("display","none","important");
     if(odds) odds.style.setProperty("display","none","important");
     if(race) race.style.setProperty("display","block","important");
+    document.querySelectorAll(".horse").forEach(function(x){x.remove();});
+    horses=[];
     if(typeof makeHorses==="function") makeHorses();
-    setTimeout(function(){ if(race) race.scrollIntoView({behavior:"smooth",block:"start"}); },60);
-  }catch(err){ alert("投票確定でエラー："+err.message); }
+    if(!horses || horses.length===0){alert("馬を作れませんでした。新しいオッズを押してからもう一度発走してください。"); return false;}
+    if(typeof chooseWeather==="function") chooseWeather();
+    if(typeof applyWeatherView==="function") applyWeatherView();
+    if(typeof cameraLocked!=="undefined") cameraLocked=false;
+    if(typeof fixedGoalCamera!=="undefined") fixedGoalCamera={x:0,y:0,scale:.78};
+    if(typeof finished!=="undefined") finished=[];
+    if(typeof resultShown!=="undefined") resultShown=false;
+    if(typeof resultFinishedAnimation!=="undefined") resultFinishedAnimation=false;
+    if(typeof raceStartMs!=="undefined") raceStartMs=performance.now();
+    for(var i=0;i<horses.length;i++){
+      horses[i].progress=0; horses[i].done=false; horses[i].deepCloserChecked=false; horses[i].deepCloserBoost=false; horses[i].deepCloserBoostEnd=1.03;
+      if(typeof placeHorse==="function") placeHorse(horses[i]);
+    }
+    if(typeof players!=="undefined"){for(var p=0;p<players.length;p++){players[p].settled=false;}}
+    if(typeof result!=="undefined" && result) result.innerHTML="レース中です。";
+    if(typeof raceInfo!=="undefined" && raceInfo) raceInfo.innerHTML="発走";
+    if(typeof lapInfo!=="undefined" && lapInfo) lapInfo.innerHTML="スタート";
+    if(typeof leaderInfo!=="undefined" && leaderInfo) leaderInfo.innerHTML="先頭：--";
+    if(typeof msg!=="undefined" && msg) msg.innerHTML="発走しました。";
+    if(typeof timer!=="undefined" && timer){clearInterval(timer);timer=null;}
+    if(window.__raceAnimId){cancelAnimationFrame(window.__raceAnimId);window.__raceAnimId=null;}
+    racing=true; window.__raceLastTime=null;
+    if(typeof stepRace==="function"){window.__raceAnimId=requestAnimationFrame(stepRace);}else{alert("stepRace関数がありません。"); return false;}
+    setTimeout(function(){if(race) race.scrollIntoView({behavior:"smooth",block:"start"});},60);
+  }catch(err){console.log(err); alert("発走でエラー："+err.message);}
   return false;
 }
-window.startWithPlayers=function(n){ return renderDirectOdds(n); };
-function bindFixedPlayerButtons(){
-  var buttons=document.querySelectorAll(".fixedPlayerBtn,.bigPlayerBtn,.playerCountBtn");
+function bindCriticalButtons(){
+  var buttons=document.querySelectorAll("button, .big, [data-go]");
   for(var i=0;i<buttons.length;i++){
-    buttons[i].onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} return renderDirectOdds(Number(this.getAttribute("data-p")||this.getAttribute("data-players")||parseInt(this.textContent,10)||1)); };
-    buttons[i].ontouchend=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} return renderDirectOdds(Number(this.getAttribute("data-p")||this.getAttribute("data-players")||parseInt(this.textContent,10)||1)); };
-    buttons[i].onpointerup=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} return renderDirectOdds(Number(this.getAttribute("data-p")||this.getAttribute("data-players")||parseInt(this.textContent,10)||1)); };
+    var txt=(buttons[i].textContent||"").replace(/\s/g,"");
+    var dg=buttons[i].getAttribute("data-go")||"";
+    if(txt.indexOf("新しいオッズ")!==-1 || (txt.indexOf("オッズ")!==-1 && txt.indexOf("表示")!==-1) || dg==="newOdds"){
+      buttons[i].setAttribute("data-go","newOdds"); buttons[i].onclick=forceNewOdds; buttons[i].ontouchend=forceNewOdds; buttons[i].onpointerup=forceNewOdds;
+    }
+    if(txt.indexOf("発走")!==-1 || dg==="startRace"){
+      buttons[i].setAttribute("data-go","startRace"); buttons[i].onclick=forceStartRace; buttons[i].ontouchend=forceStartRace; buttons[i].onpointerup=forceStartRace;
+    }
   }
 }
-window.addEventListener("load",bindFixedPlayerButtons);
+function addEmergencyRaceControls(){
+  if(document.getElementById("emergencyRaceControls")) return;
+  var bar=document.createElement("div");
+  bar.id="emergencyRaceControls";
+  bar.innerHTML="<button type='button' class='emBtn odds' onclick='return forceNewOdds(event)'>新しいオッズ</button><button type='button' class='emBtn start' onclick='return forceStartRace(event)'>発走</button>";
+  document.body.appendChild(bar);
+}
+window.addEventListener("load",function(){addEmergencyRaceControls(); bindCriticalButtons();});
+
+
+/* ===== 馬券1枚固定版：2枚目を無効化 ===== */
+function forceSingleTickets(){
+  if(typeof players!=="undefined"){
+    for(var p=0;p<players.length;p++){
+      players[p].ticketCount=1;
+      if(players[p].tickets && players[p].tickets.length>1){
+        players[p].tickets=players[p].tickets.slice(0,1);
+      }
+    }
+  }
+
+  document.querySelectorAll(".plusTicketBtn,.redMini").forEach(function(el){
+    el.style.display="none";
+  });
+
+  document.querySelectorAll("[id$='_2']").forEach(function(el){
+    var box=el.closest(".ticketBox") || el.parentElement;
+    if(box) box.style.display="none";
+  });
+}
+function addTicket(p){forceSingleTickets();return false;}
+function removeTicket(p){forceSingleTickets();return false;}
+function directAddTicket(p){forceSingleTickets();return false;}
+function directRemoveTicket(p){forceSingleTickets();return false;}
+function getPlayerTicketCount(p){return 1;}
+
+function collectDirectTicketsIfNeeded(){
+  try{
+    if(!document.getElementById("directBetArea")) return true;
+    var n=typeof activePlayerCount!=="undefined" ? activePlayerCount : 1;
+    for(var p=0;p<n;p++){
+      var typeEl=document.getElementById("directType"+p);
+      var horseEl=document.getElementById("directHorse"+p);
+      var betEl=document.getElementById("directBet"+p);
+      if(!horseEl && !betEl && !typeEl) continue;
+      var bet=betEl ? Math.floor(Number(betEl.value||100)/100)*100 : 100;
+      if(bet<100) bet=100;
+      var pick=horseEl ? Number(horseEl.value) : 0;
+      var type=typeEl ? typeEl.value : "win";
+      if(bet>players[p].money){
+        alert("P"+(p+1)+"は所持金より多く賭けられません。");
+        return false;
+      }
+      players[p].ticketCount=1;
+      players[p].tickets=[{pick:pick,bet:bet,type:type}];
+      players[p].pick=pick;
+      players[p].bet=bet;
+      players[p].type=type;
+    }
+  }catch(e){console.log(e);}
+  return true;
+}
+window.addEventListener("load",function(){setTimeout(forceSingleTickets,100);});
 
 </script>
 </body>
