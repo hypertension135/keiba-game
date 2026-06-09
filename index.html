@@ -2170,6 +2170,29 @@ button[onclick*="directRemoveTicket"],button[onclick*="removeTicket"]{
   display:none!important;
 }
 
+
+/* 馬選択プルダウンを必ず表示 */
+select[id^="horseSel"],
+select[id^="directHorse"],
+.horseSelectFixed{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  width:100%!important;
+  min-height:52px!important;
+  font-size:16px!important;
+  color:#111!important;
+  background:#f1f1f1!important;
+  -webkit-appearance:menulist!important;
+  appearance:menulist!important;
+}
+.plusTicketBtn,.redMini,
+button[onclick*="directAddTicket"],button[onclick*="addTicket"],
+button[onclick*="directRemoveTicket"],button[onclick*="removeTicket"]{
+  display:none!important;
+}
+
 </style>
 </head>
 <body><section id='startScreen'>
@@ -2595,8 +2618,10 @@ function fillSelects(){
   if(typeof fixPlaceOdds==="function") fixPlaceOdds();
   var area=document.getElementById("betArea");
   if(!area) return;
-  if(!entries || entries.length===0){ if(typeof showOdds==="function") showOdds(); }
-  var opts=buildHorseOptions();
+  if((!window.entries || !entries || entries.length===0) && typeof showOdds==="function"){
+    showOdds();
+  }
+  var opts=buildHorseOptionsStrong();
   var html="";
   for(var p=0;p<activePlayerCount;p++){
     if(!players[p]) continue;
@@ -2605,20 +2630,24 @@ function fillSelects(){
     html+="<div class='player "+(out?"out":"")+"'>";
     html+="<h3>P"+(p+1)+" "+(out?"<span class='outLabel'>脱落</span>":"")+"</h3>";
     html+="<div>所持金 <span class='money'>"+players[p].money+"</span>円</div>";
-    if(out){html+="<div class='outLabel'>ゲームオーバー</div></div>"; continue;}
+    if(out){
+      html+="<div class='outLabel'>ゲームオーバー</div></div>";
+      continue;
+    }
     html+="<div class='ticketBox'><div class='ticketTitle'>馬券</div>";
     html+="<select id='betType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>";
-    html+="<select id='horseSel"+p+"'>"+opts+"</select>";
+    html+="<select id='horseSel"+p+"' class='horseSelectFixed'>"+opts+"</select>";
     html+="<input id='betInp"+p+"' type='number' min='100' step='100' value='100'>";
     html+="</div></div>";
   }
   area.innerHTML=html;
-  restoreHorseSelects();
+  setTimeout(restoreHorseSelectsStrong,20);
 }
 
 function confirmBets(){
   if(typeof applyPlayerCount==="function") applyPlayerCount();
-  restoreHorseSelects();
+  restoreHorseSelectsStrong();
+
   if(!entries || entries.length===0){
     if(typeof showOdds==="function") showOdds();
     if(msg) msg.innerHTML="出馬表とオッズを作りました。馬を選んでからもう一度押してください。";
@@ -2626,21 +2655,38 @@ function confirmBets(){
   }
   var text=[];
   for(var p=0;p<activePlayerCount;p++){
-    if(players[p].money<=0 || players[p].out){players[p].tickets=[];players[p].out=true;text.push("P"+(p+1)+"：脱落");continue;}
-    var betEl=document.getElementById("betInp"+p)||document.getElementById("directBet"+p);
-    var horseEl=document.getElementById("horseSel"+p)||document.getElementById("directHorse"+p);
-    var typeEl=document.getElementById("betType"+p)||document.getElementById("directType"+p);
-    var bet=betEl?Number(betEl.value):100;
-    if(isNaN(bet)||bet<=0) bet=100;
+    if(players[p].money<=0 || players[p].out){
+      players[p].tickets=[];
+      players[p].out=true;
+      text.push("P"+(p+1)+"：脱落");
+      continue;
+    }
+    var betEl=document.getElementById("betInp"+p) || document.getElementById("directBet"+p);
+    var horseEl=document.getElementById("horseSel"+p) || document.getElementById("directHorse"+p);
+    var typeEl=document.getElementById("betType"+p) || document.getElementById("directType"+p);
+
+    var bet=betEl ? Number(betEl.value) : 100;
+    if(isNaN(bet) || bet<=0) bet=100;
     bet=Math.floor(bet/100)*100;
-    if(bet<100){if(msg) msg.innerHTML="P"+(p+1)+"は100円以上にしてください。";return false;}
-    if(bet>players[p].money){if(msg) msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";return false;}
-    var pick=horseEl?Number(horseEl.value):0;
-    if(isNaN(pick)||!entries[pick]){if(msg) msg.innerHTML="P"+(p+1)+"の馬を選んでください。";return false;}
-    var type=typeEl?typeEl.value:"win";
+    if(bet<100){
+      if(msg) msg.innerHTML="P"+(p+1)+"は100円以上にしてください。";
+      return false;
+    }
+    if(bet>players[p].money){
+      if(msg) msg.innerHTML="P"+(p+1)+"は所持金より多く賭けられません。";
+      return false;
+    }
+    var pick=horseEl ? Number(horseEl.value) : 0;
+    if(isNaN(pick) || !entries[pick]){
+      if(msg) msg.innerHTML="P"+(p+1)+"の馬を選んでください。";
+      return false;
+    }
+    var type=typeEl ? typeEl.value : "win";
     players[p].ticketCount=1;
     players[p].tickets=[{pick:pick,bet:bet,type:type}];
-    players[p].pick=pick; players[p].bet=bet; players[p].type=type;
+    players[p].pick=pick;
+    players[p].bet=bet;
+    players[p].type=type;
     text.push("P"+(p+1)+"："+(type==="place"?"複勝":"単勝")+" "+entries[pick].no+"番 "+entries[pick].name+" "+bet+"円");
   }
   betsConfirmed=true;
@@ -3914,24 +3960,52 @@ function directRemoveTicket(p){forceSingleTickets();return false;}
 function getPlayerTicketCount(p){return 1;}
 function directTicketHtml(p,t){
   if(t!==0) return "";
-  return "<div class='ticketBox'><div class='ticketTitle'>馬券</div>"
-    +"<select id='directType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>"
-    +"<select id='directHorse"+p+"'>"+buildHorseOptions()+"</select>"
-    +"<input id='directBet"+p+"' type='number' min='100' step='100' value='100'></div>";
+  var html="<div class='ticketBox'><div class='ticketTitle'>馬券</div>";
+  html+="<select id='directType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>";
+  html+="<select id='directHorse"+p+"' class='horseSelectFixed'>"+buildHorseOptionsStrong()+"</select>";
+  html+="<input id='directBet"+p+"' type='number' min='100' step='100' value='100'>";
+  html+="</div>";
+  return html;
 }
-window.addEventListener("load",function(){setTimeout(restoreHorseSelects,250);});
+
+function directAddTicket(p){forceSingleTickets();return false;}
+function directRemoveTicket(p){forceSingleTickets();return false;}
+function getPlayerTicketCount(p){return 1;}
+function bindHorseSelectRestore(){
+  ["touchstart","mousedown","focusin"].forEach(function(evt){
+    document.addEventListener(evt,function(ev){
+      var el=ev.target;
+      if(el && el.tagName==="SELECT" && (el.id.indexOf("horseSel")===0 || el.id.indexOf("directHorse")===0)){
+        restoreHorseSelectsStrong();
+      }
+    }, evt==="touchstart" ? {passive:true} : false);
+  });
+}
+window.addEventListener("load",function(){
+  bindHorseSelectRestore();
+  setTimeout(restoreHorseSelectsStrong,100);
+  setTimeout(restoreHorseSelectsStrong,500);
+  setTimeout(restoreHorseSelectsStrong,1200);
+});
 
 
-(function(){
-  var oldShow=window.showOdds;
-  if(typeof oldShow==="function"){
-    window.showOdds=function(){var r=oldShow.apply(this,arguments); setTimeout(restoreHorseSelects,50); return r;};
-  }
-  var oldForce=window.forceNewOdds;
-  if(typeof oldForce==="function"){
-    window.forceNewOdds=function(){var r=oldForce.apply(this,arguments); setTimeout(restoreHorseSelects,80); return r;};
-  }
-})();
+window.addEventListener("load",function(){
+  setTimeout(function(){
+    ["showOdds","forceNewOdds","renderDirectOdds","fillSelects"].forEach(function(name){
+      var old=window[name];
+      if(typeof old==="function" && !old.__wrappedHorseRestore){
+        var wrapped=function(){
+          var r=old.apply(this,arguments);
+          setTimeout(restoreHorseSelectsStrong,50);
+          setTimeout(restoreHorseSelectsStrong,250);
+          return r;
+        };
+        wrapped.__wrappedHorseRestore=true;
+        window[name]=wrapped;
+      }
+    });
+  },50);
+});
 
 </script>
 </body>
