@@ -2193,7 +2193,89 @@ button[onclick*="directRemoveTicket"],button[onclick*="removeTicket"]{
   display:none!important;
 }
 
+
+/* 馬選択エラー修正 */
+select[id^="horseSel"],
+select[id^="directHorse"]{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  width:100%!important;
+  min-height:52px!important;
+  font-size:16px!important;
+  color:#111!important;
+  background:#f1f1f1!important;
+}
+.plusTicketBtn,.redMini{
+  display:none!important;
+}
+
 </style>
+
+<script>
+/* ===== 先読み保険：馬選択復活関数を最初に定義 ===== */
+window.buildHorseOptionsStrong = function(){
+  var h="";
+  try{
+    if(window.entries && Array.isArray(window.entries) && window.entries.length>0){
+      for(var i=0;i<window.entries.length;i++){
+        var e=window.entries[i] || {};
+        var no=e.no || (i+1);
+        var name=e.name || ("馬"+no);
+        var win=Number(e.odds || (2+i));
+        var place=Number(e.placeOdds || Math.max(1.1, win*0.4));
+        h+="<option value='"+i+"'>"+no+"番 "+name+" / 単"+win.toFixed(1)+"倍 複"+place.toFixed(1)+"倍</option>";
+      }
+    }
+  }catch(e){}
+  if(!h){
+    for(var j=0;j<12;j++){
+      h+="<option value='"+j+"'>"+(j+1)+"番</option>";
+    }
+  }
+  return h;
+};
+
+window.restoreHorseSelectsStrong = function(){
+  try{
+    var opts=window.window.buildHorseOptionsStrong();
+    for(var p=0;p<5;p++){
+      var a=document.getElementById("horseSel"+p);
+      if(a){
+        a.innerHTML=opts;
+        a.disabled=false;
+        a.style.display="block";
+        a.style.visibility="visible";
+        a.style.opacity="1";
+        a.style.pointerEvents="auto";
+      }
+      var b=document.getElementById("directHorse"+p);
+      if(b){
+        b.innerHTML=opts;
+        b.disabled=false;
+        b.style.display="block";
+        b.style.visibility="visible";
+        b.style.opacity="1";
+        b.style.pointerEvents="auto";
+      }
+    }
+    document.querySelectorAll(".plusTicketBtn,.redMini").forEach(function(el){
+      el.style.display="none";
+    });
+  }catch(e){
+    console.log(e);
+  }
+};
+
+window.buildHorseOptions = function(){
+  return window.window.buildHorseOptionsStrong();
+};
+window.restoreHorseSelects = function(){
+  return window.window.window.restoreHorseSelectsStrong();
+};
+</script>
+
 </head>
 <body><section id='startScreen'>
   <div class="startOnlyPanel">
@@ -2621,7 +2703,7 @@ function fillSelects(){
   if((!window.entries || !entries || entries.length===0) && typeof showOdds==="function"){
     showOdds();
   }
-  var opts=buildHorseOptionsStrong();
+  var opts=window.buildHorseOptionsStrong();
   var html="";
   for(var p=0;p<activePlayerCount;p++){
     if(!players[p]) continue;
@@ -2641,12 +2723,12 @@ function fillSelects(){
     html+="</div></div>";
   }
   area.innerHTML=html;
-  setTimeout(restoreHorseSelectsStrong,20);
+  setTimeout(window.restoreHorseSelectsStrong,20);
 }
 
 function confirmBets(){
   if(typeof applyPlayerCount==="function") applyPlayerCount();
-  restoreHorseSelectsStrong();
+  window.window.restoreHorseSelectsStrong();
 
   if(!entries || entries.length===0){
     if(typeof showOdds==="function") showOdds();
@@ -3962,7 +4044,7 @@ function directTicketHtml(p,t){
   if(t!==0) return "";
   var html="<div class='ticketBox'><div class='ticketTitle'>馬券</div>";
   html+="<select id='directType"+p+"'><option value='win'>単勝</option><option value='place'>複勝</option></select>";
-  html+="<select id='directHorse"+p+"' class='horseSelectFixed'>"+buildHorseOptionsStrong()+"</select>";
+  html+="<select id='directHorse"+p+"' class='horseSelectFixed'>"+window.buildHorseOptionsStrong()+"</select>";
   html+="<input id='directBet"+p+"' type='number' min='100' step='100' value='100'>";
   html+="</div>";
   return html;
@@ -3976,16 +4058,16 @@ function bindHorseSelectRestore(){
     document.addEventListener(evt,function(ev){
       var el=ev.target;
       if(el && el.tagName==="SELECT" && (el.id.indexOf("horseSel")===0 || el.id.indexOf("directHorse")===0)){
-        restoreHorseSelectsStrong();
+        window.window.restoreHorseSelectsStrong();
       }
     }, evt==="touchstart" ? {passive:true} : false);
   });
 }
 window.addEventListener("load",function(){
   bindHorseSelectRestore();
-  setTimeout(restoreHorseSelectsStrong,100);
-  setTimeout(restoreHorseSelectsStrong,500);
-  setTimeout(restoreHorseSelectsStrong,1200);
+  setTimeout(window.restoreHorseSelectsStrong,100);
+  setTimeout(window.restoreHorseSelectsStrong,500);
+  setTimeout(window.restoreHorseSelectsStrong,1200);
 });
 
 
@@ -3996,8 +4078,8 @@ window.addEventListener("load",function(){
       if(typeof old==="function" && !old.__wrappedHorseRestore){
         var wrapped=function(){
           var r=old.apply(this,arguments);
-          setTimeout(restoreHorseSelectsStrong,50);
-          setTimeout(restoreHorseSelectsStrong,250);
+          setTimeout(window.restoreHorseSelectsStrong,50);
+          setTimeout(window.restoreHorseSelectsStrong,250);
           return r;
         };
         wrapped.__wrappedHorseRestore=true;
@@ -4008,5 +4090,21 @@ window.addEventListener("load",function(){
 });
 
 </script>
+
+<script>
+/* ===== 馬選択関数の最終代入保険 ===== */
+try{
+  if(typeof buildHorseOptionsStrong === "function"){ window.buildHorseOptionsStrong = buildHorseOptionsStrong; }
+  if(typeof restoreHorseSelectsStrong === "function"){ window.restoreHorseSelectsStrong = restoreHorseSelectsStrong; }
+  if(typeof buildHorseOptions === "function"){ window.buildHorseOptions = buildHorseOptions; }
+  if(typeof restoreHorseSelects === "function"){ window.restoreHorseSelects = restoreHorseSelects; }
+}catch(e){}
+window.addEventListener("load",function(){
+  setTimeout(function(){
+    if(window.restoreHorseSelectsStrong) window.restoreHorseSelectsStrong();
+  },300);
+});
+</script>
+
 </body>
 </html>
