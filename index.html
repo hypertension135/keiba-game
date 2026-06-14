@@ -182,6 +182,14 @@ input[type=number]{width:108px; text-align:right;}
   background:#1456c8; color:#fff; font-weight:900; font-size:10px; line-height:1.2;
   padding:1px 5px; border-radius:6px; white-space:nowrap; border:1px solid #fff;
   box-shadow:0 1px 3px rgba(0,0,0,.5);}
+/* ----- 騎手（CSSのみ・馬の背に乗る） ----- */
+.jockey{position:absolute; left:40px; top:4px; width:22px; height:26px; z-index:2; pointer-events:none;}
+.jockeyBody{position:absolute; left:1px; top:11px; width:15px; height:13px;
+  background:var(--silk,#d23); border:1px solid rgba(0,0,0,.35);
+  border-radius:8px 8px 5px 5px/9px 9px 4px 4px; transform:rotate(-14deg);
+  box-shadow:0 1px 2px rgba(0,0,0,.4);}
+.jockeyHead{position:absolute; left:8px; top:0; width:11px; height:11px; border-radius:50%;
+  background:#f3cda6; border:2px solid var(--silk,#d23); box-sizing:border-box;}
 
 /* ----- 実況 (Phase2) ----- */
 #liveCommentary{position:absolute; left:0; right:0; bottom:0; z-index:30;
@@ -380,6 +388,8 @@ var horseFrames = ["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAF8CAYAAA
 var horseNames=["ミナトベエイジ","ミナトクラウン","ハヤシトモヒコ","レッドグレイス","カワサキク","エムヒス","ハヤテマジェスタ","トウカイリベルテ","スギハラスメント","ダイヤモンドレイン","ナイトヴェール","ブルームスター","ホワイトファルコン","エアリアルムーン","ラピスラズリ","メイショウオーラ","タイセイファントム","キングスヴァイス","ヴェルデライト","ルミナスロード","アストラルウィンド","ブラックセレナーデ","フェニックスベル","ロードエスペランサ","マジェスティックラン","ステラフォーチュン","グレイスフルリリー","オーシャンバロン","ノーブルリーフ","サンライズエール","プラチナホーク","ミスティックソング","アカツキソレイユ","セントライトニング","クイーンミラージュ","ディープヴァリアント","ロイヤルスパーク","シャインガーネット","アルカディアスター","エターナルブレス","スカイインパクト","ヴァンガードクロス","ブルーエクリプス","サザンクレスト","ファインテンペスト","クリムゾンレイ","レジェンドホープ","ミッドナイトパール","グローリーブリッジ","エンペラーノヴァ"];
 var jockeyNames=["Kシュワーバー","Aジャッジ","大谷","Bハーパー","羽月","Eモンテロ","Kローリー","山川","Wゲレーロjr.","Jソト","Mトラウト","アベシンノスケ"];
 var styles=["逃げ","先行","差し","追込","まくり"];
+/* 騎手服（勝負服）の色：馬ごとに少し変えて見分けやすく（12色） */
+var jockeyColors=["#e23b3b","#2c6fe0","#27a844","#f0a91e","#8e44d8","#16b3b3","#ff6fae","#5b6470","#d94f1a","#1f9bd6","#b5b81e","#9c5a2c"];
 var marks=["◎","○","▲","△","☆","△","☆","△"];
 var conditions=[{n:"絶好調",m:0.06,w:12},{n:"好調",m:0.03,w:26},{n:"普通",m:0,w:42},{n:"不調",m:-0.05,w:20}];
 var temperaments=["素直","気分屋","大舞台型","ムラ駆け"];
@@ -830,6 +840,7 @@ function makeHorses(){
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"' alt=''>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"' alt=''>"
+      +"<div class='jockey' style='--silk:"+jockeyColors[i%jockeyColors.length]+"'><div class='jockeyBody'></div><div class='jockeyHead'></div></div>"
       +"</div>";
     $("world").appendChild(el);
     horses.push({ el:el, lane:i, idx:i, progress:0,
@@ -858,6 +869,9 @@ function goRaceScreen(){
   $("startRaceBtn").disabled=false; $("startRaceBtn").style.opacity="1";
   $("liveCommentary").innerHTML="<span class='tick'>●</span>"+currentRaceName+"（"+currentGrade+"・"+currentDist+"m・馬場"+currentBaba+"）まもなく発走！";
   raceState="idle";
+  // 発走前は残り距離演出を一切残さない（前レースのmilestoneが再生される不具合を防止）
+  commentaryDoneRemain={};
+  resetMilestone();
   buildWorldMarkers();
   makeHorses();
   applyPlayerTags();
@@ -898,9 +912,20 @@ function setCommentary(html,cls){
   $("liveCommentary").innerHTML="<span class='tick'>●</span>"+(cls?"<span class='"+cls+"'>":"")+html+(cls?"</span>":"");
 }
 function showMilestone(text){
+  // 発走中（raceState==="running"）以外では中央演出を出さない
+  if(raceState!=="running") return;
   var el=$("milestone");
   el.textContent=text;
   el.classList.remove("show"); void el.offsetWidth; el.classList.add("show");
+}
+/* 残り距離の中央演出を完全初期化（テキスト・showクラス・opacity）。
+   display切替時のアニメ再生による「未発走なのに残り100m！」を防止する。 */
+function resetMilestone(){
+  var el=$("milestone");
+  if(!el) return;
+  el.classList.remove("show");
+  el.textContent="";
+  el.style.opacity="0";
 }
 /* プレイヤー本命（賭けた馬）の伸びを検知するための集合 */
 function playerPickSet(){
@@ -982,6 +1007,26 @@ function phaseSpeed(e,h,prog){
   return Math.max(0.4,s);
 }
 
+/* 残り200m以下だけに効く終盤補正（混戦・追い比べ・末脚/スタミナ反映）。
+   補正は小さめ。極端なワープや不自然な逆転は避ける。 */
+function finalStretchFactor(e,h,leadProg,finalThresh){
+  if(h.progress<finalThresh) return 1;                       // 残り200m以前は無補正
+  var t=clamp((h.progress-finalThresh)/(1-finalThresh),0,1); // 残り200m→ゴールで0→1
+  var f=1;
+  f += (e.finishingKick-1)*0.12*t;                           // 末脚の高い馬は終盤伸びる
+  if(e.stamina<1) f += (e.stamina-1)*0.10*t;                 // スタミナ低い馬は少し垂れる
+  // 追い比べ：先頭との差が僅差な馬だけ食らいつく（上位の混戦化）
+  var gap=leadProg-h.progress;
+  if(gap>0 && gap<0.045){
+    var closeness=1-gap/0.045;                               // 差が小さいほど大きく
+    var grit=0.05*closeness*t*(0.6+(e.finishingKick-0.8)*0.5+(e.stability-0.7)*0.25);
+    if(e.temperament==="ムラ駆け") grit+=rnd(-0.01,0.025)*t; // 気性で粘りに僅かな揺らぎ
+    else if(e.temperament==="気分屋") grit+=rnd(-0.008,0.02)*t;
+    f += grit;
+  }
+  return clamp(f,0.85,1.22);
+}
+
 function stepRace(ts){
   if(raceState!=="running"){ return; }
   if(!lastTs) lastTs=ts;
@@ -991,10 +1036,16 @@ function stepRace(ts){
   var targetSec=18+(currentDist-1600)/400*3;  // 1600m≒18s, 2400m≒24s
   var baseRate=1/targetSec;
 
+  // 終盤補正用：現フレームの先頭進行度と残り200mのしきい値
+  var finalThresh=1-200/currentDist;
+  var leadProg=0;
+  for(var i=0;i<horses.length;i++){ if(horses[i].progress>leadProg) leadProg=horses[i].progress; }
+
   for(var i=0;i<horses.length;i++){
     var h=horses[i]; if(h.progress>=1.25) continue;
     var e=entries[i];
     var sp=phaseSpeed(e,h,clamp(h.progress,0,1));
+    sp *= finalStretchFactor(e,h,leadProg,finalThresh);
     h.progress += baseRate*sp*dt*(1+(e.ability-0.7)*0.18);
     if(!h.done && h.progress>=1){ h.done=true; finished.push(i); }
     placeHorse(h);
@@ -1488,6 +1539,8 @@ function launchConfetti(){
 }
 function restartSeries(){
   var ov=$("champOverlay"); if(ov) ov.remove();
+  commentaryDoneRemain={};
+  resetMilestone();
   initSeries(activePlayerCount);
   updateSeriesBadge();
   $("oddsScreen").style.display="none";
