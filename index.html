@@ -49,6 +49,30 @@ button{font-family:inherit; cursor:pointer; border:none; border-radius:12px; fon
 .subtitle{color:var(--gold); font-weight:800; letter-spacing:.3em; font-size:13px;}
 .seriesBadge{display:inline-block; background:var(--red); color:#fff; font-weight:900;
   padding:4px 12px; border-radius:999px; font-size:13px; margin-top:8px;}
+/* 遊び方 */
+.howto{text-align:left; background:rgba(0,0,0,.22); border:1px solid var(--line);
+  border-radius:12px; padding:10px 12px; margin:8px 0;}
+.howtoStep{font-size:13px; font-weight:700; margin:4px 0; display:flex; align-items:center; gap:8px;}
+.howtoStep b{flex:none; width:20px; height:20px; border-radius:50%; background:var(--gold);
+  color:#3a2b00; font-size:12px; display:flex; align-items:center; justify-content:center;}
+
+/* 注目馬 */
+.focusGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+@media(max-width:520px){ .focusGrid{grid-template-columns:1fr;} }
+.focusCard{background:rgba(0,0,0,.2); border:1px solid var(--line); border-radius:12px; padding:10px;}
+.focusCard.honmei{border-color:var(--gold);} .focusCard.ana{border-color:#ff8a5b;} .focusCard.baba{border-color:#7ad9ff;}
+.focusTag{display:inline-block; font-size:11px; font-weight:900; padding:2px 8px; border-radius:999px; color:#1a1208;}
+.focusCard.honmei .focusTag{background:var(--gold);} .focusCard.ana .focusTag{background:#ff8a5b;} .focusCard.baba .focusTag{background:#7ad9ff;}
+.focusName{font-weight:900; font-size:14px; margin:5px 0 2px;}
+.focusWhy{font-size:11px; color:var(--sub);}
+
+/* 券種ガイド（折りたたみ） */
+.betGuide{margin:8px 0; background:rgba(0,0,0,.18); border:1px solid var(--line); border-radius:10px; padding:4px 10px;}
+.betGuide summary{cursor:pointer; font-size:13px; font-weight:800; color:var(--gold); padding:6px 0;}
+.guideTable{min-width:420px; font-size:12px;}
+.lv,.ret{font-weight:900; padding:1px 7px; border-radius:6px; font-size:11px; color:#10220f;}
+.lv1{background:#7be67b;} .lv2{background:#f6c945;} .lv3{background:#ff8a7a;}
+.r1{background:#9fd9b6;} .r2{background:#f6c945;} .r3{background:#ffd45e;}
 .peopleGrid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:16px 0;}
 .peopleBtn{padding:22px 0; font-size:20px; color:#1a1208;
   background:linear-gradient(#ffe690,var(--gold2)); box-shadow:0 5px 0 #b9791a;}
@@ -63,7 +87,7 @@ th,td{padding:7px 6px; text-align:center; border-bottom:1px solid rgba(255,255,2
 th{background:#0c2417; color:var(--gold); position:sticky; top:0; font-size:12px;}
 td.name{text-align:left; font-weight:800; min-width:120px;}
 tr.fav td{background:rgba(255,212,94,.10);}
-.numTag,.frameBadge{display:inline-flex; align-items:center; justify-content:center;
+.numTag{display:inline-flex; align-items:center; justify-content:center;
   width:24px; height:24px; border-radius:6px; font-weight:900; font-size:13px;}
 .fr1{background:#fff;color:#111;border:1px solid #999;} .fr2{background:#111;color:#fff;}
 .fr3{background:#e8483a;color:#fff;} .fr4{background:#2f7be8;color:#fff;}
@@ -88,10 +112,13 @@ tr.fav td{background:rgba(255,212,94,.10);}
 .betHead .money{color:var(--gold); font-weight:900;}
 .betRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
 .betRow label{font-size:12px; color:var(--sub);}
-select,input[type=number]{font-family:inherit; font-size:15px; padding:9px; border-radius:10px;
-  border:1px solid var(--line); background:#0b2416; color:var(--ink); min-width:64px;}
-select{min-width:120px;}
-input[type=number]{width:96px; text-align:right;}
+select,input[type=number]{font-family:inherit; font-size:16px; padding:12px 11px; border-radius:10px;
+  border:1px solid var(--line); background:#0b2416; color:var(--ink); min-width:64px; min-height:48px;}
+select{min-width:130px;}
+input[type=number]{width:108px; text-align:right;}
+/* スマホで押しやすい馬券・発走ボタン */
+#betArea select,#betArea input[type=number]{font-size:17px; min-height:50px;}
+#startRaceBtn{padding:20px; font-size:22px;}
 .payHint{font-size:12px; color:var(--gold); font-weight:800; margin-top:6px; min-height:16px;}
 .outBadge{background:var(--red); color:#fff; border-radius:6px; padding:1px 8px; font-size:11px; font-weight:900;}
 .horse2Wrap{display:flex; gap:8px; flex-wrap:wrap;}
@@ -105,7 +132,7 @@ input[type=number]{width:96px; text-align:right;}
 
 #raceWindow{position:relative; width:100%; height:60vh; max-height:460px; min-height:300px;
   overflow:hidden; border-radius:16px; border:2px solid #08160d; background:#7ec0ee;}
-#world{position:absolute; left:0; top:0; width:6600px; height:620px; transform-origin:0 0;
+#world{position:absolute; left:0; top:0; width:6600px; height:680px; transform-origin:0 0;
   will-change:transform;}
 .sky{position:absolute; left:0; top:0; width:100%; height:260px;
   background:linear-gradient(#8fd0f5 0%,#cfeafd 70%,#eef9ff 100%);}
@@ -119,15 +146,15 @@ input[type=number]{width:96px; text-align:right;}
   opacity:.55;}
 .rail{position:absolute; left:0; width:100%; height:6px; background:var(--rail);
   box-shadow:0 0 0 1px #aaa;}
-.railTop{top:300px;} .railBottom{top:560px;}
-.track{position:absolute; left:0; top:306px; width:100%; height:254px;
+.railTop{top:300px;} .railBottom{top:610px;}
+.track{position:absolute; left:0; top:306px; width:100%; height:304px;
   background:linear-gradient(180deg,var(--turf) 0%,var(--turf2) 100%);}
 .track::after{content:""; position:absolute; inset:0;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 120px,rgba(0,0,0,.05) 120px 240px);}
 .boardM{position:absolute; top:312px; width:54px; height:30px; transform:translateX(-50%);
   background:#143; color:#fff; font-size:12px; font-weight:900; border-radius:5px;
   display:flex; align-items:center; justify-content:center; border:2px solid #fff;}
-.startLine,.goalLine{position:absolute; top:300px; width:10px; height:260px;}
+.startLine,.goalLine{position:absolute; top:300px; width:10px; height:310px;}
 .startLine{background:repeating-linear-gradient(0deg,#fff 0 12px,#222 12px 24px);}
 .goalLine{background:repeating-linear-gradient(0deg,#fff 0 12px,#e8483a 12px 24px);}
 .lineLabel{position:absolute; top:272px; transform:translateX(-50%); font-weight:900;
@@ -150,6 +177,11 @@ input[type=number]{width:96px; text-align:right;}
   border-radius:999px; display:none; white-space:nowrap;}
 .horse.leader .leaderBadge{display:block;}
 .horse.leader{filter:drop-shadow(0 0 6px var(--gold));}
+/* 賭けたプレイヤーのタグ（馬の足元に小さく） */
+.playerTag{position:absolute; left:50%; bottom:-13px; transform:translateX(-50%); z-index:4;
+  background:#1456c8; color:#fff; font-weight:900; font-size:10px; line-height:1.2;
+  padding:1px 5px; border-radius:6px; white-space:nowrap; border:1px solid #fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.5);}
 
 /* ----- 実況 (Phase2) ----- */
 #liveCommentary{position:absolute; left:0; right:0; bottom:0; z-index:30;
@@ -174,6 +206,11 @@ input[type=number]{width:96px; text-align:right;}
 .bigResultCard{background:linear-gradient(180deg,#13361f,#0b2415); border:2px solid var(--gold);
   border-radius:18px; width:100%; max-width:520px; padding:18px; box-shadow:0 14px 50px rgba(0,0,0,.6);}
 .bigResultTitle{text-align:center; font-size:24px; font-weight:900; color:var(--gold); margin-bottom:10px;}
+.highlightBox{background:rgba(255,212,94,.10); border:1px solid var(--gold); border-radius:12px;
+  padding:8px 10px; margin:0 0 12px;}
+.hlLine{font-weight:900; font-size:14px; color:#ffe9a8; margin:3px 0; text-shadow:0 1px 2px #000;}
+.nextComment{text-align:center; font-weight:800; font-size:14px; color:#bff3cf; margin:12px 0 0;
+  background:rgba(122,217,255,.10); border:1px solid var(--line); border-radius:10px; padding:8px 10px;}
 .podium{display:flex; gap:8px; justify-content:center; align-items:flex-end; margin-bottom:14px;}
 .podStep{flex:1; text-align:center; background:rgba(0,0,0,.25); border:1px solid var(--line);
   border-radius:12px; padding:10px 4px;}
@@ -182,11 +219,14 @@ input[type=number]{width:96px; text-align:right;}
 .podStep .no{font-size:13px;} .podStep .nm{font-size:12px; font-weight:800;}
 .podStep .od{font-size:11px; color:var(--sub);}
 .resultPlayers{display:flex; flex-direction:column; gap:7px; margin:10px 0;}
-.rpRow{display:flex; justify-content:space-between; align-items:center; gap:8px;
+.rpRow{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;
   background:rgba(0,0,0,.22); border-radius:10px; padding:8px 10px; font-size:13px;}
 .rpRow.hit{border-left:4px solid var(--gold);} .rpRow.lose{border-left:4px solid #557;}
 .rpRow .who{font-weight:900; min-width:34px;}
 .rpRow .det{flex:1; font-size:12px; color:var(--sub); text-align:left;}
+.rpRow .det .detHead{color:var(--ink); font-weight:800; font-size:12px;}
+.rpRow .det .detWhy{font-size:11px; color:var(--sub); margin:1px 0 5px;}
+.rpRow .det .detHead:not(:first-child){margin-top:4px; border-top:1px dashed rgba(255,255,255,.12); padding-top:4px;}
 .rpRow .pay{font-weight:900;} .rpRow.hit .pay{color:var(--gold);}
 .rpRow .cash{font-weight:900; color:#bff3cf; min-width:78px; text-align:right;}
 .judge{font-weight:900; padding:1px 8px; border-radius:6px; font-size:12px;}
@@ -198,7 +238,13 @@ input[type=number]{width:96px; text-align:right;}
 .champTitle{font-size:20px; color:var(--gold); font-weight:900; letter-spacing:.2em;}
 .champName{font-size:46px; font-weight:900; margin:12px 0; color:#fff; text-shadow:0 0 20px var(--gold);}
 .champMoney{font-size:22px; color:var(--gold); font-weight:900;}
-.champList{margin:16px 0; width:100%; max-width:360px;}
+.champAwards{width:100%; max-width:360px; margin:14px 0 2px; display:flex; flex-direction:column; gap:6px;}
+.awardRow{display:flex; align-items:center; gap:8px; background:rgba(255,212,94,.10);
+  border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:13px;}
+.awardRow span{color:var(--sub); min-width:104px; text-align:left; font-weight:800;}
+.awardRow b{color:#fff; font-size:16px;}
+.awardRow em{margin-left:auto; color:var(--gold); font-style:normal; font-weight:900; text-align:right;}
+.champList{margin:14px 0; width:100%; max-width:360px;}
 .confetti{position:fixed; top:-20px; width:10px; height:16px; z-index:1100; opacity:.95;
   animation:fall linear forwards;}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg); opacity:1;}}
@@ -212,7 +258,12 @@ input[type=number]{width:96px; text-align:right;}
     <div class="hero">
       <div class="subtitle">MINNA DERBY</div>
       <h1>みんなでダービー</h1>
-      <p class="notice" style="text-align:left">5レースのシリーズ戦。所持金1000円スタート、馬券を当てて増やそう！最終第5レースはG1「みんなでダービー」。優勝は最終所持金No.1！</p>
+      <div class="howto">
+        <div class="howtoStep"><b>1</b>人数を選ぶ（1〜5人）</div>
+        <div class="howtoStep"><b>2</b>各プレイヤーが馬券を購入（1000円スタート）</div>
+        <div class="howtoStep"><b>3</b>レースを観戦して払戻ゲット</div>
+        <div class="howtoStep"><b>4</b>全5レース終了時に所持金が一番多い人が優勝！</div>
+      </div>
       <div class="seriesBadge" id="seriesBadge">第1レース / 全5レース</div>
     </div>
     <h2>人数を選んでください</h2>
@@ -223,7 +274,6 @@ input[type=number]{width:96px; text-align:right;}
       <button class="peopleBtn" data-p="4">4<small>人</small></button>
       <button class="peopleBtn" data-p="5">5<small>人</small></button>
     </div>
-    <div id="startRanking"></div>
   </section>
 
   <!-- ===================== 出馬表・オッズ・投票 ===================== -->
@@ -259,7 +309,24 @@ input[type=number]{width:96px; text-align:right;}
       </table>
     </div>
 
+    <h2>今回の注目馬</h2>
+    <div id="focusHorses" class="focusGrid"></div>
+
     <h2>投票</h2>
+    <details class="betGuide">
+      <summary>馬券の種類と当たりやすさ（タップで開く）</summary>
+      <div class="tableWrap">
+        <table class="guideTable">
+          <thead><tr><th>券種</th><th>当て方</th><th>当たりやすさ</th><th>配当</th></tr></thead>
+          <tbody>
+            <tr><td>単勝</td><td>1着を当てる</td><td><span class="lv lv2">ふつう</span></td><td>選んだ馬しだい</td></tr>
+            <tr><td>複勝</td><td>3着以内を当てる</td><td><span class="lv lv1">当たりやすい</span></td><td><span class="ret r1">低め</span></td></tr>
+            <tr><td>ワイド</td><td>選んだ2頭が両方3着以内</td><td><span class="lv lv2">中間</span></td><td><span class="ret r2">中間</span></td></tr>
+            <tr><td>馬連</td><td>選んだ2頭が1着・2着（順不同）</td><td><span class="lv lv3">当たりにくい</span></td><td><span class="ret r3">高め</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
     <div class="notice">単勝・複勝＝1頭／ワイド・馬連＝2頭を選択。所持金0円の人は脱落です。</div>
     <div id="betArea"></div>
 
@@ -382,7 +449,9 @@ function initSeries(n){
   activePlayerCount=clamp(n,1,5);
   raceNoInSeries=1;
   players=[];
-  for(var i=0;i<activePlayerCount;i++) players.push({money:1000,alive:true,bets:[]});
+  // stats: シリーズ累計（チャンピオン画面で使用）
+  for(var i=0;i<activePlayerCount;i++) players.push({money:1000,alive:true,bets:[],
+    stats:{hits:0, maxPay:0, bestOdds:0, bestOddsLabel:""}});
 }
 
 function updateSeriesBadge(){
@@ -516,19 +585,23 @@ function buildEntries(){
     if(j<=2&&o>9.9)o=rnd(6.5,9.8);
     if(j===11&&o<140)o=rnd(145,160);
     s.odds=round1(o);
-    var place=1.1+s.odds*0.18;
-    if(j<=2)place=rnd(1.1,2.0); if(j>=9)place=rnd(5.0,14.0);
+    // 複勝は当てやすくリターン控えめ（高配当を抑制）
+    var place=1.1+s.odds*0.14;
+    if(j<=2)place=rnd(1.1,1.8); else if(j>=9)place=rnd(3.5,8.5); else place=Math.min(place,5.5);
     s.placeOdds=round1(place);
     s.mark=(j<5?marks[j]:pick(["△","☆",""]));
   }
 }
 
-/* 2頭組合せ配当の概算 */
+/* 2頭組合せ配当の概算
+   方針：単勝・複勝＝当てやすくリターン控えめ／ワイド＝中間／馬連＝リターン大きめ */
 function umarenOdds(i,j){
-  return round1(clamp(entries[i].odds*entries[j].odds/2.4,2.0,9999));
+  // 馬連はリターン大きめ（divisorを小さく）
+  return round1(clamp(entries[i].odds*entries[j].odds/1.9,3.0,99999));
 }
 function wideOdds(i,j){
-  return round1(clamp(entries[i].odds*entries[j].odds/2.4/3.4,1.1,999));
+  // ワイドは馬連の中間（常に馬連より低い）
+  return round1(clamp(umarenOdds(i,j)/3.8,1.3,999));
 }
 
 /* ============================================================
@@ -617,20 +690,57 @@ function onBetChange(p){
   if(!hint) return;
   if(bet<100){ hint.textContent="100円以上を100円単位で。"; return; }
   if(bet>players[p].money){ hint.textContent="所持金を超えています。"; return; }
-  var o;
-  if(type==="win"){ o=entries[i1].odds; hint.textContent="単勝 "+entries[i1].no+"番 が1着で約 "+yen(Math.floor(bet*o))+"円"; }
-  else if(type==="place"){ o=entries[i1].placeOdds; hint.textContent="複勝 "+entries[i1].no+"番 が3着以内で約 "+yen(Math.floor(bet*o))+"円"; }
-  else if(type==="wide"){ var i2=Number(h2.value); o=wideOdds(i1,i2); hint.textContent="ワイド "+entries[i1].no+"-"+entries[i2].no+" 両方3着以内で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）"; }
-  else { var j2=Number(h2.value); o=umarenOdds(i1,j2); hint.textContent="馬連 "+entries[i1].no+"-"+entries[j2].no+" が1・2着で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）"; }
+  var o, feel=betFeel[type];
+  if(type==="win"){ o=entries[i1].odds; hint.textContent="単勝 "+entries[i1].no+"番 が1着で約 "+yen(Math.floor(bet*o))+"円　["+feel+"]"; }
+  else if(type==="place"){ o=entries[i1].placeOdds; hint.textContent="複勝 "+entries[i1].no+"番 が3着以内で約 "+yen(Math.floor(bet*o))+"円　["+feel+"]"; }
+  else if(type==="wide"){ var i2=Number(h2.value); o=wideOdds(i1,i2); hint.textContent="ワイド "+entries[i1].no+"-"+entries[i2].no+" 両方3着以内で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）　["+feel+"]"; }
+  else { var j2=Number(h2.value); o=umarenOdds(i1,j2); hint.textContent="馬連 "+entries[i1].no+"-"+entries[j2].no+" が1・2着で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）　["+feel+"]"; }
 }
+/* 券種ごとの当たりやすさ・配当の雰囲気 */
+var betFeel={win:"配当は馬しだい", place:"当たりやすい/配当低め", wide:"中間", umaren:"当たりにくい/配当高め"};
 
 /* ============================================================
    オッズ画面表示
    ============================================================ */
+/* レース前の注目馬（本命・穴馬・馬場巧者）を1〜3頭表示 */
+function renderFocusHorses(){
+  var el=$("focusHorses"); if(!el) return;
+  var cards=[], used={};
+  // 本命：人気1位
+  var honmei=null;
+  for(var i=0;i<entries.length;i++){ if(entries[i].popularity===1){ honmei=i; break; } }
+  if(honmei!=null){ used[honmei]=true;
+    cards.push({cls:"honmei",tag:"本命",idx:honmei,why:"人気1位。総合力トップの軸候補"}); }
+  // 穴馬：人気薄(6番人気以下)で末脚(finishingKick)が最も高い馬
+  var ana=-1, anaKick=-1;
+  for(var a=0;a<entries.length;a++){ if(used[a]) continue;
+    if(entries[a].popularity>=6 && entries[a].finishingKick>anaKick){ anaKick=entries[a].finishingKick; ana=a; } }
+  if(ana>=0){ used[ana]=true;
+    cards.push({cls:"ana",tag:"穴馬",idx:ana,why:entries[ana].popularity+"番人気だが末脚"+entries[ana].finishingKick+"。一発の魅力"}); }
+  // 馬場巧者：現在の馬場に合う馬（適性一致＞万能）。未使用から選ぶ
+  var baba=-1;
+  for(var b=0;b<entries.length;b++){ if(used[b]) continue; if(entries[b].trackAffinity===currentBaba){ baba=b; break; } }
+  if(baba<0){ for(var c=0;c<entries.length;c++){ if(used[c]) continue; if(entries[c].trackAffinity==="万能"){ baba=c; break; } } }
+  if(baba>=0){ used[baba]=true;
+    var aff=entries[baba].trackAffinity;
+    cards.push({cls:"baba",tag:"馬場巧者",idx:baba,why:"馬場"+currentBaba+"に"+(aff==="万能"?"オールラウンド対応":"ピッタリ（"+aff+"巧者）")}); }
+
+  var html="";
+  for(var k=0;k<cards.length;k++){
+    var cd=cards[k], e=entries[cd.idx];
+    html+="<div class='focusCard "+cd.cls+"'>"
+      +"<span class='focusTag'>"+cd.tag+"</span>"
+      +"<div class='focusName'><span class='numTag "+frameClass(e.no)+"'>"+e.no+"</span> "+e.name+"</div>"
+      +"<div class='focusWhy'>"+cd.why+"<br>単"+e.odds.toFixed(1)+"倍・"+e.style+"・"+e.condition+"</div></div>";
+  }
+  el.innerHTML=html;
+}
+
 function goOddsScreen(){
   setupRaceMeta();
   buildEntries();
   drawTables();
+  renderFocusHorses();
   buildBetArea();
   renderRankStrip("moneyRankStrip");
   $("oddsRaceNo").textContent="第"+raceNoInSeries+"R";
@@ -643,7 +753,7 @@ function goOddsScreen(){
   window.scrollTo(0,0);
 }
 function rebuildOdds(){
-  buildEntries(); drawTables(); buildBetArea();
+  buildEntries(); drawTables(); renderFocusHorses(); buildBetArea();
   $("oddsGrade").textContent=currentGrade;
 }
 
@@ -681,9 +791,10 @@ function confirmAndGoRace(){
 /* ============================================================
    レース画面準備
    ============================================================ */
-var WORLD_W=6600, START_X=320, GOAL_X=6300, TRACK_TOP=320, TRACK_BOT=540;
+var WORLD_W=6600, START_X=320, GOAL_X=6300, TRACK_TOP=320, TRACK_BOT=600;
 function laneY(i){
-  var n=12, top=TRACK_TOP+22, bot=TRACK_BOT-14;
+  // 縦間隔を広げ、どの馬が伸びているか見やすく（土の範囲を広く使う）
+  var n=12, top=TRACK_TOP+20, bot=TRACK_BOT-18;
   return top+(bot-top)*(i/(n-1));
 }
 function buildWorldMarkers(){
@@ -715,6 +826,7 @@ function makeHorses(){
     el.className="horse"; el.setAttribute("data-no",e.no);
     el.innerHTML="<div class='leaderBadge'>先頭</div>"
       +"<div class='numTag "+frameClass(e.no)+"'>"+e.no+"</div>"
+      +"<div class='playerTag' style='display:none'></div>"
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"' alt=''>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"' alt=''>"
@@ -748,9 +860,30 @@ function goRaceScreen(){
   raceState="idle";
   buildWorldMarkers();
   makeHorses();
+  applyPlayerTags();
   camScale=0.5;
   updateCamera(true);
   window.scrollTo(0,0);
+}
+
+/* 各馬に賭けたプレイヤーのタグ「P1」「P1/P3」を表示（単複ワイド馬連すべての選択馬） */
+function applyPlayerTags(){
+  var set=playerPickSet();   // horseIndex -> [playerIndex,...]
+  for(var i=0;i<horses.length;i++){
+    var tag=horses[i].el.querySelector(".playerTag");
+    if(!tag) continue;
+    var ps=set[i];
+    if(ps && ps.length){
+      // 重複プレイヤーを除いて昇順
+      var uniq=[]; for(var k=0;k<ps.length;k++){ if(uniq.indexOf(ps[k])===-1) uniq.push(ps[k]); }
+      uniq.sort(function(a,b){return a-b;});
+      tag.textContent=uniq.map(function(p){return "P"+(p+1);}).join("/");
+      tag.style.display="block";
+    }else{
+      tag.style.display="none";
+      tag.textContent="";
+    }
+  }
 }
 function backToOdds(){
   stopRace();
@@ -779,6 +912,27 @@ function playerPickSet(){
   return set;
 }
 var _pickSet={}, _favUpsetSaid=false, _pickRunSaid={};
+var _upsetLeadSaid=false, _favSinkSaid=false, _closeFinishSaid=false;
+/* プレイヤー視点の実況用：単複の本命集合・ワイド馬連の2頭組・発火制御 */
+var _honmeiSet={}, _comboTickets=[], _playerComSaid={}, _playerComCount=0;
+var MAX_PLAYER_COM=4;
+function buildPlayerBetInfo(){
+  _honmeiSet={}; _comboTickets=[];
+  for(var p=0;p<activePlayerCount;p++){
+    var b=players[p].bets||[];
+    for(var t=0;t<b.length;t++){
+      var tk=b[t];
+      if(tk.type==="win"||tk.type==="place"){ _honmeiSet[tk.h1]=(_honmeiSet[tk.h1]||[]).concat(p); }
+      else if(tk.h2!=null){ _comboTickets.push({p:p, h1:tk.h1, h2:tk.h2, type:tk.type}); }
+    }
+  }
+}
+function playerComment(html){
+  if(_playerComCount>=MAX_PLAYER_COM) return false;
+  _playerComCount++;
+  setCommentary(html,"comFav");
+  return true;
+}
 
 /* ============================================================
    レース進行
@@ -789,6 +943,8 @@ function startRace(){
   $("startRaceBtn").disabled=true; $("startRaceBtn").style.opacity="0.5";
   $("raceMsg").textContent="レース中！";
   commentaryDoneRemain={}; _favUpsetSaid=false; _pickRunSaid={}; _pickSet=playerPickSet();
+  _upsetLeadSaid=false; _favSinkSaid=false; _closeFinishSaid=false;
+  _playerComSaid={}; _playerComCount=0; buildPlayerBetInfo();
   prevLeaderIdx=-1;
   for(var i=0;i<horses.length;i++){ horses[i].el.classList.add("run"); }
   setCommentary("ゲートが開いた！一斉にスタート！","comLead");
@@ -909,10 +1065,19 @@ function handleCommentary(li,remain){
     }
   }
 
-  // 波乱：人気薄(7番人気以下)が現在2位以内
+  var ord=rankOrder();
+  // 現在順位マップ（馬index → 1始まりの順位）
+  var rankOf={}; for(var r=0;r<ord.length;r++) rankOf[ord[r]]=r+1;
+
+  // 人気薄が先頭に立った時
+  if(!_upsetLeadSaid && raceState==="running" && entries[li].popularity>=8){
+    _upsetLeadSaid=true;
+    setCommentary("波乱の予感！ "+entries[li].popularity+"番人気 "+entries[li].no+"番 "+entries[li].name+" が先頭に立った！","comUpset");
+  }
+
+  // 波乱：人気薄(8番人気以下)が現在2位以内
   if(!_favUpsetSaid){
-    var order=rankOrder();
-    var top2=[order[0],order[1]];
+    var top2=[ord[0],ord[1]];
     for(var t=0;t<top2.length;t++){
       if(entries[top2[t]].popularity>=8){
         _favUpsetSaid=true;
@@ -922,8 +1087,18 @@ function handleCommentary(li,remain){
     }
   }
 
+  // 人気馬が沈んでいる時（1〜2番人気が中団以降に下がった）
+  if(!_favSinkSaid && raceState==="running" && remain<=1000 && remain>250){
+    for(var fp=0;fp<entries.length;fp++){
+      if(entries[fp].popularity<=2 && rankOf[fp]>=8){
+        _favSinkSaid=true;
+        setCommentary(entries[fp].popularity+"番人気 "+entries[fp].no+"番 "+entries[fp].name+" は伸びを欠く…後方のままだ！","comUpset");
+        break;
+      }
+    }
+  }
+
   // プレイヤー本命が伸びてきた（賭けた馬が3位以内に上がった）
-  var ord=rankOrder();
   var top3=[ord[0],ord[1],ord[2]];
   for(var k=0;k<top3.length;k++){
     var hi=top3[k];
@@ -933,6 +1108,54 @@ function handleCommentary(li,remain){
       var who="P"+(ps[0]+1)+(ps.length>1?"ほか":"");
       setCommentary(who+"の本命 "+entries[hi].no+"番 "+entries[hi].name+" が上がってきた！","comFav");
       break;
+    }
+  }
+
+  // ゴール前で3頭以上が接戦
+  if(!_closeFinishSaid && remain<=250 && remain>40 && ord.length>=3){
+    var lead=horses[ord[0]].progress;
+    var n=0;
+    for(var q=0;q<ord.length;q++){ if(lead-horses[ord[q]].progress<=0.018) n++; }
+    if(n>=3){
+      _closeFinishSaid=true;
+      setCommentary("大接戦！ 先頭"+n+"頭が横一線、もつれてゴールへ！","comLead");
+    }
+  }
+
+  // ===== プレイヤー視点の実況（1レース最大MAX_PLAYER_COM回） =====
+  if(_playerComCount<MAX_PLAYER_COM && raceState==="running" && remain>60){
+    var top2b=[ord[0],ord[1]];
+    // A) 選んだ馬が先頭争い（top2）
+    for(var a=0;a<top2b.length;a++){
+      var hi=top2b[a], psA=_pickSet[hi];
+      if(psA && !_playerComSaid["lead"+hi]){
+        _playerComSaid["lead"+hi]=true;
+        var whoA=psA.length>1?("P"+(psA[0]+1)+"ほか"):("P"+(psA[0]+1));
+        if(playerComment(whoA+"が選んだ "+entries[hi].no+"番 "+entries[hi].name+" が先頭争い！")) break;
+      }
+    }
+    // B) 馬連／ワイド候補の2頭がともに上位(4位以内)
+    if(_playerComCount<MAX_PLAYER_COM){
+      for(var ci=0;ci<_comboTickets.length;ci++){
+        var ct=_comboTickets[ci], ckey="combo"+ct.p+"_"+ci;
+        if(!_playerComSaid[ckey] && rankOf[ct.h1]<=4 && rankOf[ct.h2]<=4){
+          _playerComSaid[ckey]=true;
+          var lbl=(ct.type==="umaren")?"馬連":"ワイド";
+          if(playerComment("P"+(ct.p+1)+"の"+lbl+"候補2頭が上位に来ている！（"+entries[ct.h1].no+"番・"+entries[ct.h2].no+"番）")) break;
+        }
+      }
+    }
+    // C) 本命（単複）がまだ中団（5〜9位）— レース中盤に一度
+    if(_playerComCount<MAX_PLAYER_COM && remain>=currentDist*0.32 && remain<=currentDist*0.7){
+      for(var hk in _honmeiSet){
+        var hidx=Number(hk);
+        if(!_playerComSaid["mid"+hidx] && rankOf[hidx]>=5 && rankOf[hidx]<=9){
+          _playerComSaid["mid"+hidx]=true;
+          var psB=_honmeiSet[hidx];
+          var whoB=psB.length>1?("P"+(psB[0]+1)+"ほか"):("P"+(psB[0]+1));
+          if(playerComment(whoB+"の本命 "+entries[hidx].no+"番 "+entries[hidx].name+"、まだ中団！ここから伸びるか？")) break;
+        }
+      }
     }
   }
 }
@@ -948,25 +1171,27 @@ function updateCamera(instant){
   var leadProg=clamp(lh.progress,0,1);
   var remainM=(1-leadProg)*currentDist;
 
-  // フェーズによる目標スケール
+  // フェーズによる目標スケール（終盤のズームは控えめにし、4〜5番手も入るように）
   var target;
   if(leadProg<0.12) target=0.5;            // スタート：引き
-  else if(remainM<=100) target=1.0;        // ゴール前：寄り
-  else if(remainM<=200) target=0.92;
-  else if(remainM<=400) target=0.82;       // 残り400から少しズーム
+  else if(remainM<=100) target=0.92;       // ゴール前：寄り（強すぎない）
+  else if(remainM<=200) target=0.85;
+  else if(remainM<=400) target=0.78;       // 残り400から少しズーム
   else if(leadProg<0.55) target=0.62;      // 中盤：先頭集団
   else target=0.7;
   camScale += (target-camScale)*(instant?1:0.08);
 
-  // フォーカスX：通常は先頭、終盤は上位3頭の中心（先頭3頭が見えるように）
+  // フォーカスX：終盤は上位5頭の重心に寄せ、先頭3頭＋4〜5番手まで画面に収める
   var focusX;
-  if(remainM<=250){
+  if(remainM<=400){
     var ord=rankOrder();
-    focusX=(horses[ord[0]].x+horses[ord[1]].x+horses[ord[2]].x)/3;
+    var k=Math.min(5,ord.length), sum=0;
+    for(var c=0;c<k;c++) sum+=horses[ord[c]].x;
+    focusX=sum/k;
   }else{
     focusX=lh.x;
   }
-  var anchor=remainM<=250?0.5:0.6;
+  var anchor=remainM<=400?0.5:0.6;
   var tx=win.width*anchor-focusX*camScale;
   // 端の制限
   var minTx=win.width-WORLD_W*camScale;
@@ -977,7 +1202,7 @@ function updateCamera(instant){
   var midY=(TRACK_TOP+TRACK_BOT)/2;
   var ty=win.height*0.55-midY*camScale;
   if(ty>0) ty=0;
-  if(ty<win.height-620*camScale) ty=win.height-620*camScale;
+  if(ty<win.height-680*camScale) ty=win.height-680*camScale;
 
   $("world").style.transform="translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+camScale.toFixed(3)+")";
 }
@@ -1024,26 +1249,123 @@ function judgeTicket(tk){
   return {hit:false,odds:0};
 }
 var typeLabel={win:"単勝",place:"複勝",wide:"ワイド",umaren:"馬連"};
+/* 馬index → 着順(1始まり)。圏外はnull */
+function finishRank(idx){ var r=finished.indexOf(idx); return r===-1?null:r+1; }
+function rankText(idx){ var r=finishRank(idx); return entries[idx].no+"番は"+(r?r+"着":"着外"); }
+
+/* 賭けた内容と、なぜ当たり/外れかの理由文を返す */
+function ticketDetail(tk,hit,pay){
+  var h1=entries[tk.h1];
+  var head=typeLabel[tk.type]+" "+h1.no+"番 "+h1.name+(tk.h2!=null?" ＋ "+entries[tk.h2].no+"番 "+entries[tk.h2].name:"")+" "+yen(tk.bet)+"円";
+  var cond,res;
+  if(tk.type==="win"){ cond="1着なら的中"; res=rankText(tk.h1); }
+  else if(tk.type==="place"){ cond="3着以内なら的中"; res=rankText(tk.h1); }
+  else if(tk.type==="wide"){ cond="2頭とも3着以内なら的中"; res=rankText(tk.h1)+"・"+rankText(tk.h2); }
+  else { cond="2頭で1・2着なら的中"; res=rankText(tk.h1)+"・"+rankText(tk.h2); }
+  var verdict=hit?("<b style='color:var(--gold)'>的中</b> 払戻"+yen(pay)+"円"):"<b>不的中</b>";
+  return "<div class='detHead'>"+head+"</div><div class='detWhy'>条件："+cond+" ／ "+res+" → "+verdict+"</div>";
+}
 
 function payout(){
   for(var p=0;p<activePlayerCount;p++){
     var pl=players[p];
     pl.lastResult=null;
+    var wasAlive=pl.alive;
     if(!pl.bets.length) continue;
     var totalBet=0, totalPay=0, dets=[], anyHit=false;
+    var hitTypes=[], maxTicketPay=0, bestOddsHit=0, bestOddsLabel="";
     for(var t=0;t<pl.bets.length;t++){
       var tk=pl.bets[t];
       var jr=judgeTicket(tk);
       var pay=jr.hit?Math.floor(tk.bet*jr.odds):0;
       totalBet+=tk.bet; totalPay+=pay; if(jr.hit) anyHit=true;
-      var sel=entries[tk.h1].no+(tk.h2!=null?"-"+entries[tk.h2].no:"")+"番";
-      dets.push(typeLabel[tk.type]+" "+sel+" "+(jr.hit?"的中":"不的中")+(jr.hit?" 払戻"+yen(pay)+"円":""));
+      dets.push(ticketDetail(tk,jr.hit,pay));
+      if(jr.hit){
+        if(hitTypes.indexOf(tk.type)===-1) hitTypes.push(tk.type);
+        if(pay>maxTicketPay) maxTicketPay=pay;
+        if(tk.odds>bestOddsHit){ bestOddsHit=tk.odds; bestOddsLabel=typeLabel[tk.type]+" "+entries[tk.h1].no+"番"+(tk.h2!=null?"-"+entries[tk.h2].no+"番":""); }
+        // シリーズ累計スタッツ
+        pl.stats.hits++;
+        if(pay>pl.stats.maxPay) pl.stats.maxPay=pay;
+        if(tk.odds>pl.stats.bestOdds){ pl.stats.bestOdds=tk.odds; pl.stats.bestOddsLabel=bestOddsLabel; }
+      }
     }
     pl.money += (totalPay-totalBet);
     if(pl.money<0) pl.money=0;
     if(pl.money<=0) pl.alive=false;
-    pl.lastResult={bet:totalBet,pay:totalPay,hit:anyHit,dets:dets};
+    pl.lastResult={bet:totalBet,pay:totalPay,hit:anyHit,dets:dets,
+      hitTypes:hitTypes, maxTicketPay:maxTicketPay, bestOddsHit:bestOddsHit, bestOddsLabel:bestOddsLabel,
+      newlyEliminated:(wasAlive && !pl.alive)};
   }
+}
+
+/* 次レースへのひとこと（初心者向けの見通し） */
+function nextRaceComment(rk){
+  if(!rk) rk=moneyRanking();
+  var last=(raceNoInSeries>=MAX_RACES);
+  if(last) return "最終レース終了！結果発表へ！";
+  var aliveCnt=0; for(var i=0;i<rk.length;i++) if(rk[i].alive) aliveCnt++;
+  var leader=rk[0];
+  // 最終レース前
+  if(raceNoInSeries===MAX_RACES-1){
+    if(rk.length>=2 && rk[0].money-rk[1].money<=500) return "⚔️ 最終レース前、まだ逆転可能！次のG1ダービーで決着！";
+    return "🏆 次はいよいよ最終G1ダービー！大逆転のラストチャンス！";
+  }
+  // 残金わずかなプレイヤー
+  var lowP=-1, lowMoney=1e9;
+  for(var p=0;p<rk.length;p++){ if(rk[p].alive && rk[p].money<lowMoney){ lowMoney=rk[p].money; lowP=rk[p].p; } }
+  if(lowP>=0 && lowMoney>0 && lowMoney<=300) return "P"+(lowP+1)+"は残金わずか。次レースが勝負どころ！";
+  // リード差で文言
+  if(activePlayerCount>=2){
+    var gap=rk[0].money-rk[1].money;
+    if(gap>=1500) return "P"+(leader.p+1)+"が大きくリード！追う側は高配当狙いか？";
+    if(gap<=300) return "首位は大接戦！次のレースで順位が入れ替わるかも？";
+    return "P"+(leader.p+1)+"が一歩リード。次は逆転なるか！？";
+  }
+  return "次のレースも当てて所持金を増やそう！";
+}
+
+/* レース後ハイライト（盛り上げコメント）を最大3件返す */
+function resultHighlights(){
+  var lines=[], rk=moneyRanking();
+  var anyHit=false, topPay=0, topPayP=-1, bestOdds=0, bestOddsP=-1;
+  for(var p=0;p<activePlayerCount;p++){
+    var r=players[p].lastResult; if(!r) continue;
+    if(r.hit) anyHit=true;
+    if(r.maxTicketPay>topPay){ topPay=r.maxTicketPay; topPayP=p; }
+    if(r.bestOddsHit>bestOdds){ bestOdds=r.bestOddsHit; bestOddsP=p; }
+  }
+  // 優先度順に追加（先頭3件を表示）。脱落・首位逆転は重要なので上位に。
+  // 1) 馬連的中で首位
+  var leaderP=rk[0].p, lr=players[leaderP].lastResult;
+  if(lr && lr.hit && lr.hitTypes.indexOf("umaren")!==-1 && rk.length>1 && rk[0].money>rk[1].money){
+    lines.push("🔥 P"+(leaderP+1)+"、馬連的中で一気に首位！");
+  }
+  // 2) 脱落
+  for(var e=0;e<activePlayerCount;e++){
+    var er=players[e].lastResult;
+    if(er && er.newlyEliminated) lines.push("💀 残金0円でP"+(e+1)+"が脱落…");
+  }
+  // 3) 全員不的中／的中ハイライト
+  if(!anyHit){
+    lines.push("😱 全員不的中、波乱の決着！");
+  }else{
+    if(topPayP>=0 && topPay>0) lines.push("💰 P"+(topPayP+1)+"、"+yen(topPay)+"円の払戻でガッツポーズ！");
+    if(bestOddsP>=0 && bestOdds>=15 && bestOddsP!==topPayP) lines.push("🎯 P"+(bestOddsP+1)+"、"+bestOdds.toFixed(1)+"倍の大穴を的中！");
+    for(var q=0;q<activePlayerCount;q++){
+      var rr=players[q].lastResult;
+      if(rr && rr.hit && rr.hitTypes.length===1 && rr.hitTypes[0]==="place" && rr.pay>rr.bet){
+        lines.push("👍 P"+(q+1)+"、複勝で堅実に回収！"); break;
+      }
+    }
+  }
+  // 4) 最終レース前の首位接戦（第4レース後）
+  if(raceNoInSeries===MAX_RACES-1 && rk.length>=2 && rk[0].alive && rk[1].alive){
+    if(rk[0].money-rk[1].money<=400){
+      lines.push("⚔️ 最終レース前、首位争いが接戦！次のダービーで決まる！");
+    }
+  }
+  return lines.slice(0,3);
 }
 
 function showResultOverlay(){
@@ -1060,6 +1382,14 @@ function showResultOverlay(){
   }
   html+="</div>";
 
+  // レース後ハイライト
+  var hl=resultHighlights();
+  if(hl.length){
+    html+="<div class='highlightBox'>";
+    for(var hi2=0;hi2<hl.length;hi2++) html+="<div class='hlLine'>"+hl[hi2]+"</div>";
+    html+="</div>";
+  }
+
   html+="<div class='resultPlayers'>";
   for(var p=0;p<activePlayerCount;p++){
     var pl=players[p], r=pl.lastResult;
@@ -1069,7 +1399,7 @@ function showResultOverlay(){
     }
     html+="<div class='rpRow "+(r.hit?"hit":"lose")+"'><span class='who'>P"+(p+1)+"</span>"
       +"<span class='judge "+(r.hit?"hit":"lose")+"'>"+(r.hit?"的中":"ハズレ")+"</span>"
-      +"<span class='det'>"+r.dets.join("<br>")+"</span>"
+      +"<span class='det'>"+r.dets.join("")+"</span>"
       +"<span class='cash'>"+yen(pl.money)+"円"+(pl.alive?"":"<br><span class='outBadge'>脱落</span>")+"</span></div>";
   }
   html+="</div>";
@@ -1079,6 +1409,10 @@ function showResultOverlay(){
   html+="<div class='rankStrip' style='justify-content:center'>";
   for(var k=0;k<rk.length;k++){ html+="<div class='rankPill"+(rk[k].alive?"":" out")+"'><span class='pos'>"+(k+1)+"位</span>P"+(rk[k].p+1)+" "+yen(rk[k].money)+"円</div>"; }
   html+="</div>";
+
+  // 次レースへのひとこと
+  var nc=nextRaceComment(rk);
+  if(nc) html+="<div class='nextComment'>"+nc+"</div>";
 
   // 次へ
   var last=(raceNoInSeries>=MAX_RACES);
@@ -1112,6 +1446,22 @@ function showChampion(){
   html+="<div class='champTitle'>★ みんなでダービー シリーズ優勝 ★</div>";
   html+="<div class='champName'>P"+(champ.p+1)+"</div>";
   html+="<div class='champMoney'>最終所持金 "+yen(champ.money)+"円</div>";
+
+  // タイトル：最大払戻 / 的中王 / 大穴ハンター
+  var bestPayP=-1,bestPay=0, mostHitP=-1,mostHit=0, upsetP=-1,upsetOdds=0;
+  for(var s=0;s<players.length;s++){
+    var st=players[s].stats||{hits:0,maxPay:0,bestOdds:0};
+    if(st.maxPay>bestPay){ bestPay=st.maxPay; bestPayP=s; }
+    if(st.hits>mostHit){ mostHit=st.hits; mostHitP=s; }
+    if(st.bestOdds>upsetOdds){ upsetOdds=st.bestOdds; upsetP=s; }
+  }
+  html+="<div class='champAwards'>";
+  if(bestPayP>=0&&bestPay>0) html+="<div class='awardRow'><span>💰 最大払戻</span><b>P"+(bestPayP+1)+"</b><em>"+yen(bestPay)+"円</em></div>";
+  if(mostHitP>=0&&mostHit>0) html+="<div class='awardRow'><span>🎯 的中王</span><b>P"+(mostHitP+1)+"</b><em>"+mostHit+"回的中</em></div>";
+  if(upsetP>=0&&upsetOdds>=10) html+="<div class='awardRow'><span>🐎 大穴ハンター</span><b>P"+(upsetP+1)+"</b><em>"+upsetOdds.toFixed(1)+"倍 "+(players[upsetP].stats.bestOddsLabel||"")+"</em></div>";
+  if(!(bestPay>0)) html+="<div class='awardRow'><span>記録</span><em>シリーズ通して的中なし…リベンジだ！</em></div>";
+  html+="</div>";
+
   html+="<div class='champList'><div class='rankStrip' style='flex-direction:column'>";
   for(var i=0;i<rk.length;i++){
     html+="<div class='rankPill"+(rk[i].alive?"":" out")+"'><span class='pos'>"+(i+1)+"位</span>P"+(rk[i].p+1)+"　"+yen(rk[i].money)+"円"+(rk[i].alive?"":" 脱落")+"</div>";
@@ -1143,13 +1493,7 @@ function restartSeries(){
   $("oddsScreen").style.display="none";
   $("raceScreen").style.display="none";
   $("startScreen").style.display="block";
-  renderStartRanking();
   window.scrollTo(0,0);
-}
-
-function renderStartRanking(){
-  var el=$("startRanking");
-  if(!players.length){ el.innerHTML=""; return; }
 }
 
 /* ============================================================
