@@ -132,7 +132,7 @@ input[type=number]{width:108px; text-align:right;}
 
 #raceWindow{position:relative; width:100%; height:60vh; max-height:460px; min-height:300px;
   overflow:hidden; border-radius:16px; border:2px solid #08160d; background:#7ec0ee;}
-#world{position:absolute; left:0; top:0; width:6600px; height:680px; transform-origin:0 0;
+#world{position:absolute; left:0; top:0; width:7300px; height:680px; transform-origin:0 0;
   will-change:transform;}
 .sky{position:absolute; left:0; top:0; width:100%; height:260px;
   background:linear-gradient(#8fd0f5 0%,#cfeafd 70%,#eef9ff 100%);}
@@ -141,16 +141,29 @@ input[type=number]{width:108px; text-align:right;}
              radial-gradient(80px 50px at 26% 70%,#4f9e4f 60%,transparent 61%),
              radial-gradient(70px 45px at 55% 65%,#5fae5f 60%,transparent 61%),
              radial-gradient(90px 55px at 82% 72%,#4f9e4f 60%,transparent 61%);}
-.crowd{position:absolute; left:0; top:262px; width:100%; height:46px;
-  background:repeating-linear-gradient(90deg,#b94 0 8px,#a83 8px 16px,#cc9 16px 24px,#97a 24px 32px);
-  opacity:.55;}
+/* 観客スタンド（CSSのみ・色とりどりの観客ドット2列） */
+.crowd{position:absolute; left:0; top:256px; width:100%; height:50px;
+  background:
+    radial-gradient(3px 3px at 6px 12px,#ffd9b3 60%,transparent 62%),
+    radial-gradient(3px 3px at 16px 9px,#9acbe6 60%,transparent 62%),
+    radial-gradient(3px 3px at 26px 13px,#f6a98a 60%,transparent 62%),
+    radial-gradient(3px 3px at 36px 10px,#c9b08a 60%,transparent 62%),
+    radial-gradient(3px 3px at 11px 26px,#bcd9f0 60%,transparent 62%),
+    radial-gradient(3px 3px at 21px 28px,#ffcf8a 60%,transparent 62%),
+    radial-gradient(3px 3px at 31px 25px,#dab0c0 60%,transparent 62%),
+    radial-gradient(3px 3px at 1px 27px,#a8cfe6 60%,transparent 62%),
+    linear-gradient(180deg,#6a5340 0%,#4a3a2c 60%,#3a2e22 100%);
+  background-size:40px 100%,40px 100%,40px 100%,40px 100%,40px 100%,40px 100%,40px 100%,40px 100%,100% 100%;
+  background-repeat:repeat-x;
+  opacity:.92;}
 .rail{position:absolute; left:0; width:100%; height:6px; background:var(--rail);
   box-shadow:0 0 0 1px #aaa;}
 .railTop{top:300px;} .railBottom{top:610px;}
+/* 土（ダート）のコース */
 .track{position:absolute; left:0; top:306px; width:100%; height:304px;
-  background:linear-gradient(180deg,var(--turf) 0%,var(--turf2) 100%);}
+  background:linear-gradient(180deg,#c79257 0%,#b07a44 50%,#9a6735 100%);}
 .track::after{content:""; position:absolute; inset:0;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 120px,rgba(0,0,0,.05) 120px 240px);}
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 120px,rgba(0,0,0,.07) 120px 240px);}
 .boardM{position:absolute; top:312px; width:54px; height:30px; transform:translateX(-50%);
   background:#143; color:#fff; font-size:12px; font-weight:900; border-radius:5px;
   display:flex; align-items:center; justify-content:center; border:2px solid #fff;}
@@ -182,14 +195,68 @@ input[type=number]{width:108px; text-align:right;}
   background:#1456c8; color:#fff; font-weight:900; font-size:10px; line-height:1.2;
   padding:1px 5px; border-radius:6px; white-space:nowrap; border:1px solid #fff;
   box-shadow:0 1px 3px rgba(0,0,0,.5);}
-/* ----- 騎手（CSSのみ・馬の背に乗る） ----- */
-.jockey{position:absolute; left:40px; top:4px; width:22px; height:26px; z-index:2; pointer-events:none;}
-.jockeyBody{position:absolute; left:1px; top:11px; width:15px; height:13px;
+/* ----- 騎手（CSS/HTMLのみ・馬の背に前傾姿勢で乗る／少し大きめ） ----- */
+.jockey{position:absolute; left:27px; top:-5px; width:44px; height:42px; z-index:6; pointer-events:none;}
+/* 胴体（勝負服・前傾） */
+.jockeyBody{position:absolute; left:5px; top:17px; width:26px; height:17px;
+  background:var(--silk,#d23); border:1px solid rgba(0,0,0,.4);
+  border-radius:12px 14px 7px 7px; transform:rotate(-20deg); transform-origin:left bottom;
+  box-shadow:0 1px 2px rgba(0,0,0,.45);}
+/* 頭（肌色） */
+.jockeyHead{position:absolute; left:20px; top:6px; width:14px; height:14px; border-radius:50%;
+  background:#f3cda6; border:1px solid rgba(0,0,0,.3); box-sizing:border-box;}
+/* ヘルメット（勝負服色＋前向きのつば） */
+.jockeyCap{position:absolute; left:17px; top:0; width:17px; height:11px;
+  background:var(--silk,#d23); border:1px solid rgba(0,0,0,.4);
+  border-radius:9px 9px 4px 4px; box-sizing:border-box;}
+.jockeyCap::after{content:""; position:absolute; left:14px; top:6px; width:10px; height:5px;
+  background:var(--silk,#d23); border:1px solid rgba(0,0,0,.4); border-left:none;
+  border-radius:0 4px 4px 0;}
+/* 腕（手綱へ前方に伸ばす） */
+.jockeyArm{position:absolute; left:22px; top:21px; width:17px; height:7px;
   background:var(--silk,#d23); border:1px solid rgba(0,0,0,.35);
-  border-radius:8px 8px 5px 5px/9px 9px 4px 4px; transform:rotate(-14deg);
-  box-shadow:0 1px 2px rgba(0,0,0,.4);}
-.jockeyHead{position:absolute; left:8px; top:0; width:11px; height:11px; border-radius:50%;
-  background:#f3cda6; border:2px solid var(--silk,#d23); box-sizing:border-box;}
+  border-radius:4px; transform:rotate(24deg); transform-origin:left center;
+  box-shadow:0 1px 1px rgba(0,0,0,.3);}
+
+/* ----- 天気の視覚演出（CSSのみ・追加DOMは#weatherLayer 1個。背景パターンをbackground-positionで流す） -----
+   z-index:20＝背景/馬(#world)より前・実況(z30)/節目(z40)より後ろ。半透明で視認性を確保。 */
+#weatherLayer{position:absolute; inset:0; z-index:20; pointer-events:none; overflow:hidden;}
+/* 雨：細い斜線を2層で上から下へ */
+#weatherLayer.rain{
+  background-image:
+    repeating-linear-gradient(100deg, transparent 0 9px, rgba(195,218,255,.30) 9px 10px, transparent 10px 18px),
+    repeating-linear-gradient(100deg, transparent 0 14px, rgba(170,202,255,.18) 14px 15px, transparent 15px 30px);
+  background-size:50px 50px, 80px 80px;
+  animation:wxRain .5s linear infinite; opacity:.9;}
+@keyframes wxRain{ to{ background-position:-9px 50px, -14px 80px; } }
+/* 雪：白い小さな丸を複数層でゆっくり落下＋横揺れ */
+#weatherLayer.snow{
+  background-image:
+    radial-gradient(circle 2.4px at 25px 25px, rgba(255,255,255,.95) 99%, transparent 100%),
+    radial-gradient(circle 2px at 80px 60px, rgba(255,255,255,.85) 99%, transparent 100%),
+    radial-gradient(circle 1.7px at 125px 30px, rgba(255,255,255,.8) 99%, transparent 100%),
+    radial-gradient(circle 2px at 160px 95px, rgba(255,255,255,.85) 99%, transparent 100%);
+  background-size:150px 150px,150px 150px,190px 190px,210px 210px;
+  animation:wxSnow 7s linear infinite; opacity:.92;}
+@keyframes wxSnow{ to{ background-position:14px 150px,-12px 150px,10px 190px,-8px 210px; } }
+/* 風：薄い横流線を左→右へ（ときどき強めの線） */
+#weatherLayer.wind{
+  background-image:
+    repeating-linear-gradient(88deg, transparent 0 60px, rgba(255,255,255,.13) 60px 64px, transparent 64px 170px),
+    repeating-linear-gradient(90deg, transparent 0 130px, rgba(255,255,255,.22) 130px 137px, transparent 137px 380px);
+  background-size:230px 100%, 510px 100%;
+  animation:wxWind 1.1s linear infinite; opacity:.82;}
+@keyframes wxWind{ to{ background-position:230px 0, 510px 0; } }
+/* 晴れ：右上に太陽＋明るいグラデ */
+#weatherLayer.sunny{
+  background-image:radial-gradient(60% 45% at 85% 12%, rgba(255,246,200,.40), rgba(255,240,170,.10) 45%, transparent 65%);}
+#weatherLayer.sunny::before{
+  content:""; position:absolute; right:6%; top:7%; width:52px; height:52px; border-radius:50%;
+  background:radial-gradient(circle,#fff6cf 0%,#ffe488 50%,#ffd45e 72%,rgba(255,212,94,0) 76%);
+  box-shadow:0 0 26px 10px rgba(255,228,150,.5);
+  animation:wxSun 3.6s ease-in-out infinite;}
+@keyframes wxSun{ 0%,100%{transform:scale(1);opacity:.9} 50%{transform:scale(1.07);opacity:1} }
+@media(max-width:520px){ #weatherLayer.sunny::before{ width:42px; height:42px; } }
 
 /* ----- 実況 (Phase2) ----- */
 #liveCommentary{position:absolute; left:0; right:0; bottom:0; z-index:30;
@@ -291,7 +358,8 @@ input[type=number]{width:108px; text-align:right;}
         <div class="infoChip"><b id="oddsRaceNo">第1R</b>シリーズ</div>
         <div class="infoChip"><b id="oddsGrade">G3</b>グレード</div>
         <div class="infoChip"><b id="oddsDist">1600m</b>距離</div>
-        <div class="infoChip"><b id="oddsBaba">良</b>馬場</div>
+        <div class="infoChip"><b id="oddsWeather">晴れ</b>天気</div>
+        <div class="infoChip"><b id="oddsPattern">平均型</b>展開想定</div>
       </div>
     </div>
 
@@ -330,12 +398,11 @@ input[type=number]{width:108px; text-align:right;}
             <tr><td>単勝</td><td>1着を当てる</td><td><span class="lv lv2">ふつう</span></td><td>選んだ馬しだい</td></tr>
             <tr><td>複勝</td><td>3着以内を当てる</td><td><span class="lv lv1">当たりやすい</span></td><td><span class="ret r1">低め</span></td></tr>
             <tr><td>ワイド</td><td>選んだ2頭が両方3着以内</td><td><span class="lv lv2">中間</span></td><td><span class="ret r2">中間</span></td></tr>
-            <tr><td>馬連</td><td>選んだ2頭が1着・2着（順不同）</td><td><span class="lv lv3">当たりにくい</span></td><td><span class="ret r3">高め</span></td></tr>
           </tbody>
         </table>
       </div>
     </details>
-    <div class="notice">単勝・複勝＝1頭／ワイド・馬連＝2頭を選択。所持金0円の人は脱落です。</div>
+    <div class="notice">単勝・複勝＝1頭／ワイド＝2頭を選択。1人1レース1枚。所持金0円の人は脱落です。</div>
     <div id="betArea"></div>
 
     <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
@@ -351,7 +418,7 @@ input[type=number]{width:108px; text-align:right;}
         <div class="infoChip"><b id="raceGrade">G3</b><span id="raceName">レース</span></div>
         <div class="infoChip"><b id="lapInfo">残り--m</b>残り距離</div>
         <div class="infoChip"><b id="leaderInfo">--</b>先頭</div>
-        <div class="infoChip"><b id="babaInfo">良</b>馬場</div>
+        <div class="infoChip"><b id="weatherInfo">晴れ</b>天気</div>
       </div>
     </div>
 
@@ -365,6 +432,7 @@ input[type=number]{width:108px; text-align:right;}
         <div class="track"></div>
         <!-- 距離マーカー / スタート・ゴールは生成 -->
       </div>
+      <div id="weatherLayer" class="weatherLayer"></div>
       <div id="milestone"></div>
       <div id="liveCommentary"><span class="tick">●</span>ゲート入りました。発走を押してください。</div>
     </div>
@@ -394,6 +462,9 @@ var marks=["◎","○","▲","△","☆","△","☆","△"];
 var conditions=[{n:"絶好調",m:0.06,w:12},{n:"好調",m:0.03,w:26},{n:"普通",m:0,w:42},{n:"不調",m:-0.05,w:20}];
 var temperaments=["素直","気分屋","大舞台型","ムラ駆け"];
 var babaList=["良","稍重","重","不良"];
+/* 天気（4種・レースごとにランダム）と展開タイプ */
+var weatherList=["晴れ","雨","風","雪"];
+var racePatternList=["平均型","混戦","逃げ切り","大逃げ","差し決着","追込決着"];
 
 var STORAGE_KEY="minna_derby_recent5_records_v1";
 var COUNT_KEY="minna_derby_recent5_count_v1";
@@ -410,11 +481,15 @@ var horses=[];                   // 走行ランタイム
 var finished=[];                 // ゴール順index
 var records={}, lastRun={}, raceCount=0;
 var currentGrade="G3", currentDist=1600, currentBaba="良", currentRaceName="";
+var currentWeather="晴れ", weatherFavoredStyle=null;   // 晴れ・風はランダム有利脚質
+var racePattern="平均型", frontRunnerIdx=-1;           // 展開タイプ・逃げ/大逃げの主役
+var raceStarted=false, raceFinished=false;             // 明確な状態管理
 var raceState="idle";            // idle|running|done
 var rafId=null, lastTs=0, startTs=0;
 var leaderIdx=-1, prevLeaderIdx=-1;
 var commentaryDoneRemain={};     // 実況/節目の発火管理
 var camScale=0.55;
+var _camTx=0;                    // カメラ横位置の平滑化用（ズームは行わない）
 
 /* ============================================================
    小道具
@@ -492,14 +567,15 @@ function setupRaceMeta(){
   if(raceNoInSeries>=MAX_RACES){ currentGrade="G1"; currentDist=2400; currentRaceName="みんなでダービー"; }
   else if(raceNoInSeries===1){ currentGrade="G3"; currentDist=1600; currentRaceName="第"+raceNoInSeries+"レース"; }
   else { currentGrade=(Math.random()<0.35?"G2":"G3"); currentDist=pick([1600,1800,2000]); currentRaceName="第"+raceNoInSeries+"レース"; }
-  currentBaba=weightedBaba();
+  // 天気は buildEntries 内で（オッズ作り直しでも再抽選されるよう）決める
 }
-function weightedBaba(){
-  var w=[["良",62],["稍重",20],["重",12],["不良",6]];
-  var t=0; for(var i=0;i<w.length;i++) t+=w[i][1];
-  var r=Math.random()*t, a=0;
-  for(var j=0;j<w.length;j++){ a+=w[j][1]; if(r<=a) return w[j][0]; }
-  return "良";
+/* 天気を抽選し、馬場（内部の適性計算用）を天気から導く。
+   晴れ・風はランダムに有利脚質を決め「どの脚質が有利か分からない」展開にする。 */
+function pickWeather(){
+  currentWeather=pick(weatherList);
+  if(currentWeather==="晴れ"||currentWeather==="風") weatherFavoredStyle=pick(styles);
+  else weatherFavoredStyle=null;   // 雨・雪は逃げ有利（脚質ボーナスで表現）
+  currentBaba=(currentWeather==="晴れ")?"良":(currentWeather==="風")?"稍重":(currentWeather==="雨")?"重":"不良";
 }
 
 /* ============================================================
@@ -547,6 +623,7 @@ function affinityBonus(e){
 function buildEntries(){
   loadRecords();
   finished=[]; entries=[];
+  pickWeather();                 // 天気＋（晴れ/風の）有利脚質＋馬場を決定
   var runners=select12();
   var nums=shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
   var js=shuffle(jockeyNames.slice());
@@ -601,17 +678,31 @@ function buildEntries(){
     s.placeOdds=round1(place);
     s.mark=(j<5?marks[j]:pick(["△","☆",""]));
   }
+  assignPattern();               // 展開タイプ＋逃げ/大逃げの主役馬を決定
 }
 
-/* 2頭組合せ配当の概算
-   方針：単勝・複勝＝当てやすくリターン控えめ／ワイド＝中間／馬連＝リターン大きめ */
-function umarenOdds(i,j){
-  // 馬連はリターン大きめ（divisorを小さく）
+/* レース展開タイプを抽選。逃げ/大逃げ用の主役（逃げ・先行の能力上位）も決める。
+   天気を少し反映（雨・雪は逃げ切り/大逃げが出やすい）。 */
+function assignPattern(){
+  frontRunnerIdx=-1; var best=-1;
+  for(var i=0;i<entries.length;i++){
+    var st=entries[i].style;
+    if(st==="逃げ"||st==="先行"){ var w=entries[i].ability+(st==="逃げ"?0.15:0); if(w>best){ best=w; frontRunnerIdx=i; } }
+  }
+  if(frontRunnerIdx<0){ for(var j=0;j<entries.length;j++){ if(entries[j].ability>best){ best=entries[j].ability; frontRunnerIdx=j; } } }
+  var pool=[["平均型",26],["混戦",22],["差し決着",16],["逃げ切り",15],["追込決着",11],["大逃げ",10]];
+  if(currentWeather==="雨"||currentWeather==="雪") pool=[["平均型",22],["混戦",16],["差し決着",10],["逃げ切り",24],["追込決着",6],["大逃げ",22]];
+  var t=0; for(var k=0;k<pool.length;k++) t+=pool[k][1];
+  var r=Math.random()*t, a=0; racePattern="平均型";
+  for(var m=0;m<pool.length;m++){ a+=pool[m][1]; if(r<=a){ racePattern=pool[m][0]; break; } }
+}
+
+/* ワイド配当の概算（2頭の単勝オッズ積をベースに算出する内部計算） */
+function comboBaseOdds(i,j){
   return round1(clamp(entries[i].odds*entries[j].odds/1.9,3.0,99999));
 }
 function wideOdds(i,j){
-  // ワイドは馬連の中間（常に馬連より低い）
-  return round1(clamp(umarenOdds(i,j)/3.8,1.3,999));
+  return round1(clamp(comboBaseOdds(i,j)/3.8,1.3,999));
 }
 
 /* ============================================================
@@ -669,7 +760,7 @@ function buildBetArea(){
     html+="<div class='betRow'>";
     html+="<label>馬券</label><select id='type"+p+"' onchange='onBetChange("+p+")'>"
       +"<option value='win'>単勝</option><option value='place'>複勝</option>"
-      +"<option value='wide'>ワイド</option><option value='umaren'>馬連</option></select>";
+      +"<option value='wide'>ワイド</option></select>";
     html+="<div class='horse2Wrap'>";
     html+="<select id='h1_"+p+"' onchange='onBetChange("+p+")'>"+horseOptions(0)+"</select>";
     html+="<select id='h2_"+p+"' class='hideEl' onchange='onBetChange("+p+")'>"+horseOptions(1)+"</select>";
@@ -684,7 +775,7 @@ function buildBetArea(){
 }
 function onBetChange(p){
   var type=$("type"+p).value;
-  var two=(type==="wide"||type==="umaren");
+  var two=(type==="wide");
   var h2=$("h2_"+p);
   if(h2) h2.classList.toggle("hideEl",!two);
   // 同一馬禁止
@@ -703,11 +794,10 @@ function onBetChange(p){
   var o, feel=betFeel[type];
   if(type==="win"){ o=entries[i1].odds; hint.textContent="単勝 "+entries[i1].no+"番 が1着で約 "+yen(Math.floor(bet*o))+"円　["+feel+"]"; }
   else if(type==="place"){ o=entries[i1].placeOdds; hint.textContent="複勝 "+entries[i1].no+"番 が3着以内で約 "+yen(Math.floor(bet*o))+"円　["+feel+"]"; }
-  else if(type==="wide"){ var i2=Number(h2.value); o=wideOdds(i1,i2); hint.textContent="ワイド "+entries[i1].no+"-"+entries[i2].no+" 両方3着以内で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）　["+feel+"]"; }
-  else { var j2=Number(h2.value); o=umarenOdds(i1,j2); hint.textContent="馬連 "+entries[i1].no+"-"+entries[j2].no+" が1・2着で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）　["+feel+"]"; }
+  else { var i2=Number(h2.value); o=wideOdds(i1,i2); hint.textContent="ワイド "+entries[i1].no+"-"+entries[i2].no+" 両方3着以内で約 "+yen(Math.floor(bet*o))+"円（"+o.toFixed(1)+"倍）　["+feel+"]"; }
 }
 /* 券種ごとの当たりやすさ・配当の雰囲気 */
-var betFeel={win:"配当は馬しだい", place:"当たりやすい/配当低め", wide:"中間", umaren:"当たりにくい/配当高め"};
+var betFeel={win:"配当は馬しだい", place:"当たりやすい/配当低め", wide:"中間"};
 
 /* ============================================================
    オッズ画面表示
@@ -733,7 +823,7 @@ function renderFocusHorses(){
   if(baba<0){ for(var c=0;c<entries.length;c++){ if(used[c]) continue; if(entries[c].trackAffinity==="万能"){ baba=c; break; } } }
   if(baba>=0){ used[baba]=true;
     var aff=entries[baba].trackAffinity;
-    cards.push({cls:"baba",tag:"馬場巧者",idx:baba,why:"馬場"+currentBaba+"に"+(aff==="万能"?"オールラウンド対応":"ピッタリ（"+aff+"巧者）")}); }
+    cards.push({cls:"baba",tag:"天気巧者",idx:baba,why:"天気"+currentWeather+"（"+currentBaba+"馬場）に"+(aff==="万能"?"オールラウンド対応":"ピッタリ（"+aff+"巧者）")}); }
 
   var html="";
   for(var k=0;k<cards.length;k++){
@@ -756,7 +846,8 @@ function goOddsScreen(){
   $("oddsRaceNo").textContent="第"+raceNoInSeries+"R";
   $("oddsGrade").textContent=currentGrade;
   $("oddsDist").textContent=currentDist+"m";
-  $("oddsBaba").textContent=currentBaba;
+  $("oddsWeather").textContent=currentWeather;
+  $("oddsPattern").textContent=racePattern;
   $("startScreen").style.display="none";
   $("raceScreen").style.display="none";
   $("oddsScreen").style.display="block";
@@ -765,6 +856,8 @@ function goOddsScreen(){
 function rebuildOdds(){
   buildEntries(); drawTables(); renderFocusHorses(); buildBetArea();
   $("oddsGrade").textContent=currentGrade;
+  $("oddsWeather").textContent=currentWeather;   // 天気・展開想定も再生成して同期
+  $("oddsPattern").textContent=racePattern;
 }
 
 /* ============================================================
@@ -785,9 +878,9 @@ function confirmBets(){
     else if(type==="place") ticket.odds=entries[i1].placeOdds;
     else{
       var i2=Number($("h2_"+p).value);
-      if(i2===i1){ alert("P"+(p+1)+"：ワイド／馬連は別々の2頭を選んでください。"); return false; }
+      if(i2===i1){ alert("P"+(p+1)+"：ワイドは別々の2頭を選んでください。"); return false; }
       ticket.h2=i2;
-      ticket.odds=(type==="wide")?wideOdds(i1,i2):umarenOdds(i1,i2);
+      ticket.odds=wideOdds(i1,i2);
     }
     pl.bets.push(ticket);
   }
@@ -801,10 +894,10 @@ function confirmAndGoRace(){
 /* ============================================================
    レース画面準備
    ============================================================ */
-var WORLD_W=6600, START_X=320, GOAL_X=6300, TRACK_TOP=320, TRACK_BOT=600;
+var WORLD_W=7300, START_X=320, GOAL_X=6300, TRACK_TOP=320, TRACK_BOT=600;
 function laneY(i){
-  // 縦間隔を広げ、どの馬が伸びているか見やすく（土の範囲を広く使う）
-  var n=12, top=TRACK_TOP+20, bot=TRACK_BOT-18;
+  // 12頭が土（ダート）の範囲内に収まるレーン配置（騎手・タグ込みでも大きくはみ出さない）
+  var n=12, top=TRACK_TOP+46, bot=TRACK_BOT-26;
   return top+(bot-top)*(i/(n-1));
 }
 function buildWorldMarkers(){
@@ -840,7 +933,10 @@ function makeHorses(){
       +"<div class='realHorseRunner'>"
       +"<img class='realHorseImg frameA' src='"+horseFrames[0]+"' alt=''>"
       +"<img class='realHorseImg frameB' src='"+horseFrames[1]+"' alt=''>"
-      +"<div class='jockey' style='--silk:"+jockeyColors[i%jockeyColors.length]+"'><div class='jockeyBody'></div><div class='jockeyHead'></div></div>"
+      +"<div class='jockey' style='--silk:"+jockeyColors[i%jockeyColors.length]+"'>"
+        +"<span class='jockeyArm'></span><span class='jockeyBody'></span>"
+        +"<span class='jockeyHead'></span><span class='jockeyCap'></span>"
+      +"</div>"
       +"</div>";
     $("world").appendChild(el);
     horses.push({ el:el, lane:i, idx:i, progress:0,
@@ -850,7 +946,7 @@ function makeHorses(){
   }
 }
 function placeHorse(h){
-  var run=clamp(h.progress,0,1.25);
+  var run=clamp(h.progress,0,1.16);
   h.x=START_X+(GOAL_X-START_X)*run;
   h.el.style.left=Math.round(h.x-48)+"px";
   h.el.style.top=Math.round(h.y-58)+"px";
@@ -862,13 +958,14 @@ function goRaceScreen(){
   $("raceScreen").style.display="block";
   $("raceGrade").textContent=currentGrade;
   $("raceName").textContent=currentRaceName;
-  $("babaInfo").textContent=currentBaba;
+  $("weatherInfo").textContent=currentWeather;
+  applyWeatherLayer();
   $("lapInfo").textContent="残り"+currentDist+"m";
   $("leaderInfo").textContent="--";
   $("raceMsg").textContent="発走を押してください。";
   $("startRaceBtn").disabled=false; $("startRaceBtn").style.opacity="1";
-  $("liveCommentary").innerHTML="<span class='tick'>●</span>"+currentRaceName+"（"+currentGrade+"・"+currentDist+"m・馬場"+currentBaba+"）まもなく発走！";
-  raceState="idle";
+  $("liveCommentary").innerHTML="<span class='tick'>●</span>"+currentRaceName+"（"+currentGrade+"・"+currentDist+"m・天気"+currentWeather+"）まもなく発走！";
+  raceState="idle"; raceStarted=false; raceFinished=false;
   // 発走前は残り距離演出を一切残さない（前レースのmilestoneが再生される不具合を防止）
   commentaryDoneRemain={};
   resetMilestone();
@@ -880,7 +977,7 @@ function goRaceScreen(){
   window.scrollTo(0,0);
 }
 
-/* 各馬に賭けたプレイヤーのタグ「P1」「P1/P3」を表示（単複ワイド馬連すべての選択馬） */
+/* 各馬に賭けたプレイヤーのタグ「P1」「P1/P3」を表示（単勝・複勝・ワイドの選択馬） */
 function applyPlayerTags(){
   var set=playerPickSet();   // horseIndex -> [playerIndex,...]
   for(var i=0;i<horses.length;i++){
@@ -927,6 +1024,13 @@ function resetMilestone(){
   el.textContent="";
   el.style.opacity="0";
 }
+/* 現在の天気に応じてレース画面の視覚演出（#weatherLayer）を切り替える。
+   チップ表示(currentWeather)と必ず一致。晴れ=sunny/雨=rain/風=wind/雪=snow。 */
+function applyWeatherLayer(){
+  var el=$("weatherLayer"); if(!el) return;
+  var map={"晴れ":"sunny","雨":"rain","風":"wind","雪":"snow"};
+  el.className="weatherLayer "+(map[currentWeather]||"sunny");
+}
 /* プレイヤー本命（賭けた馬）の伸びを検知するための集合 */
 function playerPickSet(){
   var set={};
@@ -937,8 +1041,8 @@ function playerPickSet(){
   return set;
 }
 var _pickSet={}, _favUpsetSaid=false, _pickRunSaid={};
-var _upsetLeadSaid=false, _favSinkSaid=false, _closeFinishSaid=false;
-/* プレイヤー視点の実況用：単複の本命集合・ワイド馬連の2頭組・発火制御 */
+var _upsetLeadSaid=false, _favSinkSaid=false, _closeFinishSaid=false, _congestionSaid=false;
+/* プレイヤー視点の実況用：単複の本命集合・ワイドの2頭組・発火制御 */
 var _honmeiSet={}, _comboTickets=[], _playerComSaid={}, _playerComCount=0;
 var MAX_PLAYER_COM=4;
 function buildPlayerBetInfo(){
@@ -964,11 +1068,11 @@ function playerComment(html){
    ============================================================ */
 function startRace(){
   if(raceState==="running") return;
-  raceState="running";
+  raceState="running"; raceStarted=true; raceFinished=false;
   $("startRaceBtn").disabled=true; $("startRaceBtn").style.opacity="0.5";
   $("raceMsg").textContent="レース中！";
   commentaryDoneRemain={}; _favUpsetSaid=false; _pickRunSaid={}; _pickSet=playerPickSet();
-  _upsetLeadSaid=false; _favSinkSaid=false; _closeFinishSaid=false;
+  _upsetLeadSaid=false; _favSinkSaid=false; _closeFinishSaid=false; _congestionSaid=false;
   _playerComSaid={}; _playerComCount=0; buildPlayerBetInfo();
   prevLeaderIdx=-1;
   for(var i=0;i<horses.length;i++){ horses[i].el.classList.add("run"); }
@@ -1001,30 +1105,86 @@ function phaseSpeed(e,h,prog){
   if(e.temperament==="気分屋" && Math.random()<0.02) s+=rnd(-0.05,0.18);
   else if(e.temperament==="ムラ駆け") s+=rnd(-0.10,0.16);
   else if(e.temperament==="大舞台型" && currentGrade==="G1") s+=0.05;
+  // 天気（雨・雪は逃げ有利／晴れ・風はランダム有利脚質）
+  s+=weatherStyleBonus(e);
+  // 展開タイプ（逃げ切り・大逃げ・差し決着・追込決着）
+  s+=patternBonus(e,h,prog);
   // 安定度→ノイズ量（低いほどブレる）
   var noiseAmp=0.10/Math.max(0.5,e.stability);
   s+=rnd(-noiseAmp,noiseAmp);
   return Math.max(0.4,s);
 }
 
-/* 残り200m以下だけに効く終盤補正（混戦・追い比べ・末脚/スタミナ反映）。
-   補正は小さめ。極端なワープや不自然な逆転は避ける。 */
-function finalStretchFactor(e,h,leadProg,finalThresh){
-  if(h.progress<finalThresh) return 1;                       // 残り200m以前は無補正
-  var t=clamp((h.progress-finalThresh)/(1-finalThresh),0,1); // 残り200m→ゴールで0→1
-  var f=1;
-  f += (e.finishingKick-1)*0.12*t;                           // 末脚の高い馬は終盤伸びる
-  if(e.stamina<1) f += (e.stamina-1)*0.10*t;                 // スタミナ低い馬は少し垂れる
-  // 追い比べ：先頭との差が僅差な馬だけ食らいつく（上位の混戦化）
-  var gap=leadProg-h.progress;
-  if(gap>0 && gap<0.045){
-    var closeness=1-gap/0.045;                               // 差が小さいほど大きく
-    var grit=0.05*closeness*t*(0.6+(e.finishingKick-0.8)*0.5+(e.stability-0.7)*0.25);
-    if(e.temperament==="ムラ駆け") grit+=rnd(-0.01,0.025)*t; // 気性で粘りに僅かな揺らぎ
-    else if(e.temperament==="気分屋") grit+=rnd(-0.008,0.02)*t;
-    f += grit;
+/* 天気による脚質ボーナス（小さめ） */
+function weatherStyleBonus(e){
+  if(currentWeather==="雨"||currentWeather==="雪"){
+    if(e.style==="逃げ") return 0.03;   // 雨雪の逃げ有利は残すが控えめに
+    if(e.style==="先行") return 0.01;
+    return 0;
   }
-  return clamp(f,0.85,1.22);
+  if(weatherFavoredStyle && e.style===weatherFavoredStyle) return 0.04;  // 晴れ・風
+  return 0;
+}
+
+/* 展開タイプによる速度補正（progは進行度0-1）。
+   逃げ切り＝主役が前で粘る／大逃げ＝主役が中盤まで大きく抜け出す（終盤は失速し追いつかれ得る）。 */
+function patternBonus(e,h,prog){
+  var b=0, idx=h.idx;
+  if(racePattern==="逃げ切り"){
+    if(idx===frontRunnerIdx) b+=(prog<0.85?0.05:0.02);
+  }else if(racePattern==="大逃げ"){
+    if(idx===frontRunnerIdx) b+=(prog<0.55?0.18:(prog<0.78?0.07:-0.03));  // 終盤は脚が上がる
+    else if(prog<0.55) b+=-0.025;                      // 後続は中盤やや置かれる
+  }else if(racePattern==="差し決着"){
+    if(e.style==="差し") b+=(prog>0.6?0.05:-0.01);
+  }else if(racePattern==="追込決着"){
+    if(e.style==="追込") b+=(prog>1-400/currentDist?0.08:(prog<0.5?-0.02:0));  // 残り400mから加速
+  }
+  return b;
+}
+
+/* 終盤2ゾーン補正：
+   - 圧縮ゾーン（先頭の残り≲320m）＝先頭付近の2〜6番手を強く引き寄せ「団子」を作る。
+   - 決定ゾーン（先頭の残り≲220m）＝末脚/脚質/スタミナ/前付けフェードで勝敗を決める。
+   速度倍率として滑らかに積分し、ワープは避ける。 */
+function finalStretchFactor(e,h,leadProg,finalThresh){
+  var phaseRemain=(1-leadProg)*currentDist;                  // 先頭から見た残り距離（レース局面）
+  if(phaseRemain>420) return 1;                              // 残り420m以前は無補正
+  var ct=clamp((420-phaseRemain)/420,0,1);                   // 圧縮ゾーン進度 0→1
+  var dz=clamp((220-phaseRemain)/220,0,1);                   // 決定ゾーン進度 0→1
+  var f=1;
+  var closer=(e.style==="差し"||e.style==="追込"||e.style==="まくり");
+
+  // ---- 隊列圧縮（catch-up）：先頭から一定距離内の後続を強く引き寄せて団子に ----
+  var gapWindow=0.11;
+  if(racePattern==="混戦") gapWindow=0.14;
+  var gap=leadProg-h.progress;
+  if(gap>0 && gap<gapWindow){
+    var prox=1-gap/gapWindow;                                // 近いほど大（0..1）
+    var gNear=0.004;                                         // 最接近では引き寄せを弱め無限交代を防ぐ
+    var nearTaper=(gap<gNear)?(gap/gNear):1;
+    var pull=0.34*prox*nearTaper*ct*(0.7+(e.finishingKick-0.8)*0.5);
+    pull *= 1 + clamp(gap*7,0,0.9);                          // 先頭が離すほど後続の追走を強める
+    if(closer) pull*=1.2;
+    if(racePattern==="逃げ切り" && h.idx!==frontRunnerIdx) pull*=0.9;   // 逃げ切りは詰まりにくいが迫れる
+    else if(racePattern==="大逃げ" && h.idx!==frontRunnerIdx) pull*=1.2; // 大逃げは最後に追いつきやすく
+    f += pull;
+  }
+
+  // ---- 決定ゾーン（残り220m以降）：末脚・脚質・スタミナ・前付けフェード ----
+  if(dz>0){
+    f += (e.finishingKick-1)*(closer?0.50:0.30)*dz;          // 末脚（差し・追込・まくりは強い）
+    if(closer) f += 0.05*dz;                                 // 確実に伸びる差し脚
+    f += (e.stamina-1)*0.18*dz;                              // 粘り(>1)／失速(<1)
+    if(e.style==="逃げ") f -= (0.07 + (1-e.stamina)*0.15) * dz;   // 逃げの終盤フェード（低スタミナほど大）
+    else if(e.style==="先行") f -= (0.03 + (1-e.stamina)*0.08) * dz;
+    if(racePattern==="差し決着" && e.style==="差し") f+=0.07*dz;
+    else if(racePattern==="追込決着" && e.style==="追込") f+=0.08*dz;
+    else if(racePattern==="逃げ切り" && h.idx===frontRunnerIdx) f+=0.035*dz; // 主役は粘る
+    var inst=Math.max(0,1.1-e.stability);
+    if(inst>0) f += rnd(-inst*0.08, inst*0.10)*dz;           // 安定度が低い馬は伸びたり止まったり
+  }
+  return clamp(f,0.70,1.6);
 }
 
 function stepRace(ts){
@@ -1032,20 +1192,26 @@ function stepRace(ts){
   if(!lastTs) lastTs=ts;
   var dt=(ts-lastTs)/1000; lastTs=ts;
   if(dt>0.05) dt=0.05;            // タブ復帰時の暴走防止
-  // 1着がゴールするまでの目安時間：距離に応じて
-  var targetSec=18+(currentDist-1600)/400*3;  // 1600m≒18s, 2400m≒24s
+  // 先頭が400mを約5秒で進む速さ（先頭は能力補正で素のtargetSecよりやや速く走る）
+  var targetSec=currentDist/67;   // 例：1600m≒23.9s → 先頭は実測で約400m/5s
   var baseRate=1/targetSec;
 
-  // 終盤補正用：現フレームの先頭進行度と残り200mのしきい値
-  var finalThresh=1-200/currentDist;
-  var leadProg=0;
-  for(var i=0;i<horses.length;i++){ if(horses[i].progress>leadProg) leadProg=horses[i].progress; }
+  // 終盤補正用：現フレームの先頭・2番手の進行度と残り250mのしきい値（団子化を残り250mから）
+  var finalThresh=1-250/currentDist;
+  var leadProg=0, secondProg=0;
+  for(var i=0;i<horses.length;i++){ var p=horses[i].progress;
+    if(p>leadProg){ secondProg=leadProg; leadProg=p; } else if(p>secondProg){ secondProg=p; } }
+  var leadMargin=leadProg-secondProg;   // 先頭と2番手の差（離して逃げているほど大）
 
   for(var i=0;i<horses.length;i++){
-    var h=horses[i]; if(h.progress>=1.25) continue;
+    var h=horses[i]; if(h.progress>=1.16) continue;
     var e=entries[i];
     var sp=phaseSpeed(e,h,clamp(h.progress,0,1));
     sp *= finalStretchFactor(e,h,leadProg,finalThresh);
+    // 終盤、後続を離した単独先頭は脚が少し緩む＝最後に追いつかれやすくする（楽逃げ/大逃げ対策）
+    if(h.progress>=finalThresh && h.progress>=leadProg-1e-9 && leadMargin>0.014){
+      sp *= clamp(1-(leadMargin-0.014)*3.6, 0.83, 1);
+    }
     h.progress += baseRate*sp*dt*(1+(e.ability-0.7)*0.18);
     if(!h.done && h.progress>=1){ h.done=true; finished.push(i); }
     placeHorse(h);
@@ -1065,16 +1231,12 @@ function stepRace(ts){
   // カメラ
   updateCamera(false);
 
-  // 終了条件：1着がゴール後、上位3頭が確定したら結果
-  if(finished.length>=3 || lh.progress>=1){
-    // 先頭がゴールしてから少し走らせて全体を見せる
-    if(lh.progress>=1 && raceState==="running"){
-      // 1着確定。3着まで埋まるか、リーダーが1.12到達で確定
-      if(finished.length>=3 || lh.progress>=1.12){
-        finishRace();
-        return;
-      }
-    }
+  // 終了条件：全12頭がゴール板を通過し、さらに少し駆け抜けてから結果へ
+  var allPassed=(finished.length>=horses.length);
+  if(allPassed){
+    var allCleared=true;
+    for(var z=0;z<horses.length;z++){ if(horses[z].progress<1.12){ allCleared=false; break; } }
+    if(allCleared){ finishRace(); return; }
   }
   rafId=requestAnimationFrame(stepRace);
 }
@@ -1162,6 +1324,17 @@ function handleCommentary(li,remain){
     }
   }
 
+  // 残り250mで先頭付近に5頭以上 → 「混戦」を中央表示（判定距離を少し広げる）
+  if(!_congestionSaid && remain<=250 && remain>40 && ord.length>=5){
+    var leadC=horses[ord[0]].progress, m5=0;
+    for(var qc=0;qc<ord.length;qc++){ if(leadC-horses[ord[qc]].progress<=0.06) m5++; }
+    if(m5>=5){
+      _congestionSaid=true;
+      showMilestone("混戦！");
+      setCommentary("大混戦！ 先頭に"+m5+"頭がひしめき合う！","comLead");
+    }
+  }
+
   // ゴール前で3頭以上が接戦
   if(!_closeFinishSaid && remain<=250 && remain>40 && ord.length>=3){
     var lead=horses[ord[0]].progress;
@@ -1185,14 +1358,13 @@ function handleCommentary(li,remain){
         if(playerComment(whoA+"が選んだ "+entries[hi].no+"番 "+entries[hi].name+" が先頭争い！")) break;
       }
     }
-    // B) 馬連／ワイド候補の2頭がともに上位(4位以内)
+    // B) ワイド候補の2頭がともに上位(4位以内)
     if(_playerComCount<MAX_PLAYER_COM){
       for(var ci=0;ci<_comboTickets.length;ci++){
         var ct=_comboTickets[ci], ckey="combo"+ct.p+"_"+ci;
         if(!_playerComSaid[ckey] && rankOf[ct.h1]<=4 && rankOf[ct.h2]<=4){
           _playerComSaid[ckey]=true;
-          var lbl=(ct.type==="umaren")?"馬連":"ワイド";
-          if(playerComment("P"+(ct.p+1)+"の"+lbl+"候補2頭が上位に来ている！（"+entries[ct.h1].no+"番・"+entries[ct.h2].no+"番）")) break;
+          if(playerComment("P"+(ct.p+1)+"のワイド候補2頭が上位に来ている！（"+entries[ct.h1].no+"番・"+entries[ct.h2].no+"番）")) break;
         }
       }
     }
@@ -1214,66 +1386,62 @@ function handleCommentary(li,remain){
 /* ============================================================
    カメラ（Phase2）
    ============================================================ */
+/* カメラ：レース中はズームしない（固定スケール）。
+   横方向のみ追従し、スタート〜残り100mは先頭馬、残り100m〜50mでゴール板へ寄せ、
+   残り50m以降〜先頭通過後はゴール板を画面中央に固定する。 */
 function updateCamera(instant){
   var win=$("raceWindow").getBoundingClientRect();
   if(!horses.length){ return; }
+  // 固定スケール（ウィンドウ高さからトラックが収まる倍率を一度きりに決める＝レース中は不変）
+  var scale=clamp(win.height/430,0.62,1.05);
+  camScale=scale;
+
   var li=leaderIndex();
   var lh=horses[li];
-  var leadProg=clamp(lh.progress,0,1);
-  var remainM=(1-leadProg)*currentDist;
+  var remainM=(1-clamp(lh.progress,0,1))*currentDist;
 
-  // フェーズによる目標スケール（終盤のズームは控えめにし、4〜5番手も入るように）
-  var target;
-  if(leadProg<0.12) target=0.5;            // スタート：引き
-  else if(remainM<=100) target=0.92;       // ゴール前：寄り（強すぎない）
-  else if(remainM<=200) target=0.85;
-  else if(remainM<=400) target=0.78;       // 残り400から少しズーム
-  else if(leadProg<0.55) target=0.62;      // 中盤：先頭集団
-  else target=0.7;
-  camScale += (target-camScale)*(instant?1:0.08);
-
-  // フォーカスX：終盤は上位5頭の重心に寄せ、先頭3頭＋4〜5番手まで画面に収める
-  var focusX;
-  if(remainM<=400){
-    var ord=rankOrder();
-    var k=Math.min(5,ord.length), sum=0;
-    for(var c=0;c<k;c++) sum+=horses[ord[c]].x;
-    focusX=sum/k;
+  // 横のフォーカス
+  var focusX, anchor;
+  if(lh.progress>=1){ focusX=GOAL_X; anchor=0.5; }                  // 先頭がゴール通過後：ゴール板固定
+  else if(remainM<=50){ focusX=GOAL_X; anchor=0.5; }                // 残り50m：ゴール板を中央へ
+  else if(remainM<=100){
+    var kk=(100-remainM)/50;                                        // 100m:0 → 50m:1
+    focusX=lh.x+(GOAL_X-lh.x)*kk;                                   // 先頭→ゴール板へ徐々に
+    anchor=0.56+(0.5-0.56)*kk;
   }else{
-    focusX=lh.x;
+    focusX=lh.x; anchor=0.56;                                       // 先頭追従（前方を少し見せる）
   }
-  var anchor=remainM<=400?0.5:0.6;
-  var tx=win.width*anchor-focusX*camScale;
-  // 端の制限
-  var minTx=win.width-WORLD_W*camScale;
-  if(tx<minTx) tx=minTx;
-  if(tx>0) tx=0;
+  var targetTx=win.width*anchor-focusX*scale;
+  var minTx=win.width-WORLD_W*scale;
+  if(targetTx<minTx) targetTx=minTx;
+  if(targetTx>0) targetTx=0;
+  _camTx += (targetTx-_camTx)*(instant?1:0.12);
 
-  // 縦：トラックを中央へ
-  var midY=(TRACK_TOP+TRACK_BOT)/2;
-  var ty=win.height*0.55-midY*camScale;
+  // 縦：トラック＋騎手が収まるよう中央寄せ（固定）
+  var midY=445;
+  var ty=win.height*0.52-midY*scale;
   if(ty>0) ty=0;
-  if(ty<win.height-680*camScale) ty=win.height-680*camScale;
+  if(ty<win.height-680*scale) ty=win.height-680*scale;
 
-  $("world").style.transform="translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+camScale.toFixed(3)+")";
+  $("world").style.transform="translate("+_camTx.toFixed(1)+"px,"+ty.toFixed(1)+"px) scale("+scale.toFixed(3)+")";
 }
 
 /* ============================================================
    結果確定・払戻
    ============================================================ */
 function finishRace(){
-  raceState="done";
-  // 残りの順位を progress で補完
+  raceState="done"; raceFinished=true;
+  // 全12頭がゴール板を通過済み（finished はゴール通過順で12頭そろっている）
   var ord=rankOrder();
   for(var i=0;i<ord.length;i++){ if(finished.indexOf(ord[i])===-1) finished.push(ord[i]); }
-  // 馬は流して走らせ続ける（演出）→停止
-  setTimeout(stopRace,1500);
+  stopRace();
   $("lapInfo").textContent="ゴール";
-  setCommentary("ゴーーール！ 勝ったのは "+entries[finished[0]].no+"番 "+entries[finished[0]].name+"！","comLead");
+  setCommentary("全馬ゴール！ 勝ったのは "+entries[finished[0]].no+"番 "+entries[finished[0]].name+"！","comLead");
 
   recordResult();
   payout();
-  showResultOverlay();
+  // 駆け抜けを見せてから結果画面へ
+  setTimeout(showResultOverlay,700);
 }
 
 function recordResult(){
@@ -1292,14 +1460,13 @@ function top3Set(){ return [finished[0],finished[1],finished[2]]; }
 
 function judgeTicket(tk){
   var t3=top3Set();
-  var first=finished[0], second=finished[1];
+  var first=finished[0];
   if(tk.type==="win") return {hit:tk.h1===first, odds:tk.odds};
   if(tk.type==="place") return {hit:t3.indexOf(tk.h1)!==-1, odds:tk.odds};
   if(tk.type==="wide") return {hit:(t3.indexOf(tk.h1)!==-1 && t3.indexOf(tk.h2)!==-1), odds:tk.odds};
-  if(tk.type==="umaren") return {hit:((tk.h1===first&&tk.h2===second)||(tk.h1===second&&tk.h2===first)), odds:tk.odds};
   return {hit:false,odds:0};
 }
-var typeLabel={win:"単勝",place:"複勝",wide:"ワイド",umaren:"馬連"};
+var typeLabel={win:"単勝",place:"複勝",wide:"ワイド"};
 /* 馬index → 着順(1始まり)。圏外はnull */
 function finishRank(idx){ var r=finished.indexOf(idx); return r===-1?null:r+1; }
 function rankText(idx){ var r=finishRank(idx); return entries[idx].no+"番は"+(r?r+"着":"着外"); }
@@ -1311,8 +1478,7 @@ function ticketDetail(tk,hit,pay){
   var cond,res;
   if(tk.type==="win"){ cond="1着なら的中"; res=rankText(tk.h1); }
   else if(tk.type==="place"){ cond="3着以内なら的中"; res=rankText(tk.h1); }
-  else if(tk.type==="wide"){ cond="2頭とも3着以内なら的中"; res=rankText(tk.h1)+"・"+rankText(tk.h2); }
-  else { cond="2頭で1・2着なら的中"; res=rankText(tk.h1)+"・"+rankText(tk.h2); }
+  else { cond="2頭とも3着以内なら的中"; res=rankText(tk.h1)+"・"+rankText(tk.h2); }
   var verdict=hit?("<b style='color:var(--gold)'>的中</b> 払戻"+yen(pay)+"円"):"<b>不的中</b>";
   return "<div class='detHead'>"+head+"</div><div class='detWhy'>条件："+cond+" ／ "+res+" → "+verdict+"</div>";
 }
@@ -1387,10 +1553,10 @@ function resultHighlights(){
     if(r.bestOddsHit>bestOdds){ bestOdds=r.bestOddsHit; bestOddsP=p; }
   }
   // 優先度順に追加（先頭3件を表示）。脱落・首位逆転は重要なので上位に。
-  // 1) 馬連的中で首位
+  // 1) ワイド的中で首位
   var leaderP=rk[0].p, lr=players[leaderP].lastResult;
-  if(lr && lr.hit && lr.hitTypes.indexOf("umaren")!==-1 && rk.length>1 && rk[0].money>rk[1].money){
-    lines.push("🔥 P"+(leaderP+1)+"、馬連的中で一気に首位！");
+  if(lr && lr.hit && lr.hitTypes.indexOf("wide")!==-1 && rk.length>1 && rk[0].money>rk[1].money){
+    lines.push("🔥 P"+(leaderP+1)+"、ワイド的中で一気に首位！");
   }
   // 2) 脱落
   for(var e=0;e<activePlayerCount;e++){
@@ -1541,6 +1707,7 @@ function restartSeries(){
   var ov=$("champOverlay"); if(ov) ov.remove();
   commentaryDoneRemain={};
   resetMilestone();
+  var wl=$("weatherLayer"); if(wl) wl.className="weatherLayer";   // 前回の天気演出を残さない
   initSeries(activePlayerCount);
   updateSeriesBadge();
   $("oddsScreen").style.display="none";
