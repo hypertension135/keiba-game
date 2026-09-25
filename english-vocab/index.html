@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="英単語Day26-37" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Day26–37 英単語4択トレーニング</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#64748b;--line:#dbe2ea;--accent:#2563eb;--accent2:#1d4ed8;--ok:#15803d;--okbg:#ecfdf3;--ng:#b91c1c;--ngbg:#fff1f2;--warn:#92400e;--warnbg:#fffbeb}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;-webkit-text-size-adjust:100%}
+    button,select,input{font:inherit}
+    button{touch-action:manipulation}
+    .app{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+    .hero{padding:4px 2px 14px}
+    .hero h1{font-size:clamp(24px,7vw,36px);margin:0 0 7px;line-height:1.15}
+    .hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:0 0 14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .between{justify-content:space-between}
+    .label{font-weight:800;margin:0 0 10px;font-size:15px}
+    .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .seg.two{grid-template-columns:repeat(2,1fr)}
+    .seg input{position:absolute;opacity:0;pointer-events:none}
+    .seg label{border:1px solid var(--line);border-radius:12px;min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:#fff;font-weight:700;cursor:pointer}
+    .seg input:checked+label{border-color:var(--accent);background:#eff6ff;color:#1d4ed8;box-shadow:0 0 0 1px var(--accent) inset}
+    select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:0 12px;background:#fff;color:var(--text);font-size:16px}
+    .btn{min-height:50px;border:0;border-radius:13px;padding:12px 16px;font-weight:800;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#fff;width:100%;font-size:17px}
+    .btn.primary:active{background:var(--accent2)}
+    .btn.secondary{background:#eef2f7;color:#1f2937}
+    .btn.danger{background:#fff1f2;color:#be123c}
+    .btn:disabled{opacity:.48;cursor:not-allowed}
+    .mini{font-size:12px;color:var(--muted)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px;text-align:center}
+    .stat b{display:block;font-size:19px}.stat span{font-size:11px;color:var(--muted)}
+    .progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:8px 0 14px}
+    .bar{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+    .qmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+    .badge{font-size:12px;font-weight:800;border-radius:999px;padding:6px 9px;background:#eef2ff;color:#3730a3}
+    .badge.day{background:#f1f5f9;color:#334155}
+    .prompt{font-size:clamp(31px,10vw,48px);line-height:1.18;text-align:center;font-weight:900;margin:14px 0 22px;overflow-wrap:anywhere}
+    .prompt.jp{font-size:clamp(26px,8vw,39px)}
+    .choices{display:grid;grid-template-columns:1fr;gap:10px}
+    .choice{min-height:58px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:left;padding:12px 14px;font-size:17px;font-weight:800;color:var(--text);cursor:pointer}
+    .choice:focus{outline:3px solid #bfdbfe;outline-offset:2px}
+    .choice.correct{border-color:var(--ok);background:var(--okbg);color:#166534}
+    .choice.wrong{border-color:var(--ng);background:var(--ngbg);color:#991b1b}
+    .choice.dim{opacity:.62}
+    .feedback{display:none;margin-top:14px;border-radius:14px;padding:14px;font-weight:800;line-height:1.55}
+    .feedback.show{display:block}.feedback.ok{background:var(--okbg);color:#166534}.feedback.ng{background:var(--ngbg);color:#991b1b}
+    .next{display:none;margin-top:12px}.next.show{display:block}
+    .note{background:var(--warnbg);color:var(--warn);border:1px solid #fde68a;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5}
+    .mistakes{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .chip{font-size:12px;background:#f1f5f9;border-radius:999px;padding:6px 9px}
+    .summary h2{margin:0 0 8px}.summary p{color:var(--muted)}
+    .hidden{display:none!important}
+    .footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media(min-width:620px){.choices{grid-template-columns:1fr 1fr}.choice{min-height:70px}.card{padding:22px}.app{padding-top:28px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <h1>Day26–37 英単語4択</h1>
+      <p>英→日・日→英・ミックスに対応。間違えた問題は後で再出題され、間違いノートにも残ります。</p>
+    </header>
+
+    <section id="setup" class="card">
+      <div class="label">① 出題方向</div>
+      <div class="seg">
+        <input id="dir-enja" name="dir" type="radio" value="enja"><label for="dir-enja">英 → 日</label>
+        <input id="dir-jaen" name="dir" type="radio" value="jaen"><label for="dir-jaen">日 → 英</label>
+        <input id="dir-mix" name="dir" type="radio" value="mix" checked><label for="dir-mix">両方</label>
+      </div>
+
+      <div class="label" style="margin-top:18px">② 出題順</div>
+      <div class="seg two">
+        <input id="ord-day" name="order" type="radio" value="day" checked><label for="ord-day">Day26→37順</label>
+        <input id="ord-random" name="order" type="radio" value="random"><label for="ord-random">ランダム</label>
+      </div>
+
+      <div class="label" style="margin-top:18px">③ 範囲</div>
+      <select id="day-range" aria-label="出題範囲">
+        <option value="all">Day26〜37 全部（144語）</option>
+        <option value="26">Day26</option><option value="27">Day27</option><option value="28">Day28</option>
+        <option value="29">Day29</option><option value="30">Day30</option><option value="31">Day31</option>
+        <option value="32">Day32</option><option value="33">Day33</option><option value="34">Day34</option>
+        <option value="35">Day35</option><option value="36">Day36</option><option value="37">Day37</option>
+      </select>
+
+      <button id="start" class="btn primary" style="margin-top:18px">学習を開始</button>
+      <div class="footer-actions">
+        <button id="review" class="btn secondary">間違いだけ復習 <span id="review-count"></span></button>
+        <button id="share" class="btn secondary">このアプリを共有</button>
+      </div>
+      <div class="footer-actions">
+        <button id="clear-errors" class="btn danger">間違いノートを消去</button>
+        <button id="clear-stats" class="btn secondary">成績をリセット</button>
+      </div>
+      <div class="note" style="margin-top:14px">不正解の問題は、その場で答えを確認したあと数問後にもう一度出ます。間違えた単語は「間違いノート」に端末内保存されます。</div>
+    </section>
+
+    <section id="quiz" class="hidden">
+      <div class="stats">
+        <div class="stat"><b id="stat-progress">0/0</b><span>進行</span></div>
+        <div class="stat"><b id="stat-correct">0</b><span>正解</span></div>
+        <div class="stat"><b id="stat-errors">0</b><span>今回のミス</span></div>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
+      <section class="card">
+        <div class="qmeta"><span id="day-badge" class="badge day">Day26</span><span id="dir-badge" class="badge">英 → 日</span><span id="retry-badge" class="badge hidden" style="background:#fff7ed;color:#9a3412">再挑戦</span></div>
+        <div id="prompt" class="prompt">word</div>
+        <div id="choices" class="choices"></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <button id="next" class="btn primary next">次の問題へ</button>
+      </section>
+      <div class="row between">
+        <button id="quit" class="btn secondary">終了して設定へ</button>
+        <span id="pending" class="mini"></span>
+      </div>
+    </section>
+
+    <section id="summary" class="card summary hidden">
+      <h2>おつかれさま！</h2>
+      <p id="summary-text"></p>
+      <div id="summary-mistakes" class="mistakes"></div>
+      <button id="again" class="btn primary" style="margin-top:18px">もう一度</button>
+      <button id="summary-review" class="btn secondary" style="width:100%;margin-top:10px">間違いだけ復習</button>
+    </section>
+  </main>
+<script>
+(() => {
+  const WORDS = [
+    [26,'mathematics','数学'],[26,'literature','文学'],[26,'field','畑／野原／分野'],[26,'learn','〜を学ぶ／習得する'],[26,'spelling','つづり／スペル'],[26,'grammar','文法'],[26,'vocabulary','語彙／用語'],[26,'topic','話題／トピック'],[26,'conversation','会話'],[26,'educate','〜を教育する'],[26,'express','〜を表現する'],[26,'duty','義務／仕事'],
+    [27,'suffer','苦しむ'],[27,'cough','せき'],[27,'throat','のど'],[27,'tube','管／チューブ'],[27,'illness','病気'],[27,'advice','助言／アドバイス'],[27,'patient','患者'],[27,'correct','正しい／訂正する'],[27,'ability','能力'],[27,'recover','回復する'],[27,'headache','頭痛'],[27,'stomach','胃／腹'],
+    [28,'dentist','歯医者／歯科医'],[28,'problem','問題／課題'],[28,'pain','苦痛／痛み'],[28,'clinic','医院／診療所'],[28,'remind','〜に思い出させる'],[28,'blood','血／血液'],[28,'nervous','不安な／神経質な'],[28,'remember','〜を覚えている'],[28,'purpose','目的'],[28,'fix','〜を修理する／直す'],[28,'examine','〜を診察する／調べる'],[28,'prevent','〜を防ぐ'],
+    [29,'adventure','冒険'],[29,'climb','登る'],[29,'travel','旅行する'],[29,'exciting','わくわくさせる／刺激的な'],[29,'possible','可能な／できる'],[29,'scientist','科学者'],[29,'develop','〜を発展させる／開発する'],[29,'moment','瞬間'],[29,'view','〜を見る／眺め'],[29,'build','〜を建てる'],[29,'likely','〜しそうな／ありそうな'],[29,'energy','エネルギー／活力'],
+    [30,'human','人間／人間の'],[30,'tool','道具／手段'],[30,'hammer','金づち／ハンマー'],[30,'approach','〜に近づく／取り組み'],[30,'bottom','底'],[30,'reach','〜に届く／達する'],[30,'straight','真っすぐな／率直な'],[30,'thin','薄い／細い／やせた'],[30,'steel','はがね／鋼'],[30,'shape','形／体型'],[30,'lift','〜を持ち上げる'],[30,'science','科学／自然科学'],
+    [31,'safety','安全／安全性'],[31,'steal','〜を盗む'],[31,'account','口座／報告／アカウント'],[31,'detail','詳細／細部'],[31,'control','支配／管理'],[31,'difficult','難しい'],[31,'impossible','不可能な'],[31,'guess','〜を推測する'],[31,'regular','規則的な／定期的な'],[31,'part','一部／部分'],[31,'dozen','12の／ダース'],[31,'real','現実の／本物の'],
+    [32,'discover','〜を発見する'],[32,'create','〜を作り出す'],[32,'glass','ガラス／グラス'],[32,'solid','固体の／固形の'],[32,'material','材料／物質／生地'],[32,'directly','真っすぐに／直接に'],[32,'melt','〜を溶かす／溶ける'],[32,'temperature','温度／気温'],[32,'quality','質／特性／資質'],[32,'same','同じ'],[32,'process','工程／過程／プロセス'],[32,'practical','実用的な／実践的な'],
+    [33,'expect','〜を予期する／予想する'],[33,'ocean','海／大洋'],[33,'coast','海岸／沿岸'],[33,'disappear','消える／見えなくなる'],[33,'stream','小川／流れ'],[33,'shore','海岸／岸'],[33,'sudden','突然の／思いがけない'],[33,'flood','洪水'],[33,'several','いくつかの'],[33,'act','行動する／ふるまう／演じる'],[33,'far','遠くへ／遠い'],[33,'single','たった1つの／独身の／1人用の'],
+    [34,'convenient','便利な／都合のよい'],[34,'join','〜に加わる／参加する'],[34,'nest','巣'],[34,'wooden','木でできた／木製の'],[34,'dig','掘る／掘り出す'],[34,'remove','〜を取り去る／取り除く'],[34,'vegetable','野菜'],[34,'feed','〜に食べ物を与える／えさを与える'],[34,'insect','虫／昆虫'],[34,'spot','場所／地点／斑点'],[34,'contain','〜を含む'],[34,'lay','〜を置く／横たえる／卵を産む'],
+    [35,'amount','量／額'],[35,'different','違った／異なった'],[35,'measure','〜を測る／計量する'],[35,'lack','〜を欠いている／不足'],[35,'heat','熱／熱さ／暑さ'],[35,'degree','度／程度／学位'],[35,'immediately','すぐに／直ちに／直接に'],[35,'steam','水蒸気／蒸気'],[35,'space','宇宙／場所／空間'],[35,'guard','〜を守る／保護する'],[35,'comfortable','快適な／心地よい'],[35,'balance','均衡／釣り合い／バランス'],
+    [36,'dust','ほこり／ちり'],[36,'desert','砂漠'],[36,'spread','広がる／広める'],[36,'ground','地面／土'],[36,'fence','柵／囲い'],[36,'partly','部分的に／ある程度は'],[36,'move','移動する／動く'],[36,'direction','方向／方角'],[36,'effort','努力／試み'],[36,'solve','〜を解決する／解く'],[36,'government','政府'],[36,'activity','活動／運動'],
+    [37,'middle','真ん中／中程度'],[37,'float','浮かぶ／漂う'],[37,'edge','端／縁／刃／鋭さ'],[37,'actually','実際は／実は'],[37,'throw','〜を投げる'],[37,'escape','逃げる／逃れる'],[37,'gather','集まる／集める'],[37,'interested','興味がある'],[37,'lose','〜を失う／なくす'],[37,'demand','〜を要求する'],[37,'global','世界的な／地球規模の'],[37,'discussion','議論／討議']
+  ].map((x,i)=>({id:i+1,day:x[0],en:x[1],ja:x[2]}));
+
+  const $ = s => document.querySelector(s);
+  const setup=$('#setup'), quiz=$('#quiz'), summary=$('#summary');
+  const startBtn=$('#start'), reviewBtn=$('#review'), reviewCount=$('#review-count');
+  const clearErrorsBtn=$('#clear-errors'), clearStatsBtn=$('#clear-stats'), shareBtn=$('#share');
+  const promptEl=$('#prompt'), choicesEl=$('#choices'), feedback=$('#feedback'), nextBtn=$('#next');
+  const dayBadge=$('#day-badge'), dirBadge=$('#dir-badge'), retryBadge=$('#retry-badge');
+  const statProgress=$('#stat-progress'), statCorrect=$('#stat-correct'), statErrors=$('#stat-errors'), bar=$('#bar'), pendingEl=$('#pending');
+
+  let state=null;
+  const LS_ERRORS='vocab2637_error_bank_v1', LS_STATS='vocab2637_stats_v1';
+  const loadErrors=()=>{try{return new Set(JSON.parse(localStorage.getItem(LS_ERRORS)||'[]'))}catch{return new Set()}};
+  const saveErrors=s=>localStorage.setItem(LS_ERRORS,JSON.stringify([...s]));
+  const loadStats=()=>{try{return JSON.parse(localStorage.getItem(LS_STATS)||'{}')}catch{return {}}};
+  const saveStats=s=>localStorage.setItem(LS_STATS,JSON.stringify(s));
+  const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+  const selected=(name)=>document.querySelector(`input[name="${name}"]:checked`).value;
+  const directionFor=(mode)=>mode==='mix'?(Math.random()<.5?'enja':'jaen'):mode;
+
+  function updateHome(){
+    const n=loadErrors().size;
+    reviewCount.textContent=`(${n})`;
+    reviewBtn.disabled=n===0;
+  }
+
+  function makeQuestions(words, mode, order){
+    const base=(order==='random'?shuffle(words):[...words]);
+    return base.map(w=>({word:w,dir:directionFor(mode),retry:false,mastered:false}));
+  }
+
+  function startSession(reviewOnly=false){
+    const mode=selected('dir');
+    const order=selected('order');
+    const range=$('#day-range').value;
+    const errors=loadErrors();
+    let words=WORDS.filter(w=>range==='all'||String(w.day)===range);
+    if(reviewOnly) words=words.filter(w=>errors.has(w.id));
+    if(!words.length){alert('復習する間違いがありません。');return}
+    state={mode,order,reviewOnly,queue:makeQuestions(words,mode,order),current:null,answered:false,totalInitial:words.length,completed:0,correct:0,wrong:0,sessionWrong:new Map(),pendingRetry:new Set(),errors,stats:loadStats()};
+    setup.classList.add('hidden'); summary.classList.add('hidden'); quiz.classList.remove('hidden');
+    nextQuestion();
+  }
+
+  function addRetry(q){
+    const key=`${q.word.id}:${q.dir}`;
+    if(state.pendingRetry.has(key)) return;
+    state.pendingRetry.add(key);
+    const retry={word:q.word,dir:q.dir,retry:true,retryKey:key,mastered:false};
+    const min=3,max=Math.min(7,state.queue.length+1);
+    const offset=state.queue.length ? Math.floor(Math.random()*(Math.max(1,max-min+1)))+Math.min(min,state.queue.length) : 0;
+    const idx=Math.min(state.queue.length,offset);
+    state.queue.splice(idx,0,retry);
+  }
+
+  function nextQuestion(){
+    if(state.queue.length===0){finish();return}
+    state.current=state.queue.shift(); state.answered=false;
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    const q=state.current, w=q.word;
+    dayBadge.textContent=`Day${w.day}`;
+    dirBadge.textContent=q.dir==='enja'?'英 → 日':'日 → 英';
+    retryBadge.classList.toggle('hidden',!q.retry);
+    promptEl.textContent=q.dir==='enja'?w.en:w.ja;
+    promptEl.classList.toggle('jp',q.dir==='jaen');
+    feedback.className='feedback'; feedback.textContent='';
+    nextBtn.className='btn primary next';
+    const answer=q.dir==='enja'?w.ja:w.en;
+    const pool=WORDS.filter(x=>x.id!==w.id).map(x=>q.dir==='enja'?x.ja:x.en);
+    const distractors=[];
+    for(const c of shuffle(pool)){if(c!==answer&&!distractors.includes(c))distractors.push(c);if(distractors.length===3)break}
+    const opts=shuffle([answer,...distractors]);
+    choicesEl.innerHTML='';
+    for(const opt of opts){
+      const b=document.createElement('button'); b.type='button'; b.className='choice'; b.textContent=opt; b.dataset.value=opt;
+      b.addEventListener('click',()=>answerQuestion(b,opt,answer)); choicesEl.appendChild(b);
+    }
+    refreshStats();
+  }
+
+  function answerQuestion(btn,opt,answer){
+    if(state.answered)return;
+    state.answered=true;
+    const q=state.current,w=q.word,isCorrect=opt===answer;
+    const st=state.stats[w.id]||{seen:0,correct:0,wrong:0}; st.seen++; state.stats[w.id]=st;
+    const buttons=[...choicesEl.querySelectorAll('.choice')];
+    for(const b of buttons){b.disabled=true;if(b.dataset.value===answer)b.classList.add('correct');else if(b!==btn)b.classList.add('dim')}
+    if(isCorrect){
+      btn.classList.add('correct'); state.correct++; st.correct++;
+      if(q.retry&&q.retryKey) state.pendingRetry.delete(q.retryKey);
+      feedback.className='feedback show ok'; feedback.textContent='○ 正解！';
+    }else{
+      btn.classList.add('wrong'); state.wrong++; st.wrong++;
+      state.errors.add(w.id); saveErrors(state.errors);
+      state.sessionWrong.set(w.id,(state.sessionWrong.get(w.id)||0)+1);
+      addRetry(q);
+      feedback.className='feedback show ng'; feedback.textContent=`× 不正解　正解：${answer}　→ あとでもう一度出題します`;
+    }
+    saveStats(state.stats);
+    state.completed++;
+    nextBtn.className='btn primary next show'; nextBtn.textContent=state.queue.length?'次の問題へ':'結果を見る';
+    refreshStats();
+  }
+
+  function refreshStats(){
+    const attempted=state.completed;
+    statProgress.textContent=`${Math.min(attempted,state.totalInitial)}/${state.totalInitial}`;
+    statCorrect.textContent=state.correct; statErrors.textContent=state.wrong;
+    const pct=state.totalInitial?Math.min(100,(attempted/state.totalInitial)*100):0; bar.style.width=`${pct}%`;
+    pendingEl.textContent=state.pendingRetry.size?`再挑戦待ち ${state.pendingRetry.size}問`:'再挑戦待ち 0問';
+  }
+
+  function finish(){
+    quiz.classList.add('hidden'); summary.classList.remove('hidden');
+    const unique=state.sessionWrong.size;
+    $('#summary-text').textContent=`最初の範囲 ${state.totalInitial}語。正解 ${state.correct}回、ミス ${state.wrong}回。今回間違えた単語は ${unique}語です。`;
+    const wrap=$('#summary-mistakes');wrap.innerHTML='';
+    for(const [id,count] of state.sessionWrong){const w=WORDS.find(x=>x.id===id);const s=document.createElement('span');s.className='chip';s.textContent=`Day${w.day} ${w.en} ×${count}`;wrap.appendChild(s)}
+    $('#summary-review').disabled=loadErrors().size===0;
+    updateHome();
+  }
+
+  startBtn.addEventListener('click',()=>startSession(false));
+  reviewBtn.addEventListener('click',()=>startSession(true));
+  nextBtn.addEventListener('click',nextQuestion);
+  $('#quit').addEventListener('click',()=>{if(confirm('この学習を終了して設定画面に戻りますか？')){quiz.classList.add('hidden');setup.classList.remove('hidden');updateHome()}});
+  $('#again').addEventListener('click',()=>{summary.classList.add('hidden');setup.classList.remove('hidden');updateHome()});
+  $('#summary-review').addEventListener('click',()=>{summary.classList.add('hidden');setup.classList.remove('hidden');startSession(true)});
+  clearErrorsBtn.addEventListener('click',()=>{if(confirm('間違いノートをすべて消去しますか？')){localStorage.removeItem(LS_ERRORS);updateHome()}});
+  clearStatsBtn.addEventListener('click',()=>{if(confirm('正解・不正解の成績データをリセットしますか？')){localStorage.removeItem(LS_STATS);alert('成績をリセットしました。')}});
+  shareBtn.addEventListener('click',async()=>{const data={title:'Day26–37 英単語4択トレーニング',text:'Day26〜37の英単語4択練習',url:location.href};if(navigator.share){try{await navigator.share(data)}catch(e){}}else{prompt('このURLをコピーして共有してください',location.href)}});
+  updateHome();
+  if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+})();
+</script>
+</body>
+</html>
