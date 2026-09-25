@@ -247,6 +247,7 @@
       btn.classList.add('wrong'); state.wrong++; st.wrong++;
       state.errors.add(w.id); saveErrors(state.errors);
       state.sessionWrong.set(w.id,(state.sessionWrong.get(w.id)||0)+1);
+      if(q.retry&&q.retryKey) state.pendingRetry.delete(q.retryKey);
       addRetry(q);
       feedback.className='feedback show ng'; feedback.textContent=`× 不正解　正解：${answer}　→ あとでもう一度出題します`;
     }
